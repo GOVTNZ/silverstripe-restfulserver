@@ -284,7 +284,7 @@ class RestfulServer extends Controller {
 		$formatter->setCustomRelations($this->getAllowedRelations($className));
 		
 		$apiAccess = singleton($className)->stat('api_access');
-		if(is_array($apiAccess)) {
+		if(is_array($apiAccess) && isset($apiAccess['view'])) {
 			$formatter->setCustomAddFields(
 				array_intersect((array)$formatter->getCustomAddFields(), (array)$apiAccess['view'])
 			);
