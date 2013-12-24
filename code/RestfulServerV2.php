@@ -17,7 +17,7 @@ class RestfulServerV2 extends RestfulServer {
 		$className = $this->getDataClass($endPoint);
 
 		if ($className === false) {
-			$this->httpError(500, 'Something went wrong');
+			$this->httpError(404, 'Not found.'); // eventually needs to be displayed in requested format
 		}
 
 		$this->processResults($className);
