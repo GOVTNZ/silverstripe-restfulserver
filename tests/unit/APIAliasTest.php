@@ -47,6 +47,16 @@ class APIAliasTest extends SapphireTest {
 		$this->assertEquals(200, $aliasResponse->getStatusCode(), 'Did not receive a 200 response on alias URL');
 	}
 
+	public function testInvalidAliasCacheKey() {
+		// because we try to load the $ResourceName from the cache, we must ensure it is a valid cache key
+		// (and handle any exceptions)
+		$badURL = '/api/v2/randomobjects.';
+
+		$badResponse = Director::test($badURL, null, null, 'GET');
+
+		$this->assertEquals(404, $badResponse->getStatusCode(), 'Did not receive a 400 response for bad URL');
+	}
+
 }
 
 class APIAliasTestObject extends DataObject implements TestOnly {

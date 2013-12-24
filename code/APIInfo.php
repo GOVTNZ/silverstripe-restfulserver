@@ -44,34 +44,51 @@ class APIInfo {
 		self::$alias_cache = SS_Cache::factory(self::RESOURCE_NAME_CACHE_KEY);
 	}
 
-	private static function get_class_name_from_cache($endPoint) {
-		return self::$alias_cache->load($endPoint);
+	private static function get_class_name_from_cache($resourceName) {
+		try {
+			$cacheValue = self::$alias_cache->load($resourceName);
+		} catch (Zend_Cache_Exception $exception) {
+			$cacheValue = false;
+		}
+
+		return $cacheValue;
 	}
 
-	private static function get_class_name_from_exact_match($endPoint) {
-		if (!class_exists($endPoint)) {
+	private static function get_class_name_from_exact_match($resourceName) {
+		if (!class_exists($resourceName)) {
 			return false;
 		}
 
-		$apiAccess = singleton($endPoint)->stat('api_access');
+		$apiAccess = singleton($resourceName)->stat('api_access');
 
 		if (!$apiAccess) {
 			return false;
 		}
 
-		self::$alias_cache->save($endPoint, $endPoint);
-		return $endPoint;
+		try {
+			self::$alias_cache->save($resourceName, $resourceName);
+		} catch (Zend_Cache_Exception $exception) {
+			// not sure if we should do this or just allow uncached results...
+			user_error('The ' . $className . ' DataObject has an invalid class name. Must only use: [a-zA-Z0-9_]');
+		}
+
+		return $resourceName;
 	}
 
-	private static function get_class_name_from_class_info($endPoint) {
+	private static function get_class_name_from_class_info($resourceName) {
 		$dataClasses = ClassInfo::subclassesFor('DataObject');
 
-		foreach ($dataClasses as $dataClass) {
-			$apiAccess = singleton($dataClass)->stat('api_access');
+		foreach ($dataClasses as $className) {
+			$apiAccess = singleton($className)->stat('api_access');
 
-			if (is_array($apiAccess) && isset($apiAccess['end_point_alias']) && $apiAccess['end_point_alias'] == $endPoint) {
-				self::$alias_cache->save($dataClass, $endPoint);
-				return $dataClass;
+			if (is_array($apiAccess) && isset($apiAccess['end_point_alias']) && $apiAccess['end_point_alias'] == $resourceName) {
+				try {
+					self::$alias_cache->save($className, $resourceName);
+				} catch (Zend_Cache_Exception $exception) {
+					user_error('The ' . $className . ' DataObject has an invalid end_point_alias value. Must only use: [a-zA-Z0-9_]');
+				}
+
+				return $className;
 			}
 		}
 
