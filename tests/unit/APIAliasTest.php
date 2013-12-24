@@ -2,20 +2,26 @@
 
 class APIAliasTest extends SapphireTest {
 
+	protected static $fixture_file = 'APIAliasTest.yml';
+
 	protected $extraDataObjects = array(
 		'APIAliasTestObject'
 	);
 
 	public function setUpOnce() {
 		$this->cleanAliasCache();
+
+		parent::setUpOnce();
 	}
 
 	public function tearDownOnce() {
 		$this->cleanAliasCache();
+
+		parent::tearDownOnce();
 	}
 
 	private function cleanAliasCache() {
-		$aliasCache = SS_Cache::factory(RestfulServerV2::ALIAS_CACHE_KEY);
+		$aliasCache = SS_Cache::factory(APIInfo::RESOURCE_NAME_CACHE_KEY);
 		$aliasCache->clean();
 	}
 
@@ -45,12 +51,12 @@ class APIAliasTest extends SapphireTest {
 
 class APIAliasTestObject extends DataObject implements TestOnly {
 
-	private static $api_access = array(
-		'end_point_alias' => 'testobjects'
+	private static $db = array(
+		'Name' => 'Varchar(255)'
 	);
 
-	public static $db = array(
-		'Name' => 'Varchar(255)'
+	private static $api_access = array(
+		'end_point_alias' => 'testobjects'
 	);
 
 }

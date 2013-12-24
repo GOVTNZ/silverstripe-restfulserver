@@ -1,0 +1,7 @@
+APIAliasTestObject:
+  one:
+    Name: Test One
+  two:
+    Name: Test Two
+  three:
+    Name: Test Three
