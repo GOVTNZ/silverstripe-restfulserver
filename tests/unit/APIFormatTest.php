@@ -8,6 +8,8 @@ class APIFormatTest extends SapphireTest {
 		'APITestObject'
 	);
 
+	// these tests fail until pagination is implemented
+
 	public function testJSONFormat() {
 		$response = Director::test('/api/v2/testobjects');
 
