@@ -22,48 +22,25 @@ class RestfulServerV2 extends Controller {
 		'xml' => 'XMLFormatter'
 	);
 
-	public function listResources() {
-		$resourceName = $this->request->param('ResourceName');
+	private $formatter = null;
 
-		$className = APIInfo::get_class_name_by_resource_name($resourceName);
+	public function init() {
+		parent::init();
 
-		if ($className === false) {
-			return $this->httpError(404, 'Not found.'); // eventually needs to be displayed in requested format
-		}
+		$this->setFormatter();
 
-		// only GET is supported for the time being so no checks are done
-		// $formatter = $this->getDataFormatter();
-		$formatter = $this->getFormatter();
-
-		if (is_null($formatter)) {
+		if (is_null($this->formatter)) {
+			// errors are caused when running unit tests if we don't include $this->popCurrent() here
+			// I think it's related to needing to clean up the Controller stack when we kill a request
+			// within the init method - doesn't seem to affect normal operation
+			$this->popCurrent();
 			return $this->httpError(400, 'Invalid format type');
 		}
 
-		$this->getResponse()->addHeader('Content-Type', $formatter->getOutputContentType());
-
-		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
-		$list = $className::get();
-
-		$formatter->setMetaData(array(
-			'totalCount' => (int) $list->Count(),
-			'limit' => 10,
-			'offset' => 0
-		));
-
-		$apiAccess = singleton($className)->stat('api_access');
-
-		if (isset($apiAccess['singular_name'])) {
-			$formatter->setSingularItemName($apiAccess['singular_name']);
-		}
-
-		if (isset($apiAccess['plural_name'])) {
-			$formatter->setPluralItemName($apiAccess['plural_name']);
-		}
-
-		return $formatter->formatList($list);
+		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
 	}
 
-	private function getFormatter() {
+	private function setFormatter() {
 		// we only use the URL extension to determine format for the time being
 		$extension = $this->request->getExtension();
 
@@ -75,7 +52,38 @@ class RestfulServerV2 extends Controller {
 			return null;
 		}
 
-		return new self::$valid_formats[$extension]();
+		$this->formatter = new self::$valid_formats[$extension]();
+	}
+
+	public function listResources() {
+		$resourceName = $this->request->param('ResourceName');
+
+		$className = APIInfo::get_class_name_by_resource_name($resourceName);
+
+		if ($className === false) {
+			return $this->httpError(404, 'Not found.'); // eventually needs to be displayed in requested format
+		}
+
+		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
+		$list = $className::get();
+
+		$this->formatter->setMetaData(array(
+			'totalCount' => (int) $list->Count(),
+			'limit' => 10,
+			'offset' => 0
+		));
+
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['singular_name'])) {
+			$this->formatter->setSingularItemName($apiAccess['singular_name']);
+		}
+
+		if (isset($apiAccess['plural_name'])) {
+			$this->formatter->setPluralItemName($apiAccess['plural_name']);
+		}
+
+		return $this->formatter->formatList($list);
 	}
 
 	public function showResource() {
