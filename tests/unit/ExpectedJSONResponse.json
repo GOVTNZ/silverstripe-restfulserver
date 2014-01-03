@@ -1,0 +1,21 @@
+{
+    "testObjects": [
+        {
+            "ID": 1,
+            "Name": "Test One"
+        },
+        {
+            "ID": 2,
+            "Name": "Test Two"
+        },
+        {
+            "ID": 3,
+            "Name": "Test Three"
+        }
+    ],
+    "_metadata": {
+        "totalCount": 3,
+        "limit": 10,
+        "offset": 0
+    }
+}

@@ -2,10 +2,10 @@
 
 class APIAliasTest extends SapphireTest {
 
-	protected static $fixture_file = 'APIAliasTest.yml';
+	protected static $fixture_file = 'APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APIAliasTestObject'
+		'APITestObject'
 	);
 
 	public function setUpOnce() {
@@ -27,7 +27,7 @@ class APIAliasTest extends SapphireTest {
 
 	public function testAPIAlias() {
 		$aliasURL = '/api/v2/testobjects';
-		$defaultURL = '/api/v2/APIAliasTestObject';
+		$defaultURL = '/api/v2/APITestObject';
 
 		$aliasResponse = Director::test($aliasURL, null, null, 'GET');
 		$defaultResponse = Director::test($defaultURL, null, null, 'GET');
@@ -56,17 +56,5 @@ class APIAliasTest extends SapphireTest {
 
 		$this->assertEquals(404, $badResponse->getStatusCode(), 'Did not receive a 400 response for bad URL');
 	}
-
-}
-
-class APIAliasTestObject extends DataObject implements TestOnly {
-
-	private static $db = array(
-		'Name' => 'Varchar(255)'
-	);
-
-	private static $api_access = array(
-		'end_point_alias' => 'testobjects'
-	);
 
 }

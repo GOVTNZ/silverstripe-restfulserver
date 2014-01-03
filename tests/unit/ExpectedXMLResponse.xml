@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root><testObjects><testObject><ID>1</ID><Name>Test One</Name></testObject><testObject><ID>2</ID><Name>Test Two</Name></testObject><testObject><ID>3</ID><Name>Test Three</Name></testObject></testObjects><_metadata><totalCount>3</totalCount><limit>10</limit><offset>0</offset></_metadata></root>

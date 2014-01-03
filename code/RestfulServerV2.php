@@ -17,6 +17,11 @@ class RestfulServerV2 extends Controller {
 		'listRelations'
 	);
 
+	private static $valid_formats = array(
+		'json' => 'JSONFormatter',
+		'xml' => 'XMLFormatter'
+	);
+
 	public function listResources() {
 		$resourceName = $this->request->param('ResourceName');
 
@@ -27,7 +32,8 @@ class RestfulServerV2 extends Controller {
 		}
 
 		// only GET is supported for the time being so no checks are done
-		$formatter = $this->getDataFormatter();
+		// $formatter = $this->getDataFormatter();
+		$formatter = $this->getFormatter();
 
 		if (is_null($formatter)) {
 			return $this->httpError(400, 'Invalid format type');
@@ -38,11 +44,26 @@ class RestfulServerV2 extends Controller {
 		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
 
-		$formatter->setTotalSize($list->Count());
-		return $formatter->convertDataObjectSet($list);
+		$formatter->setMetaData(array(
+			'totalCount' => (int) $list->Count(),
+			'limit' => 10,
+			'offset' => 0
+		));
+
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['singular_name'])) {
+			$formatter->setSingularItemName($apiAccess['singular_name']);
+		}
+
+		if (isset($apiAccess['plural_name'])) {
+			$formatter->setPluralItemName($apiAccess['plural_name']);
+		}
+
+		return $formatter->formatList($list);
 	}
 
-	private function getDataFormatter() {
+	private function getFormatter() {
 		// we only use the URL extension to determine format for the time being
 		$extension = $this->request->getExtension();
 
@@ -50,7 +71,11 @@ class RestfulServerV2 extends Controller {
 			$extension = self::$default_extension;
 		}
 
-		return DataFormatter::for_extension($extension);
+		if (!in_array($extension, array_keys(self::$valid_formats))) {
+			return null;
+		}
+
+		return new self::$valid_formats[$extension]();
 	}
 
 	public function showResource() {
@@ -63,6 +88,20 @@ class RestfulServerV2 extends Controller {
 
 	public function index() {
 		return $this->httpError(500, 'Base documentation not yet implemented');
+	}
+
+	public static function add_format($extension, $formatterClassName) {
+		if (!class_exists($formatterClassName)) {
+			user_error('Formatter class (' . $formatterClassName . ') not found');
+		}
+
+		self::$valid_formats[$extension] = $formatterClassName;
+	}
+
+	public static function remove_format($extension) {
+		if (isset(self::$valid_formats[$extension])) {
+			unset(self::$valid_formats[$extension]);
+		}
 	}
 
 }
