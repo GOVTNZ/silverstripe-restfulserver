@@ -30,7 +30,7 @@ class RestfulServerV2Test extends SapphireTest {
 	public function testXMLRequest() {
 		$response = Director::test('/api/v2/testobjects.xml');
 
-		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect satus code returned');
+		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
 
 		$results = simplexml_load_string($response->getBody());
 
