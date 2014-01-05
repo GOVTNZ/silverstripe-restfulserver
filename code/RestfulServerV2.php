@@ -24,6 +24,9 @@ class RestfulServerV2 extends Controller {
 
 	private $formatter = null;
 
+	const DEFAULT_LIMIT = 10;
+	const DEFAULT_OFFSET = 0;
+
 	public function init() {
 		parent::init();
 
@@ -64,14 +67,19 @@ class RestfulServerV2 extends Controller {
 			return $this->httpError(404, 'Not found.'); // eventually needs to be displayed in requested format
 		}
 
+		$limit = $this->setResultsLimit();
+		$offset = $this->setResultsOffset();
+
 		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
 
 		$this->formatter->setMetaData(array(
 			'totalCount' => (int) $list->Count(),
-			'limit' => 10,
-			'offset' => 0
+			'limit' => $limit,
+			'offset' => $offset
 		));
+
+		$list = $list->limit($limit, $offset);
 
 		$apiAccess = singleton($className)->stat('api_access');
 
@@ -84,6 +92,34 @@ class RestfulServerV2 extends Controller {
 		}
 
 		return $this->formatter->formatList($list);
+	}
+
+	private function setResultsLimit() {
+		if (!isset($_GET['limit'])) {
+			return self::DEFAULT_LIMIT;
+		}
+
+		$limit = (int) $_GET['limit'];
+
+		if ($limit <= 0 || $limit > 100) {
+			return self::DEFAULT_LIMIT;
+		}
+
+		return $limit;
+	}
+
+	private function setResultsOffset() {
+		if (!isset($_GET['offset'])) {
+			return self::DEFAULT_OFFSET;
+		}
+
+		$offset = (int) $_GET['offset'];
+
+		if ($offset < 0) {
+			return self::DEFAULT_OFFSET;
+		}
+
+		return $offset;
 	}
 
 	public function showResource() {

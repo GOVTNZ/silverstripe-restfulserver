@@ -8,8 +8,6 @@ class RestfulServerV2Test extends SapphireTest {
 		'APITestObject'
 	);
 
-	// these tests fail until pagination is implemented
-
 	public function testJSONRequest() {
 		$response = Director::test('/api/v2/testobjects.json');
 
@@ -41,7 +39,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$numResults = count($results->testObjects->testObject);
 
 		$this->assertEquals(10, $numResults);
-		$this->assertLessThanOrEqual($results->_metadata->limit, $numResults);
+		$this->assertLessThanOrEqual((int) $results->_metadata->limit, $numResults);
 	}
 
 }
