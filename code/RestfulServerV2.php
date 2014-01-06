@@ -61,19 +61,28 @@ class RestfulServerV2 extends Controller {
 		$this->formatter = new self::$valid_formats[$extension]();
 	}
 
+	private function apiError($statusCode, $responseBody) {
+		$this->getResponse()->setBody($responseBody);
+		throw new SS_HTTPResponse_Exception($this->response, $statusCode);
+	}
+
+	private function formattedError($statusCode, $data) {
+		$this->formatter->setExtraData($data);
+		$this->apiError($statusCode, $this->formatter->format());
+	}
+
+
 	public function listResources() {
 		$resourceName = $this->getRequest()->param('ResourceName');
 
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
 		if ($className === false) {
-			$this->formatter->setExtraData(array(
+			$this->formattedError(400, array(
 				'developerMessage' => 'Resource \'' . $resourceName . '\' was not found.',
 				'userMessage' => 'Oops something went wrong',
 				'moreInfo' => 'coming soon'
 			));
-
-			return $this->apiError(400, $this->formatter->format());
 		}
 
 		$limit  = $this->setResultsLimit();
@@ -85,13 +94,11 @@ class RestfulServerV2 extends Controller {
 		$totalCount = (int) $list->Count();
 
 		if ($offset >= $totalCount) {
-			$this->formatter->setExtraData(array(
+			$this->formattedError(400, array(
 				'developerMessage' => 'Query parameter \'offset\' is out of bounds',
 				'userMessage' => 'Oops something went wrong',
 				'moreInfo' => 'coming soon'
 			));
-
-			$this->apiError(400, $this->formatter->format());
 		}
 
 		$this->formatter->setExtraData(array(
@@ -148,33 +155,27 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function showResource() {
-		$this->formatter->setExtraData(array(
+		$this->formattedError(500, array(
 			'developerMessage' => 'Resource detail not yet implemented',
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
 		));
-
-		return $this->apiError(500, $this->formatter->format());
 	}
 
 	public function listRelations() {
-		$this->formatter->setExtraData(array(
+		$this->formattedError(500, array(
 			'developerMessage' => 'Relationship access not yet implemented',
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
 		));
-
-		return $this->apiError(500, $this->formatter->format());
 	}
 
 	public function index() {
-		$this->formatter->setExtraData(array(
+		$this->formattedError(500, array(
 			'developerMessage' => 'Base documentation not yet implemented',
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
 		));
-
-		return $this->apiError(500, $this->formatter->format());
 	}
 
 	public static function add_format($extension, $formatterClassName) {
@@ -189,11 +190,6 @@ class RestfulServerV2 extends Controller {
 		if (isset(self::$valid_formats[$extension])) {
 			unset(self::$valid_formats[$extension]);
 		}
-	}
-
-	public function apiError($statusCode, $responseBody) {
-		$this->getResponse()->setBody($responseBody);
-		throw new SS_HTTPResponse_Exception($this->response, $statusCode);
 	}
 
 }
