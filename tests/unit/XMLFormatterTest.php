@@ -31,7 +31,7 @@ class XMLFormatterTest extends SapphireTest {
 	public function testResultData() {
 		$testObjects = APITestObject::get();
 
-		$totalCount = $testObjects->Count();
+		$totalCount   = $testObjects->Count();
 		$pagedResults = $testObjects->limit(10, 0);
 
 		$formatter = new XMLFormatter();
@@ -54,8 +54,8 @@ class XMLFormatterTest extends SapphireTest {
 
 	public function testErrorFormat() {
 		$developerMessage = 'A detailed error message goes here';
-		$userMessage = 'A message for the user goes here';
-		$moreInfo = 'A link to more info';
+		$userMessage      = 'A message for the user goes here';
+		$moreInfo         = 'A link to more info';
 
 		$formatter = new XMLFormatter();
 
@@ -79,7 +79,7 @@ class XMLFormatterTest extends SapphireTest {
 	public function testResultDataWithPluralItemName() {
 		$testObjects = APITestObject::get();
 
-		$totalCount = $testObjects->Count();
+		$totalCount   = $testObjects->Count();
 		$pagedResults = $testObjects->limit(10, 0);
 
 		$formatter = new XMLFormatter();
