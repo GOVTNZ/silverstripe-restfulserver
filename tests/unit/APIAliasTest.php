@@ -54,7 +54,7 @@ class APIAliasTest extends SapphireTest {
 
 		$badResponse = Director::test($badURL, null, null, 'GET');
 
-		$this->assertEquals(404, $badResponse->getStatusCode(), 'Did not receive a 400 response for bad URL');
+		$this->assertEquals(400, $badResponse->getStatusCode(), 'Did not receive a 400 response for bad URL');
 	}
 
 }

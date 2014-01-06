@@ -24,7 +24,9 @@ class RestfulServerV2 extends Controller {
 
 	private $formatter = null;
 
-	const DEFAULT_LIMIT = 10;
+	const MIN_LIMIT      = 1;
+	const MAX_LIMIT      = 100;
+	const DEFAULT_LIMIT  = 10;
 	const DEFAULT_OFFSET = 0;
 
 	public function init() {
@@ -64,19 +66,39 @@ class RestfulServerV2 extends Controller {
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
 		if ($className === false) {
-			return $this->httpError(404, 'Not found.'); // eventually needs to be displayed in requested format
+			$this->formatter->setExtraData(array(
+				'developerMessage' => 'Resource \'' . $resourceName . '\' was not found.',
+				'userMessage' => 'Oops something went wrong',
+				'moreInfo' => 'coming soon'
+			));
+
+			return $this->httpError(400, $this->formatter->format());
 		}
 
-		$limit = $this->setResultsLimit();
+		$limit  = $this->setResultsLimit();
 		$offset = $this->setResultsOffset();
 
 		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
 
-		$this->formatter->setMetaData(array(
-			'totalCount' => (int) $list->Count(),
-			'limit' => $limit,
-			'offset' => $offset
+		$totalCount = (int) $list->Count();
+
+		if ($offset >= $totalCount) {
+			$this->formatter->setExtraData(array(
+				'developerMessage' => 'Query parameter \'offset\' is out of bounds',
+				'userMessage' => 'Oops something went wrong',
+				'moreInfo' => 'coming soon'
+			));
+
+			$this->httpError(400, $this->formatter->format());
+		}
+
+		$this->formatter->setExtraData(array(
+			'_metadata' => array(
+				'totalCount' => $totalCount,
+				'limit' => $limit,
+				'offset' => $offset
+			)
 		));
 
 		$list = $list->limit($limit, $offset);
@@ -91,17 +113,19 @@ class RestfulServerV2 extends Controller {
 			$this->formatter->setPluralItemName($apiAccess['plural_name']);
 		}
 
-		return $this->formatter->formatList($list);
+		$this->formatter->setResultsList($list);
+
+		return $this->formatter->format();
 	}
 
 	private function setResultsLimit() {
-		if (!isset($_GET['limit'])) {
+		if (!$this->request->getVar('limit')) {
 			return self::DEFAULT_LIMIT;
 		}
 
-		$limit = (int) $_GET['limit'];
+		$limit = (int) $this->request->getVar('limit');
 
-		if ($limit <= 0 || $limit > 100) {
+		if ($limit < self::MIN_LIMIT || $limit > self::MAX_LIMIT) {
 			return self::DEFAULT_LIMIT;
 		}
 
@@ -109,11 +133,11 @@ class RestfulServerV2 extends Controller {
 	}
 
 	private function setResultsOffset() {
-		if (!isset($_GET['offset'])) {
+		if (!$this->request->getVar('offset')) {
 			return self::DEFAULT_OFFSET;
 		}
 
-		$offset = (int) $_GET['offset'];
+		$offset = (int) $this->request->getVar('offset');
 
 		if ($offset < 0) {
 			return self::DEFAULT_OFFSET;

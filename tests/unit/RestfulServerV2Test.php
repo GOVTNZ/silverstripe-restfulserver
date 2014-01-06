@@ -42,4 +42,44 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertLessThanOrEqual((int) $results->_metadata->limit, $numResults);
 	}
 
+	public function testPagination() {
+		for ($i = 0; $i < 13; $i += 2) {
+			$response = Director::test('/api/v2/testobjects?limit=2&offset=' . $i);
+
+			$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
+
+			$body = json_decode($response->getBody(), true);
+
+			if ($i === 12) {
+				$expectedResults = 1;
+			} else {
+				$expectedResults = 2;
+			}
+
+			$this->assertEquals($expectedResults, count($body['testObjects']), 'Incorrect number of results returned');
+		}
+	}
+
+	public function testInvalidPagination() {
+		$response = Director::test('/api/v2/testobjects?limit=' . (RestfulServerV2::MAX_LIMIT + 1) . '&offset=0');
+
+		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
+
+		$body = json_decode($response->getBody(), true);
+
+		// when a request exceeds the max limit we use the default limit instead
+		$this->assertEquals(RestfulServerV2::DEFAULT_LIMIT, $body['_metadata']['limit'], 'Incorrect limit returned');
+	}
+
+	public function testOutOfRangePagination() {
+		$response = Director::test('/api/v2/testobjects?limit=10&offset=9999');
+
+		$this->assertEquals(400, $response->getStatusCode(), 'Incorrect status code returned');
+
+		$body = json_decode($response->getBody(), true);
+
+		$this->assertArrayHasKey('developerMessage', $body, 'Developer message not set');
+		$this->assertEquals('Query parameter \'offset\' is out of bounds', $body['developerMessage'], 'Incorrect developer message supplied');
+	}
+
 }

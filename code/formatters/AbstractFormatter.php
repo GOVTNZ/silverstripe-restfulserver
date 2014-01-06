@@ -2,7 +2,10 @@
 
 abstract class AbstractFormatter implements Formatter {
 
-	protected $metaData = null;
+	protected $resultsList   = null;
+	protected $resultsFields = null;
+
+	protected $extraData = null;
 
 	protected $singularItemName = 'item';
 	protected $pluralItemName = 'items';
@@ -17,23 +20,30 @@ abstract class AbstractFormatter implements Formatter {
 		$this->pluralItemName = $name;
 	}
 
-	public function setMetaData($metaData) {
-		$this->metaData = $metaData;
+	public function setExtraData($extraData) {
+		$this->extraData = $extraData;
 	}
 
 	public function getOutputContentType() {
 		return $this->outputContentType;
 	}
 
-	public function formatList(SS_List $list, $fields = null) {
+	public function setResultsList(SS_List $list, $fields = null) {
+		$this->resultsList   = $list;
+		$this->resultsFields = $fields;
+	}
+
+	public function format() {
 		$response = array();
 
-		$fields = $this->buildFieldList($list->dataClass(), $fields);
+		if (!is_null($this->resultsList)) {
+			$fields = $this->buildFieldList($this->resultsList->dataClass(), $this->resultsFields);
 
-		$response[$this->pluralItemName] = array();
-		$response[$this->pluralItemName] = $this->buildResultsArray($list, $fields);
+			$response[$this->pluralItemName] = array();
+			$response[$this->pluralItemName] = $this->buildResultsArray($this->resultsList, $fields);
+		}
 
-		$response = $this->addMetaData($response);
+		$response = $this->addExtraData($response);
 
 		return $this->generateOutput($response);
 	}
@@ -71,9 +81,9 @@ abstract class AbstractFormatter implements Formatter {
 		return $results;
 	}
 
-	private function addMetaData($response) {
-		if (!is_null($this->metaData) && is_array($this->metaData)) {
-			$response['_metadata'] = $this->metaData;
+	private function addExtraData($response) {
+		if (!is_null($this->extraData) && is_array($this->extraData)) {
+			$response = array_merge($response, $this->extraData);
 		}
 
 		return $response;
