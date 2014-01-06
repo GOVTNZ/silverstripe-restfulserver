@@ -32,7 +32,11 @@ class APIFormatTest extends SapphireTest {
 		$response = Director::test('/api/v2/testobjects.txt');
 
 		$this->assertEquals(400, $response->getStatusCode(), 'Incorrect status code received for invalid format');
-		$this->assertEquals('Invalid format type', $response->getBody(), 'Incorrect error message received for invalid format');
+		$this->assertEquals(
+			'Invalid format type',
+			$response->getBody(),
+			'Incorrect error message received for invalid format'
+		);
 	}
 
 }

@@ -39,8 +39,9 @@ class JSONFormatter extends AbstractFormatter {
 				for ($j = 0; $j < $pos; $j++) {
 					$result .= $indentStr;
 				}
-			} // eat all non-essential whitespace in the input as we do our own here and it would only mess up our process
-			else if ($outOfQuotes && false !== strpos(" \t\r\n", $char)) {
+			} else if ($outOfQuotes && false !== strpos(" \t\r\n", $char)) {
+				// eat all non-essential whitespace in the input as we do our own
+				// here and it would only mess up our process
 				continue;
 			}
 

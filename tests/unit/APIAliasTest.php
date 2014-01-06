@@ -34,7 +34,11 @@ class APIAliasTest extends SapphireTest {
 
 		$this->assertEquals(200, $aliasResponse->getStatusCode(), 'Did not receive a 200 response on alias URL');
 
-		$this->assertEquals($defaultResponse->getBody(), $aliasResponse->getBody(), 'Alias response did not match default response');
+		$this->assertEquals(
+			$defaultResponse->getBody(),
+			$aliasResponse->getBody(),
+			'Alias response did not match default response'
+		);
 	}
 
 	public function testAPIAliasCache() {

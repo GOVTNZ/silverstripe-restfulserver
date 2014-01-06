@@ -81,11 +81,17 @@ class APIInfo {
 		foreach ($dataClasses as $className) {
 			$apiAccess = singleton($className)->stat('api_access');
 
-			if (is_array($apiAccess) && isset($apiAccess['end_point_alias']) && $apiAccess['end_point_alias'] == $resourceName) {
+			if (
+				is_array($apiAccess) &&
+				isset($apiAccess['end_point_alias']) &&
+				$apiAccess['end_point_alias'] == $resourceName
+			) {
 				try {
 					self::$alias_cache->save($className, $resourceName);
 				} catch (Zend_Cache_Exception $exception) {
-					user_error('The ' . $className . ' DataObject has an invalid end_point_alias value. Must only use: [a-zA-Z0-9_]');
+					$message  = 'The ' . $className;
+					$message .=' DataObject has an invalid end_point_alias value. Must only use: [a-zA-Z0-9_]';
+					user_error($message);
 				}
 
 				return $className;

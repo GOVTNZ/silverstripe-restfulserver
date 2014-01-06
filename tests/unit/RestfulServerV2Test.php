@@ -79,7 +79,11 @@ class RestfulServerV2Test extends SapphireTest {
 		$body = json_decode($response->getBody(), true);
 
 		$this->assertArrayHasKey('developerMessage', $body, 'Developer message not set');
-		$this->assertEquals('Query parameter \'offset\' is out of bounds', $body['developerMessage'], 'Incorrect developer message supplied');
+		$this->assertEquals(
+			'Query parameter \'offset\' is out of bounds',
+			$body['developerMessage'],
+			'Incorrect developer message supplied'
+		);
 	}
 
 }
