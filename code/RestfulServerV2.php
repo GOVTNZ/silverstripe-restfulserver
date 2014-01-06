@@ -39,7 +39,8 @@ class RestfulServerV2 extends Controller {
 			// I think it's related to needing to clean up the Controller stack when we kill a request
 			// within the init method - doesn't seem to affect normal operation
 			$this->popCurrent();
-			return $this->httpError(400, 'Invalid format type');
+			$this->getResponse()->addHeader('Content-Type', 'text/plain');
+			return $this->apiError(400, 'Invalid format type');
 		}
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
@@ -47,7 +48,7 @@ class RestfulServerV2 extends Controller {
 
 	private function setFormatter() {
 		// we only use the URL extension to determine format for the time being
-		$extension = $this->request->getExtension();
+		$extension = $this->getRequest()->getExtension();
 
 		if (!$extension) {
 			$extension = self::$default_extension;
@@ -61,7 +62,7 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listResources() {
-		$resourceName = $this->request->param('ResourceName');
+		$resourceName = $this->getRequest()->param('ResourceName');
 
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
@@ -72,7 +73,7 @@ class RestfulServerV2 extends Controller {
 				'moreInfo' => 'coming soon'
 			));
 
-			return $this->httpError(400, $this->formatter->format());
+			return $this->apiError(400, $this->formatter->format());
 		}
 
 		$limit  = $this->setResultsLimit();
@@ -90,7 +91,7 @@ class RestfulServerV2 extends Controller {
 				'moreInfo' => 'coming soon'
 			));
 
-			$this->httpError(400, $this->formatter->format());
+			$this->apiError(400, $this->formatter->format());
 		}
 
 		$this->formatter->setExtraData(array(
@@ -119,11 +120,11 @@ class RestfulServerV2 extends Controller {
 	}
 
 	private function setResultsLimit() {
-		if (!$this->request->getVar('limit')) {
+		if (!$this->getRequest()->getVar('limit')) {
 			return self::DEFAULT_LIMIT;
 		}
 
-		$limit = (int) $this->request->getVar('limit');
+		$limit = (int) $this->getRequest()->getVar('limit');
 
 		if ($limit < self::MIN_LIMIT || $limit > self::MAX_LIMIT) {
 			return self::DEFAULT_LIMIT;
@@ -133,11 +134,11 @@ class RestfulServerV2 extends Controller {
 	}
 
 	private function setResultsOffset() {
-		if (!$this->request->getVar('offset')) {
+		if (!$this->getRequest()->getVar('offset')) {
 			return self::DEFAULT_OFFSET;
 		}
 
-		$offset = (int) $this->request->getVar('offset');
+		$offset = (int) $this->getRequest()->getVar('offset');
 
 		if ($offset < 0) {
 			return self::DEFAULT_OFFSET;
@@ -147,15 +148,33 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function showResource() {
-		return $this->httpError(500, 'Resource detail not yet implemented');
+		$this->formatter->setExtraData(array(
+			'developerMessage' => 'Resource detail not yet implemented',
+			'userMessage' => 'Something went wrong',
+			'moreInfo' => 'coming soon'
+		));
+
+		return $this->apiError(500, $this->formatter->format());
 	}
 
 	public function listRelations() {
-		return $this->httpError(500, 'Relationship access not yet implemented');
+		$this->formatter->setExtraData(array(
+			'developerMessage' => 'Relationship access not yet implemented',
+			'userMessage' => 'Something went wrong',
+			'moreInfo' => 'coming soon'
+		));
+
+		return $this->apiError(500, $this->formatter->format());
 	}
 
 	public function index() {
-		return $this->httpError(500, 'Base documentation not yet implemented');
+		$this->formatter->setExtraData(array(
+			'developerMessage' => 'Base documentation not yet implemented',
+			'userMessage' => 'Something went wrong',
+			'moreInfo' => 'coming soon'
+		));
+
+		return $this->apiError(500, $this->formatter->format());
 	}
 
 	public static function add_format($extension, $formatterClassName) {
@@ -170,6 +189,11 @@ class RestfulServerV2 extends Controller {
 		if (isset(self::$valid_formats[$extension])) {
 			unset(self::$valid_formats[$extension]);
 		}
+	}
+
+	public function apiError($statusCode, $responseBody) {
+		$this->getResponse()->setBody($responseBody);
+		throw new SS_HTTPResponse_Exception($this->response, $statusCode);
 	}
 
 }
