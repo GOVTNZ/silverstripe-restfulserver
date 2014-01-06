@@ -15,7 +15,7 @@ class APIFormatTest extends SapphireTest {
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Did not receive 200 response');
 
-		$expectedResponse = file_get_contents('../restfulserver/tests/unit/ExpectedJSONResponse.json');
+		$expectedResponse = file_get_contents($this->getCurrentAbsolutePath() . '/ExpectedJSONResponse.json');
 		$this->assertEquals(trim($expectedResponse), trim($response->getBody()), 'Did not receive expected response');
 	}
 
@@ -24,7 +24,7 @@ class APIFormatTest extends SapphireTest {
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Did not receive 200 response');
 
-		$expectedResponse = file_get_contents('../restfulserver/tests/unit/ExpectedXMLResponse.xml');
+		$expectedResponse = file_get_contents($this->getCurrentAbsolutePath() . '/ExpectedXMLResponse.xml');
 		$this->assertEquals(trim($expectedResponse), trim($response->getBody()), 'Did not receive expected response');
 	}
 
