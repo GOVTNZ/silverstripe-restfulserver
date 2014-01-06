@@ -3,6 +3,7 @@
 abstract class AbstractFormatter implements Formatter {
 
 	protected $resultsList   = null;
+	protected $resultsItem   = null;
 	protected $resultsFields = null;
 
 	protected $extraData = null;
@@ -28,8 +29,15 @@ abstract class AbstractFormatter implements Formatter {
 		return $this->outputContentType;
 	}
 
-	public function setResultsList(SS_List $list, $fields = null) {
+	public function setResultsList(SS_List $list) {
 		$this->resultsList   = $list;
+	}
+
+	public function setResultsItem(DataObject $item) {
+		$this->resultsItem = $item;
+	}
+
+	public function setResultsFields($fields) {
 		$this->resultsFields = $fields;
 	}
 
@@ -41,6 +49,13 @@ abstract class AbstractFormatter implements Formatter {
 
 			$response[$this->pluralItemName] = array();
 			$response[$this->pluralItemName] = $this->buildResultsArray($this->resultsList, $fields);
+		}
+
+		if (!is_null($this->resultsItem)) {
+			$fields = $this->buildFieldList($this->resultsItem->ClassName, $this->resultsFields);
+
+			$response[$this->singularItemName] = array();
+			$response[$this->singularItemName] = $this->buildResultObject($this->resultsItem, $fields);
 		}
 
 		$response = $this->addExtraData($response);
@@ -79,6 +94,16 @@ abstract class AbstractFormatter implements Formatter {
 		}
 
 		return $results;
+	}
+
+	private function buildResultObject($item, $fields) {
+		$responseItem = array();
+
+		foreach ($fields as $field) {
+			$responseItem[$field] = $item->$field;
+		}
+
+		return $responseItem;
 	}
 
 	private function addExtraData($response) {

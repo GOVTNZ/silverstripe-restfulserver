@@ -2,7 +2,9 @@
 
 interface Formatter {
 
-	public function setResultsList(SS_List $list, $fields = null);
+	public function setResultsList(SS_List $list);
+	public function setResultsItem(DataObject $item);
+	public function setResultsFields($fields);
 	public function format();
 	public function setExtraData($extraData);
 	public function getOutputContentType();

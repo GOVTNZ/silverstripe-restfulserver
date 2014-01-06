@@ -66,27 +66,11 @@ class RestfulServerV2 extends Controller {
 		throw new SS_HTTPResponse_Exception($this->response, $statusCode);
 	}
 
-	private function formattedError($statusCode, $data) {
-		$this->formatter->setExtraData($data);
-		$this->apiError($statusCode, $this->formatter->format());
-	}
-
-
 	public function listResources() {
-		$resourceName = $this->getRequest()->param('ResourceName');
+		$className = $this->getClassName();
 
-		$className = APIInfo::get_class_name_by_resource_name($resourceName);
-
-		if ($className === false) {
-			$this->formattedError(400, array(
-				'developerMessage' => 'Resource \'' . $resourceName . '\' was not found.',
-				'userMessage' => 'Oops something went wrong',
-				'moreInfo' => 'coming soon'
-			));
-		}
-
-		$limit  = $this->setResultsLimit();
-		$offset = $this->setResultsOffset();
+		$limit  = $this->getResultsLimit();
+		$offset = $this->getResultsOffset();
 
 		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
@@ -111,22 +95,29 @@ class RestfulServerV2 extends Controller {
 
 		$list = $list->limit($limit, $offset);
 
-		$apiAccess = singleton($className)->stat('api_access');
-
-		if (isset($apiAccess['singular_name'])) {
-			$this->formatter->setSingularItemName($apiAccess['singular_name']);
-		}
-
-		if (isset($apiAccess['plural_name'])) {
-			$this->formatter->setPluralItemName($apiAccess['plural_name']);
-		}
+		$this->setFormatterItemNames($className);
 
 		$this->formatter->setResultsList($list);
 
 		return $this->formatter->format();
 	}
 
-	private function setResultsLimit() {
+	private function getClassName() {
+		$resourceName = $this->getRequest()->param('ResourceName');
+		$className = APIInfo::get_class_name_by_resource_name($resourceName);
+
+		if ($className === false) {
+			$this->formattedError(400, array(
+				'developerMessage' => 'Resource \'' . $resourceName . '\' was not found.',
+				'userMessage' => 'Oops something went wrong',
+				'moreInfo' => 'coming soon'
+			));
+		}
+
+		return $className;
+	}
+
+	private function getResultsLimit() {
 		if (!$this->getRequest()->getVar('limit')) {
 			return self::DEFAULT_LIMIT;
 		}
@@ -140,7 +131,7 @@ class RestfulServerV2 extends Controller {
 		return $limit;
 	}
 
-	private function setResultsOffset() {
+	private function getResultsOffset() {
 		if (!$this->getRequest()->getVar('offset')) {
 			return self::DEFAULT_OFFSET;
 		}
@@ -154,12 +145,41 @@ class RestfulServerV2 extends Controller {
 		return $offset;
 	}
 
+	private function formattedError($statusCode, $data) {
+		$this->formatter->setExtraData($data);
+		$this->apiError($statusCode, $this->formatter->format());
+	}
+
+	private function setFormatterItemNames($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['singular_name'])) {
+			$this->formatter->setSingularItemName($apiAccess['singular_name']);
+		}
+
+		if (isset($apiAccess['plural_name'])) {
+			$this->formatter->setPluralItemName($apiAccess['plural_name']);
+		}
+	}
+
 	public function showResource() {
-		$this->formattedError(500, array(
-			'developerMessage' => 'Resource detail not yet implemented',
-			'userMessage' => 'Something went wrong',
-			'moreInfo' => 'coming soon'
-		));
+		$className = $this->getClassName();
+
+		$resource = $className::get()->byID((int) $this->getRequest()->param('ResourceID'));
+
+		if (is_null($resource)) {
+			$this->formattedError(400, array(
+				'developerMessage' => 'Record not found',
+				'userMessage' => 'We couldn\'t find that item',
+				'moreInfo' => 'coming soon'
+			));
+		}
+
+		$this->setFormatterItemNames($className);
+
+		$this->formatter->setResultsItem($resource);
+
+		return $this->formatter->format();
 	}
 
 	public function listRelations() {
