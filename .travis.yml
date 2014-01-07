@@ -27,6 +27,6 @@ before_script:
  - wget https://scrutinizer-ci.com/ocular.phar
 
 script: 
- - phpunit --coverage.clover=coverage.clover restfulserver/tests/
+ - phpunit --coverage-clover=coverage.clover restfulserver/tests/
  - phpcs --encoding=utf-8 --tab-width=4 --standard=restfulserver/tests/phpcs -np restfulserver
  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
