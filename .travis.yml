@@ -1,22 +1,12 @@
 language: php 
 php: 
  - 5.3
- - 5.4
 
 env:
  - DB=MYSQL CORE_RELEASE=3.1.1
- - DB=MYSQL CORE_RELEASE=master
- - DB=PGSQL CORE_RELEASE=master
- - DB=SQLITE CORE_RELEASE=master
-
-matrix:
-  exclude:
-    - php: 5.4
-      env: DB=PGSQL CORE_RELEASE=master
-    - php: 5.4
-      env: DB=SQLITE CORE_RELEASE=master
-    - php: 5.4
-      env: DB=MYSQL CORE_RELEASE=3.1.1
+ - DB=MYSQL CORE_RELEASE=3.1.1
+ - DB=PGSQL CORE_RELEASE=3.1.1
+ - DB=SQLITE CORE_RELEASE=3.1.1
 
 before_script:
  - pear -q install --onlyreqdeps pear/PHP_CodeSniffer
@@ -29,4 +19,4 @@ before_script:
 script: 
  - phpunit --coverage-clover=coverage.clover restfulserver/tests/
  - phpcs --encoding=utf-8 --tab-width=4 --standard=restfulserver/tests/phpcs -np restfulserver
- - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+ - php ocular.phar code-coverage:upload --format=php-clover coverage.clover --repository=g/GOVTNZ/silverstripe-restfulserver
