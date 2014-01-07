@@ -40,7 +40,17 @@ class RestfulServerV2 extends Controller {
 			// within the init method - doesn't seem to affect normal operation
 			$this->popCurrent();
 			$this->getResponse()->addHeader('Content-Type', 'text/plain');
-			return $this->apiError(400, 'Invalid format type');
+
+			$message = _t(
+				'RestfulServer.developerMessage.INVALID_FORMAT',
+				'"{extension}" is not a supported response format',
+				'',
+				array(
+					'extension' => $this->getRequest()->getExtension()
+				)
+			);
+
+			return $this->apiError(400, $message);
 		}
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
@@ -79,8 +89,8 @@ class RestfulServerV2 extends Controller {
 
 		if ($offset >= $totalCount) {
 			$this->formattedError(400, array(
-				'developerMessage' => 'Query parameter \'offset\' is out of bounds',
-				'userMessage' => 'Oops something went wrong',
+				'developerMessage' => _t('RestfulServer.developerMessage.OFFSET_OUT_OF_BOUNDS'),
+				'userMessage' => _t('RestfulServer.userMessage.OFFSET_OUT_OF_BOUNDS'),
 				'moreInfo' => 'coming soon'
 			));
 		}
@@ -107,9 +117,16 @@ class RestfulServerV2 extends Controller {
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
 		if ($className === false) {
+			$developerMessage = _t(
+				'RestfulServer.developerMessage.RESOURCE_NOT_FOUND',
+				'Resource "' . $resourceName . '" was not found',
+				'',
+				array('resourceName' => $resourceName)
+			);
+
 			$this->formattedError(400, array(
-				'developerMessage' => 'Resource \'' . $resourceName . '\' was not found.',
-				'userMessage' => 'Oops something went wrong',
+				'developerMessage' => $developerMessage,
+				'userMessage' => _t('RestfulServer.userMessage.RESOURCE_NOT_FOUND'),
 				'moreInfo' => 'coming soon'
 			));
 		}
@@ -169,8 +186,8 @@ class RestfulServerV2 extends Controller {
 
 		if (is_null($resource)) {
 			$this->formattedError(400, array(
-				'developerMessage' => 'Record not found',
-				'userMessage' => 'We couldn\'t find that item',
+				'developerMessage' => _t('RestfulServer.developerMessage.RECORD_NOT_FOUND'),
+				'userMessage' => _t('RestfulServer.userMessage.RECORD_NOT_FOUND'),
 				'moreInfo' => 'coming soon'
 			));
 		}

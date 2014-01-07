@@ -59,6 +59,22 @@ class APIAliasTest extends SapphireTest {
 		$badResponse = Director::test($badURL, null, null, 'GET');
 
 		$this->assertEquals(400, $badResponse->getStatusCode(), 'Did not receive a 400 response for bad URL');
+
+		$output = json_decode($badResponse->getBody(), true);
+
+		$this->assertArrayHasKey('developerMessage', $output);
+		$this->assertArrayHasKey('userMessage', $output);
+		$this->assertArrayHasKey('moreInfo', $output);
+
+		$this->assertEquals(
+			_t(
+				'RestfulServer.developerMessage.RESOURCE_NOT_FOUND',
+				'',
+				'',
+				array('resourceName' => 'randomobjects.')
+			),
+			$output['developerMessage']
+		);
 	}
 
 }

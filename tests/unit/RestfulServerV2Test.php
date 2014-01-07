@@ -8,7 +8,7 @@ class RestfulServerV2Test extends SapphireTest {
 		'APITestObject'
 	);
 
-	public function testJSONRequest() {
+	public function testListJSONRequest() {
 		$response = Director::test('/api/v2/testobjects.json');
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
@@ -25,7 +25,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertLessThanOrEqual($results['_metadata']['limit'], $numResults);
 	}
 
-	public function testXMLRequest() {
+	public function testListXMLRequest() {
 		$response = Director::test('/api/v2/testobjects.xml');
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
@@ -40,6 +40,56 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertEquals(10, $numResults);
 		$this->assertLessThanOrEqual((int) $results->_metadata->limit, $numResults);
+	}
+
+	public function testShowJSONRequest() {
+		$testObject = APITestObject::get()->First();
+
+		$response = Director::test('/api/v2/testobjects/' . $testObject->ID . '.json');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertInternalType('array', $results);
+		$this->assertArrayHasKey('testObject', $results);
+
+		$this->assertArrayHasKey('ID', $results['testObject']);
+		$this->assertArrayHasKey('Name', $results['testObject']);
+
+		$this->assertEquals($testObject->Name, $results['testObject']['Name']);
+	}
+
+	public function testShowXMLRequest() {
+		$testObject = APITestObject::get()->First();
+
+		$response = Director::test('/api/v2/testobjects/' . $testObject->ID . '.xml');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = simplexml_load_string($response->getBody());
+
+		$this->assertInstanceOf('SimpleXMLElement', $results);
+		$this->objectHasAttribute('testObject', $results);
+
+		$this->objectHasAttribute('ID', $results->testObject);
+		$this->objectHasAttribute('Name', $results->testObject);
+
+		$this->assertEquals($testObject->Name, (string) $results->testObject->Name);
+	}
+
+	public function testRecordNotFound() {
+		$response = Director::test('/api/v2/testobjects/9999');
+
+		$this->assertEquals(400, $response->getStatusCode());
+
+		$output = json_decode($response->getBody(), true);
+
+		$this->assertArrayHasKey('developerMessage', $output);
+		$this->assertArrayHasKey('userMessage', $output);
+		$this->assertArrayHasKey('moreInfo', $output);
+
+		$this->assertEquals(_t('RestfulServer.developerMessage.RECORD_NOT_FOUND'), $output['developerMessage']);
 	}
 
 	public function testPagination() {
@@ -80,7 +130,7 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertArrayHasKey('developerMessage', $body, 'Developer message not set');
 		$this->assertEquals(
-			'Query parameter \'offset\' is out of bounds',
+			_t('RestfulServer.developerMessage.OFFSET_OUT_OF_BOUNDS'),
 			$body['developerMessage'],
 			'Incorrect developer message supplied'
 		);
