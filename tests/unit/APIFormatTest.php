@@ -15,8 +15,14 @@ class APIFormatTest extends SapphireTest {
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Did not receive 200 response');
 
-		$expectedResponse = file_get_contents($this->getCurrentAbsolutePath() . '/ExpectedJSONResponse.json');
-		$this->assertEquals(trim($expectedResponse), trim($response->getBody()), 'Did not receive expected response');
+		$output = json_decode($response->getBody(), true);
+
+		$this->assertInternalType('array', $output);
+
+		$this->assertArrayHasKey('testObjects', $output);
+		$this->assertArrayHasKey('_metadata', $output);
+
+		$this->assertEquals(10, count($output['testObjects']));
 	}
 
 	public function testXMLFormat() {
@@ -24,8 +30,14 @@ class APIFormatTest extends SapphireTest {
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Did not receive 200 response');
 
-		$expectedResponse = file_get_contents($this->getCurrentAbsolutePath() . '/ExpectedXMLResponse.xml');
-		$this->assertEquals(trim($expectedResponse), trim($response->getBody()), 'Did not receive expected response');
+		$output = simplexml_load_string($response->getBody());
+
+		$this->assertInstanceOf('SimpleXMLElement', $output);
+
+		$this->assertObjectHasAttribute('testObjects', $output);
+		$this->assertObjectHasAttribute('_metadata', $output);
+
+		$this->assertEquals(10, count($output->testObjects->testObject));
 	}
 
 	public function testInvalidFormat() {
