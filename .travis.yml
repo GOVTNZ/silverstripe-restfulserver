@@ -3,9 +3,9 @@ php:
  - 5.3
 
 env:
- - DB=MYSQL CORE_RELEASE=3.1.1
- - DB=PGSQL CORE_RELEASE=3.1.1
- - DB=SQLITE CORE_RELEASE=3.1.1
+ - DB=MYSQL CORE_RELEASE=3.1
+ - DB=PGSQL CORE_RELEASE=3.1
+ - DB=SQLITE CORE_RELEASE=3.1
 
 before_script:
  - pear -q install --onlyreqdeps pear/PHP_CodeSniffer
@@ -13,9 +13,10 @@ before_script:
  - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
  - cd ~/builds/ss
+ - cp ~/build/GOVTNZ/silverstripe-restfulserver/tests/travis/phpunit.xml.dist .
 
 script: 
- - phpunit --coverage-clover=coverage.clover restfulserver/tests/
+ - phpunit
  - phpcs --encoding=utf-8 --tab-width=4 --standard=restfulserver/tests/phpcs -np restfulserver
 
 after_script:
