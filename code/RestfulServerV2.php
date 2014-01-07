@@ -103,6 +103,9 @@ class RestfulServerV2 extends Controller {
 			)
 		));
 
+		// default sort until sorting via parameter is implemented
+		$list = $list->sort('ID', 'ASC');
+
 		$list = $list->limit($limit, $offset);
 
 		$this->setFormatterItemNames($className);
