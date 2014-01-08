@@ -90,7 +90,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertArrayHasKey('moreInfo', $output);
 
 		$this->assertEquals(
-			RestfulServerV2::get_developer_error_message('recordNotFound'),
+			APIError::get_developer_message_for('recordNotFound'),
 			$output['developerMessage']
 		);
 	}
@@ -133,68 +133,10 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertArrayHasKey('developerMessage', $body, 'Developer message not set');
 		$this->assertEquals(
-			RestfulServerV2::get_developer_error_message('offsetOutOfBounds'),
+			APIError::get_developer_message_for('offsetOutOfBounds'),
 			$body['developerMessage'],
 			'Incorrect developer message supplied'
 		);
-	}
-
-	public function testGetErrorMessages() {
-		$errors = RestfulServerV2::get_error_messages('resourceNotFound');
-
-		$this->assertInternalType('array', $errors);
-		$this->assertEquals(3, count($errors));
-
-		foreach ($errors as $message) {
-			$this->assertInternalType('string', $message);
-		}
-	}
-
-	public function testGetErrorMessagesWithInvalidKey() {
-		$errors = RestfulServerV2::get_error_messages('incorrectKey');
-
-		$this->assertNull($errors);
-	}
-
-	public function testGetErrorMessagesWithContext() {
-		$errors = RestfulServerV2::get_error_messages('resourceNotFound', array('resourceName' => 'testResource'));
-
-		$this->assertContains('testResource', $errors['developerMessage']);
-	}
-
-	public function testGetErrorMessage() {
-		$message = $this->invokeGetErrorMessage('developerMessage', 'resourceNotFound');
-
-		$this->assertInternalType('string', $message);
-	}
-
-	private function invokeGetErrorMessage($type, $key, $context = array()) {
-		$method = new ReflectionMethod('RestfulServerV2', 'get_error_message');
-		$method->setAccessible(true);
-
-		return $method->invokeArgs(null, array(
-			$type,
-			$key,
-			$context
-		));
-	}
-
-	public function testGetErrorMessageWithInvalidKey() {
-		$message = $this->invokeGetErrorMessage('developerMessage', 'incorrectKey');
-
-		$this->assertNull($message);
-	}
-
-	public function testGetErrorMessageWithContext() {
-		$message = $this->invokeGetErrorMessage(
-			'developerMessage',
-			'resourceNotFound',
-			array(
-				'resourceName' => 'testResource'
-			)
-		);
-
-		$this->assertContains('testResource', $message);
 	}
 
 }

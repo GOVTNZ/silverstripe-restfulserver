@@ -1,4 +1,4 @@
-RestfulServerV2:
+APIError:
   errors:
     invalidFormat:
       developerMessage: '"{extension}" is not a supported response format'

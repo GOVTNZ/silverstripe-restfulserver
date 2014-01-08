@@ -49,7 +49,7 @@ class RestfulServerV2 extends Controller {
 			$this->popCurrent();
 			$this->getResponse()->addHeader('Content-Type', 'text/plain');
 
-			$message = self::get_developer_error_message(
+			$message = APIError::get_developer_message_for(
 				'invalidFormat',
 				array(
 					'extension' => $this->getRequest()->getExtension()
@@ -94,7 +94,7 @@ class RestfulServerV2 extends Controller {
 		$totalCount = (int) $list->Count();
 
 		if ($offset >= $totalCount) {
-			return $this->formattedError(400, self::get_error_messages('offsetOutOfBounds'));
+			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
 		}
 
 		$this->formatter->setExtraData(array(
@@ -124,7 +124,7 @@ class RestfulServerV2 extends Controller {
 		if ($className === false) {
 			return $this->formattedError(
 				400,
-				self::get_error_messages('resourceNotFound', array('resourceName' => $resourceName))
+				APIError::get_messages_for('resourceNotFound', array('resourceName' => $resourceName))
 			);
 		}
 
@@ -182,7 +182,7 @@ class RestfulServerV2 extends Controller {
 		$resource = $className::get()->byID((int) $this->getRequest()->param('ResourceID'));
 
 		if (is_null($resource)) {
-			return $this->formattedError(400, self::get_error_messages('recordNotFound'));
+			return $this->formattedError(400, APIError::get_messages_for('recordNotFound'));
 		}
 
 		$this->setFormatterItemNames($className);
@@ -230,63 +230,6 @@ class RestfulServerV2 extends Controller {
 		if (isset(self::$valid_formats[$extension])) {
 			unset(self::$valid_formats[$extension]);
 		}
-	}
-
-	public static function get_error_messages($key, $context = array()) {
-		if (!self::valid_error_key($key)) {
-			return null;
-		}
-
-		return array(
-			'developerMessage' => self::get_developer_error_message($key, $context),
-			'userMessage' => self::get_user_error_message($key, $context),
-			'moreInfo' => self::get_more_info_error_message($key, $context)
-		);
-	}
-
-	private static function valid_error_key($key) {
-		$errors = self::config()->get('errors');
-
-		return isset($errors[$key]);
-	}
-
-	/**
-	 * @param $key string The config key to get the developer error message
-	 * @param array $context Array of key->value pairs where key is a placeholder in the error message
-	 * and value is the value to replace the placeholder with
-	 * @return null|string Returns null on error or the relevant error message on success
-	 */
-	public static function get_developer_error_message($key, $context = array()) {
-		return self::get_error_message('developerMessage', $key, $context);
-	}
-
-	public static function get_user_error_message($key, $context = array()) {
-		return self::get_error_message('userMessage', $key, $context);
-	}
-
-	public static function get_more_info_error_message($key, $context = array()) {
-		return self::get_error_message('moreInfo', $key, $context);
-	}
-
-	private static function get_error_message($type, $key, $context) {
-		$errors = self::config()->get('errors');
-
-		if (!isset($errors[$key]) || !isset($errors[$key][$type])) {
-			return null;
-		}
-
-		$message = $errors[$key][$type];
-
-		if (count($context) === 0) {
-			return $message;
-		}
-
-		foreach ($context as $placeholder => $value) {
-			$placeholder = '{' . $placeholder . '}';
-			$message = str_replace($placeholder, $value, $message);
-		}
-
-		return $message;
 	}
 
 }
