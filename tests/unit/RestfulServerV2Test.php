@@ -89,7 +89,10 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertArrayHasKey('userMessage', $output);
 		$this->assertArrayHasKey('moreInfo', $output);
 
-		$this->assertEquals(RestfulServerV2::get_developer_error_message('recordNotFound'), $output['developerMessage']);
+		$this->assertEquals(
+			RestfulServerV2::get_developer_error_message('recordNotFound'),
+			$output['developerMessage']
+		);
 	}
 
 	public function testPagination() {
