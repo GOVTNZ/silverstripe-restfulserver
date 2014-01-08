@@ -69,7 +69,7 @@ class APIInfo {
 			self::$alias_cache->save($resourceName, $resourceName);
 		} catch (Zend_Cache_Exception $exception) {
 			// not sure if we should do this or just allow uncached results...
-			user_error('The ' . $className . ' DataObject has an invalid class name. Must only use: [a-zA-Z0-9_]');
+			user_error('The ' . $resourceName . ' DataObject has an invalid class name. Must only use: [a-zA-Z0-9_]');
 		}
 
 		return $resourceName;
