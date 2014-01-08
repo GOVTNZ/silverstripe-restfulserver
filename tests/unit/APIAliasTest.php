@@ -67,12 +67,7 @@ class APIAliasTest extends SapphireTest {
 		$this->assertArrayHasKey('moreInfo', $output);
 
 		$this->assertEquals(
-			_t(
-				'RestfulServer.developerMessage.RESOURCE_NOT_FOUND',
-				'',
-				'',
-				array('resourceName' => 'randomobjects.')
-			),
+			RestfulServerV2::get_developer_error_message('developerMessage', array('resourceName' => 'randomobjects.')),
 			$output['developerMessage']
 		);
 	}

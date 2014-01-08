@@ -45,7 +45,7 @@ class APIFormatTest extends SapphireTest {
 
 		$this->assertEquals(400, $response->getStatusCode(), 'Incorrect status code received for invalid format');
 		$this->assertEquals(
-			_t('RestfulServer.developerMessage.INVALID_FORMAT', '', '', array('extension' => 'txt')),
+			RestfulServerV2::get_developer_error_message('invalidFormat', array('extension' => 'txt')),
 			$response->getBody(),
 			'Incorrect error message received for invalid format'
 		);

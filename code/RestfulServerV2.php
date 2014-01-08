@@ -5,6 +5,8 @@ class RestfulServerV2 extends Controller {
 	public static $default_extension = 'json';
 
 	public static $url_handlers = array(
+		'errors/$ErrorID!' => 'showError',
+		'errors' => 'listErrors',
 		'$ResourceName/$ResourceID!/$RelationName!' => 'listRelations',
 		'$ResourceName/$ResourceID!' => 'showResource',
 		'$ResourceName!' => 'listResources'
@@ -14,7 +16,9 @@ class RestfulServerV2 extends Controller {
 		'index',
 		'listResources',
 		'showResource',
-		'listRelations'
+		'listRelations',
+		'listErrors',
+		'showError'
 	);
 
 	private static $valid_formats = array(
@@ -32,6 +36,10 @@ class RestfulServerV2 extends Controller {
 	public function init() {
 		parent::init();
 
+		if ($this->getRequest()->param('ResourceName') === 'errors') {
+			return;
+		}
+
 		$this->setFormatter();
 
 		if (is_null($this->formatter)) {
@@ -41,16 +49,14 @@ class RestfulServerV2 extends Controller {
 			$this->popCurrent();
 			$this->getResponse()->addHeader('Content-Type', 'text/plain');
 
-			$message = _t(
-				'RestfulServer.developerMessage.INVALID_FORMAT',
-				'"{extension}" is not a supported response format',
-				'',
+			$message = self::get_developer_error_message(
+				'invalidFormat',
 				array(
 					'extension' => $this->getRequest()->getExtension()
 				)
 			);
 
-			return $this->apiError(400, $message);
+			return $this->throwAPIError(400, $message);
 		}
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
@@ -71,7 +77,7 @@ class RestfulServerV2 extends Controller {
 		$this->formatter = new self::$valid_formats[$extension]();
 	}
 
-	private function apiError($statusCode, $responseBody) {
+	private function throwAPIError($statusCode, $responseBody) {
 		$this->getResponse()->setBody($responseBody);
 		throw new SS_HTTPResponse_Exception($this->response, $statusCode);
 	}
@@ -88,11 +94,7 @@ class RestfulServerV2 extends Controller {
 		$totalCount = (int) $list->Count();
 
 		if ($offset >= $totalCount) {
-			$this->formattedError(400, array(
-				'developerMessage' => _t('RestfulServer.developerMessage.OFFSET_OUT_OF_BOUNDS'),
-				'userMessage' => _t('RestfulServer.userMessage.OFFSET_OUT_OF_BOUNDS'),
-				'moreInfo' => 'coming soon'
-			));
+			$this->formattedError(400, self::get_error_messages('offsetOutOfBounds'));
 		}
 
 		$this->formatter->setExtraData(array(
@@ -120,18 +122,10 @@ class RestfulServerV2 extends Controller {
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
 		if ($className === false) {
-			$developerMessage = _t(
-				'RestfulServer.developerMessage.RESOURCE_NOT_FOUND',
-				'Resource "' . $resourceName . '" was not found',
-				'',
-				array('resourceName' => $resourceName)
+			$this->formattedError(
+				400,
+				self::get_error_messages('resourceNotFound', array('resourceName' => $resourceName))
 			);
-
-			$this->formattedError(400, array(
-				'developerMessage' => $developerMessage,
-				'userMessage' => _t('RestfulServer.userMessage.RESOURCE_NOT_FOUND'),
-				'moreInfo' => 'coming soon'
-			));
 		}
 
 		return $className;
@@ -167,7 +161,7 @@ class RestfulServerV2 extends Controller {
 
 	private function formattedError($statusCode, $data) {
 		$this->formatter->setExtraData($data);
-		$this->apiError($statusCode, $this->formatter->format());
+		$this->throwAPIError($statusCode, $this->formatter->format());
 	}
 
 	private function setFormatterItemNames($className) {
@@ -188,11 +182,7 @@ class RestfulServerV2 extends Controller {
 		$resource = $className::get()->byID((int) $this->getRequest()->param('ResourceID'));
 
 		if (is_null($resource)) {
-			$this->formattedError(400, array(
-				'developerMessage' => _t('RestfulServer.developerMessage.RECORD_NOT_FOUND'),
-				'userMessage' => _t('RestfulServer.userMessage.RECORD_NOT_FOUND'),
-				'moreInfo' => 'coming soon'
-			));
+			$this->formattedError(400, self::get_error_messages('recordNotFound'));
 		}
 
 		$this->setFormatterItemNames($className);
@@ -208,6 +198,16 @@ class RestfulServerV2 extends Controller {
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
 		));
+	}
+
+	public function listErrors() {
+		$errors = sfYaml::load(file_get_contents('../restfulserver/lang/en.yml'));
+
+		Debug::dump($errors);
+	}
+
+	public function showError() {
+
 	}
 
 	public function index() {
@@ -230,6 +230,63 @@ class RestfulServerV2 extends Controller {
 		if (isset(self::$valid_formats[$extension])) {
 			unset(self::$valid_formats[$extension]);
 		}
+	}
+
+	public static function get_error_messages($key, $context = array()) {
+		if (!self::valid_error_key($key)) {
+			return null;
+		}
+
+		return array(
+			'developerMessage' => self::get_developer_error_message($key, $context),
+			'userMessage' => self::get_user_error_message($key, $context),
+			'moreInfo' => self::get_more_info_error_message($key, $context)
+		);
+	}
+
+	private static function valid_error_key($key) {
+		$errors = self::config()->get('errors');
+
+		return isset($errors[$key]);
+	}
+
+	/**
+	 * @param $key string The config key to get the developer error message
+	 * @param array $context Array of key->value pairs where key is a placeholder in the error message
+	 * and value is the value to replace the placeholder with
+	 * @return null|string Returns null on error or the relevant error message on success
+	 */
+	public static function get_developer_error_message($key, $context = array()) {
+		return self::get_error_message('developerMessage', $key, $context);
+	}
+
+	public static function get_user_error_message($key, $context = array()) {
+		return self::get_error_message('userMessage', $key, $context);
+	}
+
+	public static function get_more_info_error_message($key, $context = array()) {
+		return self::get_error_message('moreInfo', $key, $context);
+	}
+
+	private static function get_error_message($type, $key, $context) {
+		$errors = self::config()->get('errors');
+
+		if (!isset($errors[$key]) || !isset($errors[$key][$type])) {
+			return null;
+		}
+
+		$message = $errors[$key][$type];
+
+		if (count($context) === 0) {
+			return $message;
+		}
+
+		foreach ($context as $placeholder => $value) {
+			$placeholder = '{' . $placeholder . '}';
+			$message = str_replace($placeholder, $value, $message);
+		}
+
+		return $message;
 	}
 
 }
