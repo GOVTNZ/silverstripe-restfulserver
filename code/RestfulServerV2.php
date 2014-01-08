@@ -94,7 +94,7 @@ class RestfulServerV2 extends Controller {
 		$totalCount = (int) $list->Count();
 
 		if ($offset >= $totalCount) {
-			$this->formattedError(400, self::get_error_messages('offsetOutOfBounds'));
+			return $this->formattedError(400, self::get_error_messages('offsetOutOfBounds'));
 		}
 
 		$this->formatter->setExtraData(array(
@@ -122,7 +122,7 @@ class RestfulServerV2 extends Controller {
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
 		if ($className === false) {
-			$this->formattedError(
+			return $this->formattedError(
 				400,
 				self::get_error_messages('resourceNotFound', array('resourceName' => $resourceName))
 			);
@@ -161,7 +161,7 @@ class RestfulServerV2 extends Controller {
 
 	private function formattedError($statusCode, $data) {
 		$this->formatter->setExtraData($data);
-		$this->throwAPIError($statusCode, $this->formatter->format());
+		return $this->throwAPIError($statusCode, $this->formatter->format());
 	}
 
 	private function setFormatterItemNames($className) {
@@ -182,7 +182,7 @@ class RestfulServerV2 extends Controller {
 		$resource = $className::get()->byID((int) $this->getRequest()->param('ResourceID'));
 
 		if (is_null($resource)) {
-			$this->formattedError(400, self::get_error_messages('recordNotFound'));
+			return $this->formattedError(400, self::get_error_messages('recordNotFound'));
 		}
 
 		$this->setFormatterItemNames($className);
@@ -193,7 +193,7 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listRelations() {
-		$this->formattedError(500, array(
+		return $this->formattedError(500, array(
 			'developerMessage' => 'Relationship access not yet implemented',
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
@@ -211,7 +211,7 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function index() {
-		$this->formattedError(500, array(
+		return $this->formattedError(500, array(
 			'developerMessage' => 'Base documentation not yet implemented',
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
