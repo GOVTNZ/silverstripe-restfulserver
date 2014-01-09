@@ -58,7 +58,13 @@ class RestfulServerV2 extends Controller {
 				)
 			);
 
-			$message .= "\n" . APIError::get_more_info_link_for('invalidFormat', array('extension' => $this->getRequest()->getExtension()));
+			$message .= "\n";
+			$message .= APIError::get_more_info_link_for(
+				'invalidFormat',
+				array(
+					'extension' => $this->getRequest()->getExtension()
+				)
+			);
 
 			return $this->throwAPIError(400, $message);
 		}

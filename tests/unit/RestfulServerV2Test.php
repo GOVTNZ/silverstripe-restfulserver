@@ -180,7 +180,10 @@ class RestfulServerV2Test extends SapphireTest {
 		);
 
 		$this->assertEquals(200, $response->getStatusCode());
-		$this->assertContains(APIError::get_description('resourceNotFound', $context)->forTemplate(), $response->getBody());
+		$this->assertContains(
+			APIError::get_description('resourceNotFound', $context)->forTemplate(),
+			$response->getBody()
+		);
 	}
 
 	public function testShowErrorWithInvalidKey() {
