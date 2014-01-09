@@ -15,11 +15,11 @@ class APIError extends Object {
 		return array(
 			'developerMessage' => self::get_developer_message_for($key, $context),
 			'userMessage' => self::get_user_message_for($key, $context),
-			'moreInfo' => self::get_more_info_message_for($key, $context)
+			'moreInfo' => self::get_more_info_link_for($key, $context)
 		);
 	}
 
-	private static function valid_key($key) {
+	public static function valid_key($key) {
 		$errors = self::config()->get('errors');
 
 		return isset($errors[$key]);
@@ -47,15 +47,56 @@ class APIError extends Object {
 
 	/**
 	 * @param $key string The config key to get the more info message
-	 * @param array $context Array of key->value pairs where key is a placeholder in the error message
-	 * and value is the value to replace the placeholder with
-	 * @return null|string Returns null on error or the relevant error message on success
+	 * @return null|string Returns null on invalid key or a link to error information on success
 	 */
-	public static function get_more_info_message_for($key, $context = array()) {
-		return self::get_message('moreInfo', $key, $context);
+	public static function get_more_info_link_for($key, $context = array()) {
+		if (!self::valid_key($key)) {
+			return null;
+		}
+
+		$apiBaseURL = RestfulServerV2::get_base_url();
+
+		$errorsURL = $apiBaseURL . '/errors';
+		$errorURL = $errorsURL . '/' . $key;
+
+		$queryString = '';
+
+		if (count($context) > 0) {
+			$queryString = '?' . http_build_query(array('context' => json_encode($context)));
+		}
+
+		return $errorURL . $queryString;
 	}
 
-	private static function get_message($type, $key, $context) {
+	/**
+	 * Get the human readable name for this error
+	 *
+	 * @param $key string The error key to look up
+	 * @return string|null Returns null on invalid key or the relevant name on success
+	 */
+	public static function get_name($key) {
+		return self::get_message('name', $key);
+	}
+
+
+	/**
+	 * Get the full description for this error
+	 *
+	 * @param $key string The error key to look up
+	 * @return HTMLText|null Returns null on invalid key or the relevant description (inside HTMLText) on success
+	 */
+	public static function get_description($key, $context = array()) {
+		$descriptionText = self::get_message('description', $key);
+
+		$viewer = new SSViewer_FromString($descriptionText);
+
+		$description = new HTMLText();
+		$description->setValue(Controller::curr()->renderWith($viewer, $context));
+
+		return $description;
+	}
+
+	private static function get_message($type, $key, $context = array()) {
 		$errors = self::config()->get('errors');
 
 		if (!isset($errors[$key]) || !isset($errors[$key][$type])) {

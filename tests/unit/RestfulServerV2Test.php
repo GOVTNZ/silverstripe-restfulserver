@@ -113,6 +113,14 @@ class RestfulServerV2Test extends SapphireTest {
 		}
 	}
 
+	public function testPaginationInvalidOffset() {
+		$response = Director::test('/api/v2/testobjects?offset=-5');
+
+		$output = json_decode($response->getBody(), true);
+
+		$this->assertEquals(RestfulServerV2::DEFAULT_OFFSET, $output['_metadata']['offset']);
+	}
+
 	public function testInvalidPagination() {
 		$response = Director::test('/api/v2/testobjects?limit=' . (RestfulServerV2::MAX_LIMIT + 1) . '&offset=0');
 
@@ -137,6 +145,49 @@ class RestfulServerV2Test extends SapphireTest {
 			$body['developerMessage'],
 			'Incorrect developer message supplied'
 		);
+	}
+
+	public function testListErrors() {
+		$response = Director::test('/api/v2/errors');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$body = $response->getBody();
+		$errors = APIError::config()->get('errors');
+
+		foreach ($errors as $error) {
+			$this->assertContains($error['name'], $body);
+		}
+	}
+
+	public function testShowError() {
+		$errors = APIError::config()->get('errors');
+
+		foreach ($errors as $key => $error) {
+			$response = Director::test('/api/v2/errors/' . $key);
+			$body = $response->getBody();
+
+			$this->assertEquals(200, $response->getStatusCode());
+			$this->assertContains(APIError::get_description($key)->forTemplate(), $body);
+		}
+	}
+
+	public function testShowErrorWithContext() {
+		$context = array('resourceName' => 'invalid-resource');
+
+		$response = Director::test(
+			'/api/v2/errors/resourceNotFound?' . http_build_query(array('context' => json_encode($context)))
+		);
+
+		$this->assertEquals(200, $response->getStatusCode());
+		$this->assertContains(APIError::get_description('resourceNotFound', $context)->forTemplate(), $response->getBody());
+	}
+
+	public function testShowErrorWithInvalidKey() {
+		$response = Director::test('/api/v2/errors/someInvalidKey');
+
+		$this->assertEquals(404, $response->getStatusCode());
+		$this->assertEquals('Error detail not found', $response->getBody());
 	}
 
 }

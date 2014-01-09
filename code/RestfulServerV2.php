@@ -26,6 +26,8 @@ class RestfulServerV2 extends Controller {
 		'xml' => 'XMLFormatter'
 	);
 
+	private static $base_url = null;
+
 	private $formatter = null;
 
 	const MIN_LIMIT      = 1;
@@ -55,6 +57,8 @@ class RestfulServerV2 extends Controller {
 					'extension' => $this->getRequest()->getExtension()
 				)
 			);
+
+			$message .= "\n" . APIError::get_more_info_link_for('invalidFormat', array('extension' => $this->getRequest()->getExtension()));
 
 			return $this->throwAPIError(400, $message);
 		}
@@ -201,13 +205,39 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listErrors() {
-		$errors = sfYaml::load(file_get_contents('../restfulserver/lang/en.yml'));
+		$errors = APIError::config()->get('errors');
+		$errorOutput = array();
 
-		Debug::dump($errors);
+		foreach ($errors as $key => $error) {
+			$temp = array();
+
+			$temp['Name'] = $error['name'];
+			$temp['Link'] = APIError::get_more_info_link_for($key);
+
+			$errorOutput[] = $temp;
+		}
+
+		return $this->renderWith('ErrorList', array('Errors' => new ArrayList($errorOutput)));
 	}
 
 	public function showError() {
+		$errorID = $this->getRequest()->param('ErrorID');
 
+		if (!APIError::valid_key($errorID)) {
+			$this->getResponse()->setStatusCode(404);
+			return 'Error detail not found';
+		}
+
+		$context = array();
+
+		if ($this->getRequest()->getVar('context')) {
+			$context = json_decode($this->getRequest()->getVar('context'), true);
+		}
+
+		return $this->renderWith('ErrorDetail', array(
+			'Name' => APIError::get_name($errorID),
+			'Description' => APIError::get_description($errorID, $context)
+		));
 	}
 
 	public function index() {
@@ -230,6 +260,38 @@ class RestfulServerV2 extends Controller {
 		if (isset(self::$valid_formats[$extension])) {
 			unset(self::$valid_formats[$extension]);
 		}
+	}
+
+	public static function get_available_formats() {
+		return array_keys(self::$valid_formats);
+	}
+
+	public static function get_base_url() {
+		if (!is_null(self::$base_url)) {
+			return self::$base_url;
+		}
+
+		$rules = Config::inst()->get('Director', 'rules');
+
+		$matchedRoute = null;
+
+		foreach ($rules as $route => $className) {
+			if ($className === __CLASS__) {
+				$matchedRoute = $route;
+				break;
+			}
+		}
+
+		if (!is_null($matchedRoute)) {
+			$matchedRoute = explode('//', $matchedRoute);
+			$matchedRoute = $matchedRoute[0];
+		} else {
+			$matchedRoute = 'RestfulServerV2';
+		}
+
+		self::$base_url = Director::absoluteBaseURL() . $matchedRoute;
+
+		return self::$base_url;
 	}
 
 }

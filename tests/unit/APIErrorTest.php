@@ -60,4 +60,31 @@ class APIErrorTest extends SapphireTest {
 		$this->assertContains('testResource', $message);
 	}
 
+	public function testGetMoreInfoLink() {
+		$link = APIError::get_more_info_link_for('resourceNotFound');
+		$expectedLink = Director::absoluteBaseURL() . 'api/v2/errors/resourceNotFound';
+
+		$this->assertEquals($expectedLink, $link);
+	}
+
+	public function testGetMoreInfoLinkWithNoRestfulServerV2Route() {
+		// clear static base_url value
+		$reflectionProperty = new ReflectionProperty('RestfulServerV2', 'base_url');
+		$reflectionProperty->setAccessible(true);
+		$reflectionProperty->setValue(null);
+
+		$originalRules = Config::inst()->get('Director', 'rules');
+
+		// clear routes so that we don't find one for RestfulServerV2
+		Config::inst()->remove('Director', 'rules');
+		Config::inst()->update('Director', 'rules', array());
+
+		$link = APIError::get_more_info_link_for('resourceNotFound');
+		$expectedLink = Director::absoluteBaseURL() . 'RestfulServerV2/errors/resourceNotFound';
+
+		$this->assertEquals($expectedLink, $link);
+
+		Config::inst()->update('Director', 'rules', $originalRules);
+	}
+
 }

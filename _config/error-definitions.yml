@@ -1,18 +1,31 @@
 APIError:
   errors:
     invalidFormat:
+      name: 'Invalid response format'
       developerMessage: '"{extension}" is not a supported response format'
       userMessage: 'Something went wrong'
-      moreInfo: 'More info coming soon'
-    resourceNotFound:
-      developerMessage: 'Resource "{resourceName}" was not found'
-      userMessage: 'Something went wrong'
-      moreInfo: 'More info coming soon'
+      description: |
+        <p>An invalid response format was requested<% if $extension %> ($extension)<% end_if %>.</p>
+        <p>Default response formats available are json & xml.</p>
     offsetOutOfBounds:
+      name: 'Offset out of bounds'
       developerMessage: 'Query parameter ''offset'' is out of bounds'
       userMessage: 'Something went wrong'
-      moreInfo: 'More info coming soon'
+      description: |
+        <p>The offset parameter is larger than the total number of records available for this request.</p>
     recordNotFound:
+      name: 'Record not found'
       developerMessage: 'Record not found'
       userMessage: 'We couldn''t find that item'
-      moreInfo: 'More info coming soon'
+      description: |
+        <p>The record you requested could not be found.</p>
+    resourceNotFound:
+      name: 'Resource not found'
+      developerMessage: 'Resource "{resourceName}" was not found'
+      userMessage: 'Something went wrong'
+      description: |
+        <% if $resourceName %>
+        <p>An API end point with the resource name "$resourceName" was not found.</p>
+        <% else %>
+        <p>An API end point with the resource name requested was not found.</p>
+        <% end_if %>
