@@ -174,12 +174,12 @@ class RestfulServerV2 extends Controller {
 	}
 
 	private function getResultsSort($className) {
-		$validFields = array_keys(APIInfo::get_dataobject_field_alias_map($className));
+		$fieldMap = APIInfo::get_dataobject_field_alias_map($className);
 
 		$sort = strtolower($this->getRequest()->getVar('sort'));
 
-		if (in_array($sort, $validFields)) {
-			return $sort;
+		if (isset($fieldMap[$sort])) {
+			return $fieldMap[$sort];
 		}
 
 		return self::DEFAULT_SORT;
