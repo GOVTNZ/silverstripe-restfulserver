@@ -102,4 +102,24 @@ class JSONFormatterTest extends SapphireTest {
 		$this->assertArrayHasKey('_metadata', $output, '_metadata key missing');
 	}
 
+	public function testJsonFormat() {
+		$formatter = new JSONFormatter();
+
+		$method = new ReflectionMethod('JSONFormatter', 'jsonFormat');
+		$method->setAccessible(true);
+		$formattedJSON = $method->invoke($formatter, array('test' => array(
+			'one' => 'one',
+			'two' => 'two',
+			'three' => 'three'
+		)));
+
+		$decodedJSON = json_decode($formattedJSON, true);
+
+		$this->assertArrayHasKey('test', $decodedJSON);
+		$this->assertEquals(3, count($decodedJSON['test']));
+		$this->assertArrayHasKey('one', $decodedJSON['test']);
+		$this->assertArrayHasKey('two', $decodedJSON['test']);
+		$this->assertArrayHasKey('three', $decodedJSON['test']);
+	}
+
 }
