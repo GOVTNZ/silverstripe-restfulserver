@@ -63,6 +63,10 @@ abstract class AbstractFormatter implements Formatter {
 		return $this->generateOutput($response);
 	}
 
+	// move to APIInfo? no reason this can't be a static method on that class
+	// this allows us to get a list of fields for a DataObject
+	// this could give us a list of key->value pairs for fieldAlias->actualFieldName - e.g. id => ID, name => Name
+	// would need to include a check of 'view' array at some point to ensure fields are allowed to be access
 	private function buildFieldList($dataClass, $fields) {
 		if (!is_null($fields) && is_array($fields)) {
 			if (!in_array($fields, 'ID')) {

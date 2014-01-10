@@ -101,4 +101,16 @@ class APIInfo {
 		return false;
 	}
 
+	public static function get_dataobject_field_alias_map($className) {
+		$fields = array();
+
+		$fields['id'] = 'ID';
+
+		foreach (DataObject::custom_database_fields($className) as $fieldName => $fieldType) {
+			$fields[strtolower($fieldName)] = $fieldName;
+		}
+
+		return $fields;
+	}
+
 }

@@ -145,6 +145,38 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertEquals(RestfulServerV2::DEFAULT_LIMIT, $body['_metadata']['limit'], 'Incorrect limit returned');
 	}
 
+	public function testSort() {
+		$response = Director::test('/api/v2/testobjects?sort=id&order=desc');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$output = json_decode($response->getBody(), true);
+
+		$previousID = PHP_INT_MAX;
+
+		foreach ($output['testObjects'] as $testObject) {
+			$this->assertLessThan($previousID, $testObject['ID']);
+
+			$previousID = $testObject['ID'];
+		}
+	}
+
+	public function testSortInvalid() {
+		$response = Director::test('/api/v2/testobjects?sort=invalid&order=invalid');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$output = json_decode($response->getBody(), true);
+
+		$previousID = 0;
+
+		foreach ($output['testObjects'] as $testObject) {
+			$this->assertGreaterThan($previousID, $testObject['ID']);
+
+			$previousID = $testObject['ID'];
+		}
+	}
+
 	public function testListErrors() {
 		$response = Director::test('/api/v2/errors');
 

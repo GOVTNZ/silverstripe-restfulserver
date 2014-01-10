@@ -34,6 +34,8 @@ class RestfulServerV2 extends Controller {
 	const MAX_LIMIT      = 100;
 	const DEFAULT_LIMIT  = 10;
 	const DEFAULT_OFFSET = 0;
+	const DEFAULT_SORT   = 'ID';
+	const DEFAULT_ORDER  = 'ASC';
 
 	public function init() {
 		parent::init();
@@ -97,6 +99,8 @@ class RestfulServerV2 extends Controller {
 
 		$limit  = $this->getResultsLimit();
 		$offset = $this->getResultsOffset();
+		$sort   = $this->getResultsSort($className);
+		$order  = $this->getResultsOrder();
 
 		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
@@ -116,7 +120,7 @@ class RestfulServerV2 extends Controller {
 		));
 
 		// default sort until sorting via parameter is implemented
-		$list = $list->sort('ID', 'ASC');
+		$list = $list->sort($sort, $order);
 
 		$list = $list->limit($limit, $offset);
 
@@ -167,6 +171,33 @@ class RestfulServerV2 extends Controller {
 		}
 
 		return $offset;
+	}
+
+	private function getResultsSort($className) {
+		$validFields = array_keys(APIInfo::get_dataobject_field_alias_map($className));
+
+		$sort = strtolower($this->getRequest()->getVar('sort'));
+
+		if (in_array($sort, $validFields)) {
+			return $sort;
+		}
+
+		return self::DEFAULT_SORT;
+	}
+
+	private function getResultsOrder() {
+		$validOrders = array(
+			'ASC',
+			'DESC'
+		);
+
+		$order = strtoupper($this->getRequest()->getVar('order'));
+
+		if (in_array($order, $validOrders)) {
+			return $order;
+		}
+
+		return self::DEFAULT_ORDER;
 	}
 
 	private function formattedError($statusCode, $data) {
