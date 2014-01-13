@@ -1,0 +1,43 @@
+filter:
+  excluded_paths:
+     - 'vendor/*'
+     - 'app/*'
+     - 'web/*'
+
+tools:
+  php_mess_detector: true
+  php_code_sniffer:
+    config:
+      tab_width: ''
+      sniffs:
+        generic:
+          white_space:
+            disallow_space_indent_sniff: true
+          php:
+            disallow_short_open_tag_sniff: true
+            no_silenced_errors_sniff: true
+            lower_case_constant_sniff: true
+          formatting:
+            space_after_cast_sniff: true
+            disallow_multiple_statements_sniff: true
+          functions:
+            function_call_argument_spacing_sniff: true
+            opening_function_brace_kernighan_ritchie_sniff: true
+          files:
+            line_endings_sniff: true
+          commenting:
+            fixme_sniff: true
+            todo_sniff: true
+          control_structures:
+            inline_control_structure_sniff: true
+          naming_conventions:
+            constructor_name_sniff: true
+            upper_case_constant_name_sniff: true
+          metrics:
+            cyclomatic_complexity_sniff: true
+            nesting_level_sniff: true
+  php_cpd: true
+  php_loc: true
+  php_pdepend: true
+  external_code_coverage:
+    timeout: '900'
