@@ -21,4 +21,4 @@ script:
 
 after_script:
  - wget https://scrutinizer-ci.com/ocular.phar
- - php ocular.phar code-coverage:upload --format=php-clover coverage.clover --repository=g/GOVTNZ/silverstripe-restfulserver --revision=$TRAVIS_COMMIT
+ - php ocular.phar code-coverage:upload --format=php-clover coverage.clover --repository=g/$TRAVIS_REPO_SLUG --revision=$TRAVIS_COMMIT
