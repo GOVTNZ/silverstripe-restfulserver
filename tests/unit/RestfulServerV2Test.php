@@ -5,7 +5,8 @@ class RestfulServerV2Test extends SapphireTest {
 	protected static $fixture_file = 'APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject'
+		'APITestObject',
+		'APITestPageObject'
 	);
 
 	public function testListJSONRequest() {
@@ -221,6 +222,17 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertEquals(404, $response->getStatusCode());
 		$this->assertEquals('Error detail not found', $response->getBody());
+	}
+
+	public function testShowDetailInheritedFields() {
+		$response = Director::test('/api/v2/testpages');
+
+		$output = json_decode($response->getBody(), true);
+
+		$page = $output['testPages'][0];
+
+		$this->assertEquals('Test page', $page['Title']);
+		$this->assertEquals('Test value', $page['TestField']);
 	}
 
 }

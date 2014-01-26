@@ -76,7 +76,7 @@ abstract class AbstractFormatter implements Formatter {
 			// assume null or invalid value in $fields
 			$fields = array('ID');
 
-			foreach (DataObject::custom_database_fields($dataClass) as $fieldName => $fieldType) {
+			foreach (singleton($dataClass)->inheritedDatabaseFields() as $fieldName => $fieldType) {
 				$fields[] = $fieldName;
 			}
 		}

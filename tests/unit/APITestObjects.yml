@@ -25,3 +25,7 @@ APITestObject:
     Name: Test Twelve
   thirteen:
     Name: Test Thirteen
+APITestPageObject:
+  one:
+    Title: Test page
+    TestField: Test value
