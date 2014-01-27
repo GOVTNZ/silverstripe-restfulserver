@@ -1,6 +1,6 @@
 <?php
 
-class APITestPageObject extends SiteTree implements TestOnly {
+class APITestPageObject extends APITestObject implements TestOnly {
 
 	private static $db = array(
 		'TestField' => 'Text'

@@ -104,13 +104,7 @@ class RestfulServerV2Test extends SapphireTest {
 
 			$body = json_decode($response->getBody(), true);
 
-			if ($i === 12) {
-				$expectedResults = 1;
-			} else {
-				$expectedResults = 2;
-			}
-
-			$this->assertEquals($expectedResults, count($body['testObjects']), 'Incorrect number of results returned');
+			$this->assertEquals(2, count($body['testObjects']), 'Incorrect number of results returned');
 		}
 	}
 
@@ -231,7 +225,7 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$page = $output['testPages'][0];
 
-		$this->assertEquals('Test page', $page['Title']);
+		$this->assertEquals('Test page', $page['Name']);
 		$this->assertEquals('Test value', $page['TestField']);
 	}
 
