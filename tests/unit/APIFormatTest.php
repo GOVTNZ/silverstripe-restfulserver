@@ -5,7 +5,8 @@ class APIFormatTest extends SapphireTest {
 	protected static $fixture_file = 'APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject'
+		'APITestObject',
+		'APITestPageObject'
 	);
 
 	// these tests fail until pagination is implemented

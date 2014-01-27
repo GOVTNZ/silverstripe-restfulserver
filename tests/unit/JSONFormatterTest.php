@@ -5,7 +5,8 @@ class JSONFormatterTest extends SapphireTest {
 	protected static $fixture_file = 'APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject'
+		'APITestObject',
+		'APITestPageObject'
 	);
 
 	public function testExtraData() {
