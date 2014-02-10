@@ -34,6 +34,24 @@ class RelationshipTraversalTest extends SapphireTest {
 		$this->assertEquals(0, count($results['staff']));
 	}
 
+	public function testGetRelationListWithNonExistentResourceID() {
+		$fixtureIDs = $this->allFixtureIDs('StaffTestObject');
+
+		$unusedID = 1;
+
+		while (true) {
+			if (!in_array($unusedID, $fixtureIDs)) {
+				break;
+			} else {
+				$unusedID += 1;
+			}
+		}
+
+		$response = Director::test('/api/v2/staff/' . $unusedID . '/direct-reports');
+
+		$this->assertEquals(400, $response->getStatusCode());
+	}
+
 	public function testGetRelationListWithNonExistentRelation() {
 		$managerId = $this->idFromFixture('StaffTestObject', 'one');
 
