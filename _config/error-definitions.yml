@@ -29,3 +29,12 @@ APIError:
         <% else %>
         <p>An API end point with the resource name requested was not found.</p>
         <% end_if %>
+    invalidFilterFields:
+      name: 'Unknown fields were used for filter'
+      developerMessage: 'The following fields do not exist: {fields}'
+      userMessage: 'Something went wrong'
+      description: |
+        <p>Fields were used to filter the results but those fields did not exist.</p>
+        <% if $fields %>
+        These fields are: $fields
+        <% end_if %>

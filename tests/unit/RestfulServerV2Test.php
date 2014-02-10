@@ -43,6 +43,35 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertLessThanOrEqual((int) $results->_metadata->limit, $numResults);
 	}
 
+	public function testListWithFilter() {
+		$response = Director::test('/api/v2/testobjects?Name=ve');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertArrayHasKey('testObjects', $results);
+		$this->assertEquals(4, count($results['testObjects']));
+
+		$this->assertEquals('Test Five', $results['testObjects'][0]['Name']);
+		$this->assertEquals('Test Seven', $results['testObjects'][1]['Name']);
+		$this->assertEquals('Test Eleven', $results['testObjects'][2]['Name']);
+		$this->assertEquals('Test Twelve', $results['testObjects'][3]['Name']);
+	}
+
+	public function testListWithInvalidFilter() {
+		$response = Director::test('/api/v2/testobjects?InvalidField=test');
+
+		$this->assertEquals(400, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(
+			APIError::get_developer_message_for('invalidFilterFields', array('fields' => 'InvalidField')),
+			$results['developerMessage']
+		);
+	}
+
 	public function testShowJSONRequest() {
 		$testObject = APITestObject::get()->First();
 

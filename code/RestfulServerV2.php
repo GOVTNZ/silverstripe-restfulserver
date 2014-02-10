@@ -105,9 +105,11 @@ class RestfulServerV2 extends Controller {
 		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
 
+		$list = $this->applyFilters($list, $className);
+
 		$totalCount = (int) $list->Count();
 
-		if ($offset >= $totalCount) {
+		if ($totalCount > 0 && $offset >= $totalCount) {
 			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
 		}
 
@@ -198,6 +200,26 @@ class RestfulServerV2 extends Controller {
 		}
 
 		return self::DEFAULT_ORDER;
+	}
+
+	private function applyFilters(DataList $list, $className) {
+		$getVars = $this->getRequest()->getVars();
+		$filter = new APIFilter($className);
+		$filterArray = $filter->parseGET($getVars);
+
+		if ($filterArray === false) {
+			$invalidFilterFields = $filter->getInvalidFields();
+
+			return $this->formattedError(400, APIError::get_messages_for('invalidFilterFields', array(
+				'fields' => implode(', ', $invalidFilterFields)
+			)));
+		}
+
+		if (count($filterArray) > 0) {
+			$list = $list->filter($filterArray);
+		}
+
+		return $list;
 	}
 
 	private function formattedError($statusCode, $data) {

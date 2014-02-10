@@ -113,4 +113,14 @@ class APIInfo {
 		return $fields;
 	}
 
+	public static function class_can_be_filtered_by($className, $fieldName) {
+		$validFields = array_keys(singleton($className)->inheritedDatabaseFields());
+
+		if (in_array($fieldName, $validFields)) {
+			return true;
+		}
+
+		return false;
+	}
+
 }
