@@ -286,6 +286,11 @@ class RestfulServerV2 extends Controller {
 
 		$list = $list->sort($sort, $order);
 
+		$limit  = $this->getResultsLimit();
+		$offset = $this->getResultsOffset();
+
+		$list = $list->limit($limit, $offset);
+
 		$this->setFormatterItemNames($relationClassName);
 
 		$this->formatter->setResultsList($list);

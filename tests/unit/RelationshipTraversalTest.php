@@ -93,4 +93,17 @@ class RelationshipTraversalTest extends SapphireTest {
 		$this->assertEquals('John Smith', $results['staff'][1]['Name']);
 	}
 
+	public function testGetRelationListWithPagination() {
+		$managerId = $this->idFromFixture('StaffTestObject', 'one');
+
+		$response = Director::test('/api/v2/stafftest/' . $managerId . '/direct-reports?limit=1&offset=1');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(1, count($results['staff']));
+		$this->assertEquals('Bob Jones', $results['staff'][0]['Name']);
+	}
+
 }
