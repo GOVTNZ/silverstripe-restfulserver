@@ -33,6 +33,7 @@ class RestfulServerV2 extends Controller {
 	private $offset = null;
 	private $sort = null;
 	private $order = null;
+	private $totalCount = null;
 
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
@@ -109,15 +110,11 @@ class RestfulServerV2 extends Controller {
 		$list = $className::get();
 		$list = $this->applyFilters($list);
 
-		$totalCount = (int) $list->Count();
-
-		if ($totalCount > 0 && $this->offset >= $totalCount) {
-			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
-		}
+		$this->setTotalCount($list);
 
 		$this->formatter->setExtraData(array(
 			'_metadata' => array(
-				'totalCount' => $totalCount,
+				'totalCount' => $this->totalCount,
 				'limit' => $this->limit,
 				'offset' => $this->offset
 			)
@@ -190,6 +187,14 @@ class RestfulServerV2 extends Controller {
 			$this->order = $order;
 		} else {
 			$this->order = self::DEFAULT_ORDER;
+		}
+	}
+
+	private function setTotalCount(DataList $list) {
+		$this->totalCount = (int) $list->Count();
+
+		if ($this->totalCount > 0 && $this->offset >= $this->totalCount) {
+			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
 		}
 	}
 
@@ -276,23 +281,19 @@ class RestfulServerV2 extends Controller {
 
 		$relationClassName = $this->getRelationClassName($resource, $relationMethod);
 
-		$list = $resource->$relationMethod();
-		$list = $this->applyFilters($list);
-
 		$this->setResultsLimit();
 		$this->setResultsOffset();
 		$this->setResultsSort($relationClassName);
 		$this->setResultsOrder();
 
-		$totalCount = (int) $list->Count();
+		$list = $resource->$relationMethod();
+		$list = $this->applyFilters($list);
 
-		if ($totalCount > 0 && $this->offset >= $totalCount) {
-			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
-		}
+		$this->setTotalCount($list);
 
 		$this->formatter->setExtraData(array(
 			'_metadata' => array(
-				'totalCount' => $totalCount,
+				'totalCount' => $this->totalCount,
 				'limit' => $this->limit,
 				'offset' => $this->offset
 			)
