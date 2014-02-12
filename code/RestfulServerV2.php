@@ -291,12 +291,24 @@ class RestfulServerV2 extends Controller {
 
 		$sort   = $this->getResultsSort($relationClassName);
 		$order  = $this->getResultsOrder();
-
-		$list = $list->sort($sort, $order);
-
 		$limit  = $this->getResultsLimit();
 		$offset = $this->getResultsOffset();
 
+		$totalCount = (int) $list->Count();
+
+		if ($totalCount > 0 && $offset >= $totalCount) {
+			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
+		}
+
+		$this->formatter->setExtraData(array(
+			'_metadata' => array(
+				'totalCount' => $totalCount,
+				'limit' => $limit,
+				'offset' => $offset
+			)
+		));
+
+		$list = $list->sort($sort, $order);
 		$list = $list->limit($limit, $offset);
 
 		$this->setFormatterItemNames($relationClassName);

@@ -19,6 +19,11 @@ class RelationshipTraversalTest extends SapphireTest {
 
 		$this->assertArrayHasKey('staff', $results);
 		$this->assertEquals(2, count($results['staff']));
+
+		$this->assertArrayHasKey('_metadata', $results);
+		$this->assertEquals(2, $results['_metadata']['totalCount']);
+		$this->assertEquals(RestfulServerV2::DEFAULT_OFFSET, $results['_metadata']['offset']);
+		$this->assertEquals(RestfulServerV2::DEFAULT_LIMIT, $results['_metadata']['limit']);
 	}
 
 	public function testGetRelationListWithNoResults() {
