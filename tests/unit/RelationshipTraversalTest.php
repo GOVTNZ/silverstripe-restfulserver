@@ -60,4 +60,12 @@ class RelationshipTraversalTest extends SapphireTest {
 		$this->assertEquals(400, $response->getStatusCode());
 	}
 
+	public function testGetRelationListWithManyManyRelation() {
+		$staffID = $this->idFromFixture('StaffTestObject', 'one');
+
+		$response = Director::test('/api/v2/stafftest/' . $staffID . '/friends');
+
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
 }

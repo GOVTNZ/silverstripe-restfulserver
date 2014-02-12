@@ -298,8 +298,8 @@ class RestfulServerV2 extends Controller {
 
 		$relationClassName = $resource->many_many($relationship);
 
-		if (!is_null($relationClassName)) {
-			return $relationClassName;
+		if (!is_null($relationClassName) && isset($relationClassName[1])) {
+			return $relationClassName[1];
 		}
 
 		return null;

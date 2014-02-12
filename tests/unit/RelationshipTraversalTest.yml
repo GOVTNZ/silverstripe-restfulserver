@@ -10,3 +10,4 @@ StaffTestObject:
     Name: Bob Jones
     JobTitle: Developer
     Manager: =>StaffTestObject.one
+    Friends: =>StaffTestObject.one,=>StaffTestObject.two
