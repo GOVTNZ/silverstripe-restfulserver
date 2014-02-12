@@ -4,7 +4,7 @@ class RestfulServerV2 extends Controller {
 
 	public static $default_extension = 'json';
 
-	public static $url_handlers = array(
+	private static $url_handlers = array(
 		'errors/$ErrorID!' => 'showError',
 		'errors' => 'listErrors',
 		'$ResourceName/$ResourceID!/$RelationName!' => 'listRelations',
@@ -12,7 +12,7 @@ class RestfulServerV2 extends Controller {
 		'$ResourceName!' => 'listResources'
 	);
 
-	public static $allowed_actions = array(
+	private static $allowed_actions = array(
 		'index',
 		'listResources',
 		'showResource',
