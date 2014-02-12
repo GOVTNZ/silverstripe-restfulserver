@@ -102,10 +102,8 @@ class RestfulServerV2 extends Controller {
 		$sort   = $this->getResultsSort($className);
 		$order  = $this->getResultsOrder();
 
-		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
 		$list = $className::get();
-
-		$list = $this->applyFilters($list, $className);
+		$list = $this->applyFilters($list);
 
 		$totalCount = (int) $list->Count();
 
@@ -121,9 +119,7 @@ class RestfulServerV2 extends Controller {
 			)
 		));
 
-		// default sort until sorting via parameter is implemented
 		$list = $list->sort($sort, $order);
-
 		$list = $list->limit($limit, $offset);
 
 		$this->setFormatterItemNames($className);
@@ -202,9 +198,9 @@ class RestfulServerV2 extends Controller {
 		return self::DEFAULT_ORDER;
 	}
 
-	private function applyFilters(DataList $list, $className) {
+	private function applyFilters(DataList $list) {
 		$getVars = $this->getRequest()->getVars();
-		$filter = new APIFilter($className);
+		$filter = new APIFilter($list->dataClass());
 		$filterArray = $filter->parseGET($getVars);
 
 		if ($filterArray === false) {
@@ -286,8 +282,7 @@ class RestfulServerV2 extends Controller {
 		$relationClassName = $this->getRelationClassName($resource, $relationMethod);
 
 		$list = $resource->$relationMethod();
-
-		$list = $this->applyFilters($list, $relationClassName);
+		$list = $this->applyFilters($list);
 
 		$sort   = $this->getResultsSort($relationClassName);
 		$order  = $this->getResultsOrder();
