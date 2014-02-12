@@ -57,7 +57,13 @@ class RelationshipTraversalTest extends SapphireTest {
 
 		$response = Director::test('/api/v2/stafftest/' . $managerId . '/non-existent-relation');
 
+		$results = json_decode($response->getBody(), true);
+
 		$this->assertEquals(400, $response->getStatusCode());
+		$this->assertEquals(
+			APIError::get_developer_message_for('relationNotFound', array('relation' => 'non-existent-relation')),
+			$results['developerMessage']
+		);
 	}
 
 	public function testGetRelationListWithManyManyRelation() {

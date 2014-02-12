@@ -272,7 +272,15 @@ class RestfulServerV2 extends Controller {
 		);
 
 		if (is_null($relationMethod)) {
-			return $this->throwAPIError(400, 'invalid relation name');
+			return $this->formattedError(
+				400,
+				APIError::get_messages_for(
+					'relationNotFound',
+					array(
+						'relation' => $this->getRequest()->param('RelationName')
+					)
+				)
+			);
 		}
 
 		$relationClassName = $this->getRelationClassName($resource, $relationMethod);
