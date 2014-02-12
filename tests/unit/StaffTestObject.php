@@ -16,11 +16,11 @@ class StaffTestObject extends DataObject implements TestOnly {
 	);
 
 	private static $api_access = array(
-		'end_point_alias' => 'staff',
+		'end_point_alias' => 'stafftest',
 		'singular_name' => 'staffMember',
 		'plural_name' => 'staff',
 		'relation_aliases' => array(
-			'DirectReports' => 'direct-reports'
+			'direct-reports' => 'DirectReports'
 		)
 	);
 

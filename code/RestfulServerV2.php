@@ -256,11 +256,53 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listRelations() {
-		return $this->formattedError(500, array(
-			'developerMessage' => 'Relationship access not yet implemented',
-			'userMessage' => 'Something went wrong',
-			'moreInfo' => 'coming soon'
-		));
+		// get resource
+		$resourceClassName = $this->getClassName();
+
+		$resource = $resourceClassName::get()->byID((int) $this->getRequest()->param('ResourceID'));
+
+		if (is_null($resource)) {
+			return $this->formattedError(400, APIError::get_messages_for('recordNotFound'));
+		}
+
+		// need to translate alias to actual relationship name
+		$relationMethod = APIInfo::get_relation_method_from_name(
+			$resourceClassName,
+			$this->getRequest()->param('RelationName')
+		);
+
+		if (is_null($relationMethod)) {
+			return $this->throwAPIError(400, 'invalid relation name');
+		}
+
+		// has_ones shouldn't be handled here - they should be included as part of original records results
+		// Debug::dump($resource->has_one($relationship) === null ? 'false' : 'something');
+
+		$relationClassName = $this->getRelationClassName($resource, $relationMethod);
+
+		$list = $resource->$relationMethod();
+
+		$this->setFormatterItemNames($relationClassName);
+
+		$this->formatter->setResultsList($list);
+
+		return $this->formatter->format();
+	}
+
+	private function getRelationClassName($resource, $relationship) {
+		$relationClassName = $resource->has_many($relationship);
+
+		if ($relationClassName !== false) {
+			return $relationClassName;
+		}
+
+		$relationClassName = $resource->many_many($relationship);
+
+		if (!is_null($relationClassName)) {
+			return $relationClassName;
+		}
+
+		return null;
 	}
 
 	public function listErrors() {

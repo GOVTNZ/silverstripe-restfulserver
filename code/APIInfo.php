@@ -123,4 +123,30 @@ class APIInfo {
 		return false;
 	}
 
+	public static function get_relation_method_from_name($className, $relationName) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!self::class_has_relation_aliases($className) && self::class_has_relation($className, $relationName)) {
+			return $relationName;
+		}
+
+		if (isset($apiAccess['relation_aliases'][$relationName])) {
+			return $apiAccess['relation_aliases'][$relationName];
+		}
+
+		return null;
+	}
+
+	private static function class_has_relation_aliases($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		return is_array($apiAccess) && isset($apiAccess['relation_aliases']) && is_array($apiAccess['relation_aliases']);
+	}
+
+	private static function class_has_relation($className, $relationName) {
+		$instance = singleton($className);
+
+		return (($instance->has_many($relationName) !== false) || (!is_null($instance->many_many($relationName))));
+	}
+
 }

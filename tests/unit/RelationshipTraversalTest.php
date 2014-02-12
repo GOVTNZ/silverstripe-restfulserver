@@ -9,9 +9,9 @@ class RelationshipTraversalTest extends SapphireTest {
 	);
 
 	public function testGetRelationList() {
-		$managerId = $this->idFromFixture('StaffTestObject', 'one');
+		$managerID = $this->idFromFixture('StaffTestObject', 'one');
 
-		$response = Director::test('/api/v2/staff/' . $managerId . '/direct-reports');
+		$response = Director::test('/api/v2/stafftest/' . $managerID . '/direct-reports');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -24,7 +24,7 @@ class RelationshipTraversalTest extends SapphireTest {
 	public function testGetRelationListWithNoResults() {
 		$staffMemberId = $this->idFromFixture('StaffTestObject', 'two');
 
-		$response = Director::test('/api/v2/staff/' . $staffMemberId . '/direct-reports');
+		$response = Director::test('/api/v2/stafftest/' . $staffMemberId . '/direct-reports');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -47,7 +47,7 @@ class RelationshipTraversalTest extends SapphireTest {
 			}
 		}
 
-		$response = Director::test('/api/v2/staff/' . $unusedID . '/direct-reports');
+		$response = Director::test('/api/v2/stafftest/' . $unusedID . '/direct-reports');
 
 		$this->assertEquals(400, $response->getStatusCode());
 	}
@@ -55,7 +55,7 @@ class RelationshipTraversalTest extends SapphireTest {
 	public function testGetRelationListWithNonExistentRelation() {
 		$managerId = $this->idFromFixture('StaffTestObject', 'one');
 
-		$response = Director::test('/api/v2/staff/' . $managerId . '/non-existent-relation');
+		$response = Director::test('/api/v2/stafftest/' . $managerId . '/non-existent-relation');
 
 		$this->assertEquals(400, $response->getStatusCode());
 	}
