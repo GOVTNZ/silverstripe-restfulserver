@@ -275,9 +275,6 @@ class RestfulServerV2 extends Controller {
 			return $this->throwAPIError(400, 'invalid relation name');
 		}
 
-		// has_ones shouldn't be handled here - they should be included as part of original records results
-		// Debug::dump($resource->has_one($relationship) === null ? 'false' : 'something');
-
 		$relationClassName = $this->getRelationClassName($resource, $relationMethod);
 
 		$list = $resource->$relationMethod();
