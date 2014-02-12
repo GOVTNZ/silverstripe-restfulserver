@@ -100,14 +100,14 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listResources() {
-		$className = $this->getClassName();
+		$resourceClassName = $this->getResourceClassName();
 
 		$this->setResultsLimit();
 		$this->setResultsOffset();
-		$this->setResultsSort($className);
+		$this->setResultsSort($resourceClassName);
 		$this->setResultsOrder();
 
-		$list = $className::get();
+		$list = $resourceClassName::get();
 		$list = $this->applyFilters($list);
 
 		$this->setTotalCount($list);
@@ -123,14 +123,14 @@ class RestfulServerV2 extends Controller {
 		$list = $list->sort($this->sort, $this->order);
 		$list = $list->limit($this->limit, $this->offset);
 
-		$this->setFormatterItemNames($className);
+		$this->setFormatterItemNames($resourceClassName);
 
 		$this->formatter->setResultsList($list);
 
 		return $this->formatter->format();
 	}
 
-	private function getClassName() {
+	private function getResourceClassName() {
 		$resourceName = $this->getRequest()->param('ResourceName');
 		$className = APIInfo::get_class_name_by_resource_name($resourceName);
 
@@ -236,15 +236,15 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function showResource() {
-		$className = $this->getClassName();
+		$resourceClassName = $this->getResourceClassName();
 
-		$resource = $className::get()->byID((int) $this->getRequest()->param('ResourceID'));
+		$resource = $resourceClassName::get()->byID((int) $this->getRequest()->param('ResourceID'));
 
 		if (is_null($resource)) {
 			return $this->formattedError(400, APIError::get_messages_for('recordNotFound'));
 		}
 
-		$this->setFormatterItemNames($className);
+		$this->setFormatterItemNames($resourceClassName);
 
 		$this->formatter->setResultsItem($resource);
 
@@ -253,7 +253,7 @@ class RestfulServerV2 extends Controller {
 
 	public function listRelations() {
 		// get resource
-		$resourceClassName = $this->getClassName();
+		$resourceClassName = $this->getResourceClassName();
 
 		$resource = $resourceClassName::get()->byID((int) $this->getRequest()->param('ResourceID'));
 
