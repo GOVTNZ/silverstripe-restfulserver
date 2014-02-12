@@ -29,6 +29,10 @@ class RestfulServerV2 extends Controller {
 	private static $base_url = null;
 
 	private $formatter = null;
+	private $limit = null;
+	private $offset = null;
+	private $sort = null;
+	private $order = null;
 
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
@@ -97,30 +101,30 @@ class RestfulServerV2 extends Controller {
 	public function listResources() {
 		$className = $this->getClassName();
 
-		$limit  = $this->getResultsLimit();
-		$offset = $this->getResultsOffset();
-		$sort   = $this->getResultsSort($className);
-		$order  = $this->getResultsOrder();
+		$this->setResultsLimit();
+		$this->setResultsOffset();
+		$this->setResultsSort($className);
+		$this->setResultsOrder();
 
 		$list = $className::get();
 		$list = $this->applyFilters($list);
 
 		$totalCount = (int) $list->Count();
 
-		if ($totalCount > 0 && $offset >= $totalCount) {
+		if ($totalCount > 0 && $this->offset >= $totalCount) {
 			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
 		}
 
 		$this->formatter->setExtraData(array(
 			'_metadata' => array(
 				'totalCount' => $totalCount,
-				'limit' => $limit,
-				'offset' => $offset
+				'limit' => $this->limit,
+				'offset' => $this->offset
 			)
 		));
 
-		$list = $list->sort($sort, $order);
-		$list = $list->limit($limit, $offset);
+		$list = $list->sort($this->sort, $this->order);
+		$list = $list->limit($this->limit, $this->offset);
 
 		$this->setFormatterItemNames($className);
 
@@ -143,47 +147,38 @@ class RestfulServerV2 extends Controller {
 		return $className;
 	}
 
-	private function getResultsLimit() {
-		if (!$this->getRequest()->getVar('limit')) {
-			return self::DEFAULT_LIMIT;
-		}
-
+	private function setResultsLimit() {
 		$limit = (int) $this->getRequest()->getVar('limit');
 
 		if ($limit < self::MIN_LIMIT || $limit > self::MAX_LIMIT) {
-			return self::DEFAULT_LIMIT;
+			$this->limit = self::DEFAULT_LIMIT;
+		} else {
+			$this->limit = $limit;
 		}
-
-		return $limit;
 	}
 
-	private function getResultsOffset() {
-		if (!$this->getRequest()->getVar('offset')) {
-			return self::DEFAULT_OFFSET;
-		}
-
+	private function setResultsOffset() {
 		$offset = (int) $this->getRequest()->getVar('offset');
 
 		if ($offset < 0) {
-			return self::DEFAULT_OFFSET;
+			$this->offset = self::DEFAULT_OFFSET;
+		} else {
+			$this->offset = $offset;
 		}
-
-		return $offset;
 	}
 
-	private function getResultsSort($className) {
+	private function setResultsSort($className) {
 		$fieldMap = APIInfo::get_dataobject_field_alias_map($className);
-
 		$sort = strtolower($this->getRequest()->getVar('sort'));
 
 		if (isset($fieldMap[$sort])) {
-			return $fieldMap[$sort];
+			$this->sort = $fieldMap[$sort];
+		} else {
+			$this->sort = self::DEFAULT_SORT;
 		}
-
-		return self::DEFAULT_SORT;
 	}
 
-	private function getResultsOrder() {
+	private function setResultsOrder() {
 		$validOrders = array(
 			'ASC',
 			'DESC'
@@ -192,10 +187,10 @@ class RestfulServerV2 extends Controller {
 		$order = strtoupper($this->getRequest()->getVar('order'));
 
 		if (in_array($order, $validOrders)) {
-			return $order;
+			$this->order = $order;
+		} else {
+			$this->order = self::DEFAULT_ORDER;
 		}
-
-		return self::DEFAULT_ORDER;
 	}
 
 	private function applyFilters(DataList $list) {
@@ -284,27 +279,27 @@ class RestfulServerV2 extends Controller {
 		$list = $resource->$relationMethod();
 		$list = $this->applyFilters($list);
 
-		$sort   = $this->getResultsSort($relationClassName);
-		$order  = $this->getResultsOrder();
-		$limit  = $this->getResultsLimit();
-		$offset = $this->getResultsOffset();
+		$this->setResultsLimit();
+		$this->setResultsOffset();
+		$this->setResultsSort($relationClassName);
+		$this->setResultsOrder();
 
 		$totalCount = (int) $list->Count();
 
-		if ($totalCount > 0 && $offset >= $totalCount) {
+		if ($totalCount > 0 && $this->offset >= $totalCount) {
 			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
 		}
 
 		$this->formatter->setExtraData(array(
 			'_metadata' => array(
 				'totalCount' => $totalCount,
-				'limit' => $limit,
-				'offset' => $offset
+				'limit' => $this->limit,
+				'offset' => $this->offset
 			)
 		));
 
-		$list = $list->sort($sort, $order);
-		$list = $list->limit($limit, $offset);
+		$list = $list->sort($this->sort, $this->order);
+		$list = $list->limit($this->limit, $this->offset);
 
 		$this->setFormatterItemNames($relationClassName);
 
