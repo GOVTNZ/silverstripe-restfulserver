@@ -68,4 +68,29 @@ class RelationshipTraversalTest extends SapphireTest {
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 
+	public function testGetRelationListWithFilter() {
+		$managerId = $this->idFromFixture('StaffTestObject', 'one');
+
+		$response = Director::test('/api/v2/stafftest/' . $managerId . '/direct-reports?Name=bob');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(1, count($results['staff']));
+	}
+
+	public function testGetRelationListWithSort() {
+		$managerId = $this->idFromFixture('StaffTestObject', 'one');
+
+		$response = Director::test('/api/v2/stafftest/' . $managerId . '/direct-reports?sort=Name&order=asc');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals('Bob Jones', $results['staff'][0]['Name']);
+		$this->assertEquals('John Smith', $results['staff'][1]['Name']);
+	}
+
 }

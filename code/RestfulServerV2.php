@@ -279,6 +279,13 @@ class RestfulServerV2 extends Controller {
 
 		$list = $resource->$relationMethod();
 
+		$list = $this->applyFilters($list, $relationClassName);
+
+		$sort   = $this->getResultsSort($relationClassName);
+		$order  = $this->getResultsOrder();
+
+		$list = $list->sort($sort, $order);
+
 		$this->setFormatterItemNames($relationClassName);
 
 		$this->formatter->setResultsList($list);
