@@ -112,13 +112,7 @@ class RestfulServerV2 extends Controller {
 
 		$this->setTotalCount($list);
 
-		$this->formatter->setExtraData(array(
-			'_metadata' => array(
-				'totalCount' => $this->totalCount,
-				'limit' => $this->limit,
-				'offset' => $this->offset
-			)
-		));
+		$this->setMetaData();
 
 		$list = $list->sort($this->sort, $this->order);
 		$list = $list->limit($this->limit, $this->offset);
@@ -198,6 +192,16 @@ class RestfulServerV2 extends Controller {
 		}
 	}
 
+	private function setMetaData() {
+		$this->formatter->setExtraData(array(
+			'_metadata' => array(
+				'totalCount' => $this->totalCount,
+				'limit' => $this->limit,
+				'offset' => $this->offset
+			)
+		));
+	}
+
 	private function applyFilters(DataList $list) {
 		$getVars = $this->getRequest()->getVars();
 		$filter = new APIFilter($list->dataClass());
@@ -252,7 +256,6 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listRelations() {
-		// get resource
 		$resourceClassName = $this->getResourceClassName();
 
 		$resource = $resourceClassName::get()->byID((int) $this->getRequest()->param('ResourceID'));
@@ -261,7 +264,6 @@ class RestfulServerV2 extends Controller {
 			return $this->formattedError(400, APIError::get_messages_for('recordNotFound'));
 		}
 
-		// need to translate alias to actual relationship name
 		$relationMethod = APIInfo::get_relation_method_from_name(
 			$resourceClassName,
 			$this->getRequest()->param('RelationName')
@@ -290,14 +292,7 @@ class RestfulServerV2 extends Controller {
 		$list = $this->applyFilters($list);
 
 		$this->setTotalCount($list);
-
-		$this->formatter->setExtraData(array(
-			'_metadata' => array(
-				'totalCount' => $this->totalCount,
-				'limit' => $this->limit,
-				'offset' => $this->offset
-			)
-		));
+		$this->setMetaData();
 
 		$list = $list->sort($this->sort, $this->order);
 		$list = $list->limit($this->limit, $this->offset);
