@@ -115,6 +115,7 @@ class APIInfo {
 
 	public static function class_can_be_filtered_by($className, $fieldName) {
 		$validFields = array_keys(singleton($className)->inheritedDatabaseFields());
+		$validFields['id'] = 'ID';
 
 		if (in_array($fieldName, $validFields)) {
 			return true;
