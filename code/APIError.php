@@ -2,6 +2,18 @@
 
 class APIError extends Object {
 
+	public static function throw_formatted_error($formatter, $statusCode, $errorKey, $context = array()) {
+		$formatter->setExtraData(APIError::get_messages_for($errorKey, $context));
+		return self::throw_error($statusCode, $formatter->format(), $formatter->getOutputContentType());
+	}
+
+	public static function throw_error($statusCode, $message, $contentType = 'text/plain') {
+		$response = new SS_HTTPResponse();
+		$response->addHeader('Content-Type', $contentType);
+		$response->setBody($message);
+		throw new SS_HTTPResponse_Exception($response, $statusCode);
+	}
+
 	/**
 	 * @param $key Error message key as in _config/error-definitions.yml (e.g. resourceNotFound)
 	 * @param array $context map of placeholders to values that should be replaced in the message
