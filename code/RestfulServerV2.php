@@ -29,11 +29,6 @@ class RestfulServerV2 extends Controller {
 	private static $base_url = null;
 
 	private $formatter = null;
-	private $limit = null;
-	private $offset = null;
-	private $sort = null;
-	private $order = null;
-	private $totalCount = null;
 
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
