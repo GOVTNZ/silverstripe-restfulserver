@@ -3,7 +3,7 @@
 class APIError extends Object {
 
 	public static function throw_formatted_error($formatter, $statusCode, $errorKey, $context = array()) {
-		$formatter->setExtraData(APIError::get_messages_for($errorKey, $context));
+		$formatter->setExtraData(self::get_messages_for($errorKey, $context));
 		return self::throw_error($statusCode, $formatter->format(), $formatter->getOutputContentType());
 	}
 
