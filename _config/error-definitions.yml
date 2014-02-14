@@ -38,3 +38,12 @@ APIError:
         <% if $fields %>
         These fields are: $fields
         <% end_if %>
+    relationNotFound:
+      name: 'The relationship requested does not exist'
+      developerMessage: 'The relationship requested ({relation}) does not exist.'
+      userMessage: 'Something went wrong'
+      description: |
+        <p>
+        The relationship requested <% if $relation %>($relation) <% end_if %>does not exist.<br>
+        Please check the documentation to see which relationships are available.
+        </p>

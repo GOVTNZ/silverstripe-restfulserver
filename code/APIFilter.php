@@ -5,12 +5,14 @@ class APIFilter {
 	private $className;
 	private $invalidFields;
 
-	private static $invalid_get_vars = array(
+	private static $reserved_get_vars = array(
 		'offset',
 		'limit',
 		'url',
 		'sort',
-		'order'
+		'order',
+		'flush',
+		'flushtoken'
 	);
 
 	public function __construct($className) {
@@ -22,7 +24,7 @@ class APIFilter {
 		$invalidFields = array();
 
 		foreach ($getVars as $key => $value) {
-			if (in_array($key, self::$invalid_get_vars)) {
+			if (in_array($key, self::$reserved_get_vars)) {
 				continue; // we don't filter on any reserved get variables
 			}
 

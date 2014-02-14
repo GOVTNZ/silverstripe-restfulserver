@@ -4,7 +4,7 @@ class RestfulServerV2 extends Controller {
 
 	public static $default_extension = 'json';
 
-	public static $url_handlers = array(
+	private static $url_handlers = array(
 		'errors/$ErrorID!' => 'showError',
 		'errors' => 'listErrors',
 		'$ResourceName/$ResourceID!/$RelationName!' => 'listRelations',
@@ -12,7 +12,7 @@ class RestfulServerV2 extends Controller {
 		'$ResourceName!' => 'listResources'
 	);
 
-	public static $allowed_actions = array(
+	private static $allowed_actions = array(
 		'index',
 		'listResources',
 		'showResource',
@@ -29,6 +29,11 @@ class RestfulServerV2 extends Controller {
 	private static $base_url = null;
 
 	private $formatter = null;
+	private $limit = null;
+	private $offset = null;
+	private $sort = null;
+	private $order = null;
+	private $totalCount = null;
 
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
@@ -51,7 +56,6 @@ class RestfulServerV2 extends Controller {
 			// I think it's related to needing to clean up the Controller stack when we kill a request
 			// within the init method - doesn't seem to affect normal operation
 			$this->popCurrent();
-			$this->getResponse()->addHeader('Content-Type', 'text/plain');
 
 			$message = APIError::get_developer_message_for(
 				'invalidFormat',
@@ -68,7 +72,7 @@ class RestfulServerV2 extends Controller {
 				)
 			);
 
-			return $this->throwAPIError(400, $message);
+			return APIError::throw_error(400, $message);
 		}
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
@@ -95,131 +99,8 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listResources() {
-		$className = $this->getClassName();
-
-		$limit  = $this->getResultsLimit();
-		$offset = $this->getResultsOffset();
-		$sort   = $this->getResultsSort($className);
-		$order  = $this->getResultsOrder();
-
-		// very basic method for retrieving records for time being, improve this when adding sorting, pagination, etc.
-		$list = $className::get();
-
-		$list = $this->applyFilters($list, $className);
-
-		$totalCount = (int) $list->Count();
-
-		if ($totalCount > 0 && $offset >= $totalCount) {
-			return $this->formattedError(400, APIError::get_messages_for('offsetOutOfBounds'));
-		}
-
-		$this->formatter->setExtraData(array(
-			'_metadata' => array(
-				'totalCount' => $totalCount,
-				'limit' => $limit,
-				'offset' => $offset
-			)
-		));
-
-		// default sort until sorting via parameter is implemented
-		$list = $list->sort($sort, $order);
-
-		$list = $list->limit($limit, $offset);
-
-		$this->setFormatterItemNames($className);
-
-		$this->formatter->setResultsList($list);
-
-		return $this->formatter->format();
-	}
-
-	private function getClassName() {
-		$resourceName = $this->getRequest()->param('ResourceName');
-		$className = APIInfo::get_class_name_by_resource_name($resourceName);
-
-		if ($className === false) {
-			return $this->formattedError(
-				400,
-				APIError::get_messages_for('resourceNotFound', array('resourceName' => $resourceName))
-			);
-		}
-
-		return $className;
-	}
-
-	private function getResultsLimit() {
-		if (!$this->getRequest()->getVar('limit')) {
-			return self::DEFAULT_LIMIT;
-		}
-
-		$limit = (int) $this->getRequest()->getVar('limit');
-
-		if ($limit < self::MIN_LIMIT || $limit > self::MAX_LIMIT) {
-			return self::DEFAULT_LIMIT;
-		}
-
-		return $limit;
-	}
-
-	private function getResultsOffset() {
-		if (!$this->getRequest()->getVar('offset')) {
-			return self::DEFAULT_OFFSET;
-		}
-
-		$offset = (int) $this->getRequest()->getVar('offset');
-
-		if ($offset < 0) {
-			return self::DEFAULT_OFFSET;
-		}
-
-		return $offset;
-	}
-
-	private function getResultsSort($className) {
-		$fieldMap = APIInfo::get_dataobject_field_alias_map($className);
-
-		$sort = strtolower($this->getRequest()->getVar('sort'));
-
-		if (isset($fieldMap[$sort])) {
-			return $fieldMap[$sort];
-		}
-
-		return self::DEFAULT_SORT;
-	}
-
-	private function getResultsOrder() {
-		$validOrders = array(
-			'ASC',
-			'DESC'
-		);
-
-		$order = strtoupper($this->getRequest()->getVar('order'));
-
-		if (in_array($order, $validOrders)) {
-			return $order;
-		}
-
-		return self::DEFAULT_ORDER;
-	}
-
-	private function applyFilters(DataList $list, $className) {
-		$getVars = $this->getRequest()->getVars();
-		$filter = new APIFilter($className);
-		$filterArray = $filter->parseGET($getVars);
-
-		if ($filterArray === false) {
-			$invalidFilterFields = $filter->getInvalidFields();
-
-			return $this->formattedError(400, APIError::get_messages_for('invalidFilterFields', array(
-				'fields' => implode(', ', $invalidFilterFields)
-			)));
-		}
-
-		if (count($filterArray) > 0) {
-			$list = $list->filter($filterArray);
-		}
-
-		return $list;
+		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+		return $apiRequest->outputResourceList();
 	}
 
 	private function formattedError($statusCode, $data) {
@@ -227,40 +108,14 @@ class RestfulServerV2 extends Controller {
 		return $this->throwAPIError($statusCode, $this->formatter->format());
 	}
 
-	private function setFormatterItemNames($className) {
-		$apiAccess = singleton($className)->stat('api_access');
-
-		if (isset($apiAccess['singular_name'])) {
-			$this->formatter->setSingularItemName($apiAccess['singular_name']);
-		}
-
-		if (isset($apiAccess['plural_name'])) {
-			$this->formatter->setPluralItemName($apiAccess['plural_name']);
-		}
-	}
-
 	public function showResource() {
-		$className = $this->getClassName();
-
-		$resource = $className::get()->byID((int) $this->getRequest()->param('ResourceID'));
-
-		if (is_null($resource)) {
-			return $this->formattedError(400, APIError::get_messages_for('recordNotFound'));
-		}
-
-		$this->setFormatterItemNames($className);
-
-		$this->formatter->setResultsItem($resource);
-
-		return $this->formatter->format();
+		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+		return $apiRequest->outputResourceDetail();
 	}
 
 	public function listRelations() {
-		return $this->formattedError(500, array(
-			'developerMessage' => 'Relationship access not yet implemented',
-			'userMessage' => 'Something went wrong',
-			'moreInfo' => 'coming soon'
-		));
+		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+		return $apiRequest->outputRelationList();
 	}
 
 	public function listErrors() {
