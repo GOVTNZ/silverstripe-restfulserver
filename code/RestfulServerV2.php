@@ -28,6 +28,7 @@ class RestfulServerV2 extends Controller {
 
 	private static $base_url = null;
 
+	/** @var null|Formatter  */
 	private $formatter = null;
 
 	const MIN_LIMIT      = 1;
@@ -88,19 +89,9 @@ class RestfulServerV2 extends Controller {
 		$this->formatter = new self::$valid_formats[$extension]();
 	}
 
-	private function throwAPIError($statusCode, $responseBody) {
-		$this->getResponse()->setBody($responseBody);
-		throw new SS_HTTPResponse_Exception($this->response, $statusCode);
-	}
-
 	public function listResources() {
 		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 		return $apiRequest->outputResourceList();
-	}
-
-	private function formattedError($statusCode, $data) {
-		$this->formatter->setExtraData($data);
-		return $this->throwAPIError($statusCode, $this->formatter->format());
 	}
 
 	public function showResource() {
@@ -150,11 +141,16 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function index() {
-		return $this->formattedError(500, array(
+		$this->formatter->setExtraData(array(
 			'developerMessage' => 'Base documentation not yet implemented',
 			'userMessage' => 'Something went wrong',
 			'moreInfo' => 'coming soon'
 		));
+
+		return APIError::throw_error(
+			500,
+			$this->formatter->format()
+		);
 	}
 
 	public static function add_format($extension, $formatterClassName) {
