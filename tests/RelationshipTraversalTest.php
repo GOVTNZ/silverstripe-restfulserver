@@ -2,7 +2,7 @@
 
 class RelationshipTraversalTest extends SapphireTest {
 
-	protected static $fixture_file = 'RelationshipTraversalTest.yml';
+	protected static $fixture_file = 'fixtures/RelationshipTraversalTest.yml';
 
 	protected $extraDataObjects = array(
 		'StaffTestObject'
