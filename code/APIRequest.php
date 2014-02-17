@@ -35,11 +35,16 @@ class APIRequest {
 		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
+		$list = $className::get();
 
+		return $this->output($list, $className);
+	}
+
+	private function output(DataList $list, $className) {
 		$this->setPagination();
 		$this->setSorting($className);
 
-		$list = $className::get();
+
 		$list = $this->applyFilters($list);
 		$this->setTotalCount($list);
 		$this->setMetaData();
@@ -259,25 +264,9 @@ class APIRequest {
 		}
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
-
-		$this->setPagination();
-		$this->setSorting($this->relationClassName);
-
 		$list = $this->resource->$relationMethod();
-		$list = $this->applyFilters($list);
-
-		$this->setTotalCount($list);
-		$this->setMetaData();
-
-		$list = $list->sort($this->sort, $this->order);
-		$list = $list->limit($this->limit, $this->offset);
-
-		$this->setFormatterItemNames($this->relationClassName);
-		$this->setResponseFields($this->relationClassName);
-
-		$this->formatter->setResultsList($list);
-
-		return $this->formatter->format();
+		
+		return $this->output($list, $this->relationClassName);
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {
