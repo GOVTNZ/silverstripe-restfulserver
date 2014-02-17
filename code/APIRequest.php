@@ -35,11 +35,16 @@ class APIRequest {
 		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
+		$list = $className::get();
 
+		return $this->outputList($list, $className);
+	}
+
+	private function outputList(DataList $list, $className) {
 		$this->setPagination();
 		$this->setSorting($className);
 
-		$list = $className::get();
+
 		$list = $this->applyFilters($list);
 		$this->setTotalCount($list);
 		$this->setMetaData();
@@ -47,6 +52,7 @@ class APIRequest {
 		$list = $list->limit($this->limit, $this->offset);
 
 		$this->setFormatterItemNames($className);
+		$this->setResponseFields($className);
 
 		$this->formatter->setResultsList($list);
 
@@ -182,20 +188,42 @@ class APIRequest {
 		}
 	}
 
+	private function setResponseFields($className) {
+		$actualFields = array_keys(singleton($className)->inheritedDatabaseFields());
+		$fields = $this->httpRequest->getVar('fields');
+
+		if ($fields) {
+			$fields = explode(',', $fields);
+
+			$invalidFields = array();
+
+			foreach ($fields as $fieldName) {
+				if (!in_array($fieldName, $actualFields)) {
+					$invalidFields[] = $fieldName;
+				}
+			}
+
+			if (count($invalidFields) > 0) {
+				return APIError::throw_formatted_error($this->formatter, 400, 'invalidField', array(
+					'fields' => implode(', ', $invalidFields)
+				));
+			}
+		} else {
+			$fields = $actualFields;
+		}
+
+		$this->formatter->setResultsFields($fields);
+	}
+
 	public function outputResourceDetail() {
 		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
 		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
 		$this->setResource();
 
-		$className = $this->resourceClassName;
-		$resource = $className::get()->byID((int) $this->httpRequest->param('ResourceID'));
+		$this->setFormatterItemNames($this->resourceClassName);
+		$this->setResponseFields($this->resourceClassName);
 
-		if (is_null($resource)) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'recordNotFound');
-		}
-
-		$this->setFormatterItemNames($className);
-		$this->formatter->setResultsItem($resource);
+		$this->formatter->setResultsItem($this->resource);
 
 		return $this->formatter->format();
 	}
@@ -219,17 +247,18 @@ class APIRequest {
 		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
 		$this->setResource();
 
-		$className = $this->resourceClassName;
+		$relationMethod = $this->getRelationMethod($this->httpRequest->param('RelationName'));
 
-		$resource = $className::get()->byID((int) $this->httpRequest->param('ResourceID'));
+		$this->setRelationClassNameFromRelationName($relationMethod);
+		$list = $this->resource->$relationMethod();
 
-		if (is_null($resource)) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'recordNotFound');
-		}
+		return $this->outputList($list, $this->relationClassName);
+	}
 
+	private function getRelationMethod($relationName) {
 		$relationMethod = APIInfo::get_relation_method_from_name(
-			$className,
-			$this->httpRequest->param('RelationName')
+			$this->resourceClassName,
+			$relationName
 		);
 
 		if (is_null($relationMethod)) {
@@ -238,30 +267,12 @@ class APIRequest {
 				400,
 				'relationNotFound',
 				array(
-					'relation' => $this->httpRequest->param('RelationName')
+					'relation' => $relationName
 				)
 			);
 		}
 
-		$this->setRelationClassNameFromRelationName($relationMethod);
-
-		$this->setPagination();
-		$this->setSorting($this->relationClassName);
-
-		$list = $resource->$relationMethod();
-		$list = $this->applyFilters($list);
-
-		$this->setTotalCount($list);
-		$this->setMetaData();
-
-		$list = $list->sort($this->sort, $this->order);
-		$list = $list->limit($this->limit, $this->offset);
-
-		$this->setFormatterItemNames($this->relationClassName);
-
-		$this->formatter->setResultsList($list);
-
-		return $this->formatter->format();
+		return $relationMethod;
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {

@@ -2,7 +2,7 @@
 
 class APIAliasTest extends SapphireTest {
 
-	protected static $fixture_file = 'APITestObjects.yml';
+	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
 		'APITestObject',
