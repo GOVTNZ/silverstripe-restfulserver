@@ -1,0 +1,10 @@
+StaffTestObject:
+  one:
+    Name: Jane Doe
+    JobTitle: Team Lead
+  two:
+    Name: John Smith
+    JobTitle: Developer
+  three:
+    Name: Bob Jones
+    JobTitle: Developer

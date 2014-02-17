@@ -12,7 +12,8 @@ class APIFilter {
 		'sort',
 		'order',
 		'flush',
-		'flushtoken'
+		'flushtoken',
+		'fields'
 	);
 
 	public function __construct($className) {
