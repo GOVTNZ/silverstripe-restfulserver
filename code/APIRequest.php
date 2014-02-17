@@ -215,17 +215,10 @@ class APIRequest {
 		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
 		$this->setResource();
 
-		$className = $this->resourceClassName;
-		$resource = $className::get()->byID((int) $this->httpRequest->param('ResourceID'));
+		$this->setFormatterItemNames($this->resourceClassName);
+		$this->setResponseFields($this->resourceClassName);
 
-		if (is_null($resource)) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'recordNotFound');
-		}
-
-		$this->setFormatterItemNames($className);
-		$this->setResponseFields($className);
-
-		$this->formatter->setResultsItem($resource);
+		$this->formatter->setResultsItem($this->resource);
 
 		return $this->formatter->format();
 	}
@@ -249,16 +242,8 @@ class APIRequest {
 		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
 		$this->setResource();
 
-		$className = $this->resourceClassName;
-
-		$resource = $className::get()->byID((int) $this->httpRequest->param('ResourceID'));
-
-		if (is_null($resource)) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'recordNotFound');
-		}
-
 		$relationMethod = APIInfo::get_relation_method_from_name(
-			$className,
+			$this->resourceClassName,
 			$this->httpRequest->param('RelationName')
 		);
 
@@ -278,7 +263,7 @@ class APIRequest {
 		$this->setPagination();
 		$this->setSorting($this->relationClassName);
 
-		$list = $resource->$relationMethod();
+		$list = $this->resource->$relationMethod();
 		$list = $this->applyFilters($list);
 
 		$this->setTotalCount($list);
