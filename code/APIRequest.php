@@ -37,10 +37,10 @@ class APIRequest {
 		$className = $this->resourceClassName;
 		$list = $className::get();
 
-		return $this->output($list, $className);
+		return $this->outputList($list, $className);
 	}
 
-	private function output(DataList $list, $className) {
+	private function outputList(DataList $list, $className) {
 		$this->setPagination();
 		$this->setSorting($className);
 
@@ -265,8 +265,8 @@ class APIRequest {
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
 		$list = $this->resource->$relationMethod();
-		
-		return $this->output($list, $this->relationClassName);
+
+		return $this->outputList($list, $this->relationClassName);
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {
