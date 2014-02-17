@@ -223,6 +223,8 @@ class APIRequest {
 		}
 
 		$this->setFormatterItemNames($className);
+		$this->setResponseFields($className);
+		
 		$this->formatter->setResultsItem($resource);
 
 		return $this->formatter->format();
