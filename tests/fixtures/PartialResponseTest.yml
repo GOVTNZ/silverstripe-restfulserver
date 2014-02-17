@@ -5,6 +5,8 @@ StaffTestObject:
   two:
     Name: John Smith
     JobTitle: Developer
+    Manager: =>StaffTestObject.one
   three:
     Name: Bob Jones
     JobTitle: Developer
+    Manager: =>StaffTestObject.one

@@ -224,7 +224,7 @@ class APIRequest {
 
 		$this->setFormatterItemNames($className);
 		$this->setResponseFields($className);
-		
+
 		$this->formatter->setResultsItem($resource);
 
 		return $this->formatter->format();
@@ -288,6 +288,7 @@ class APIRequest {
 		$list = $list->limit($this->limit, $this->offset);
 
 		$this->setFormatterItemNames($this->relationClassName);
+		$this->setResponseFields($this->relationClassName);
 
 		$this->formatter->setResultsList($list);
 

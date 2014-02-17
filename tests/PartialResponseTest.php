@@ -48,4 +48,18 @@ class PartialResponseTest extends SapphireTest {
 		$this->assertArrayHasKey('JobTitle', $results['staffMember']);
 	}
 
+	public function testPartialResponseForShowRelation() {
+		$staffMember = $this->objFromFixture('StaffTestObject', 'one');
+		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '/direct-reports?fields=JobTitle');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(2, count($results['staff']));
+		$this->assertEquals(2, count($results['staff'][0]));
+		$this->assertArrayHasKey('ID', $results['staff'][0]);
+		$this->assertArrayHasKey('JobTitle', $results['staff'][0]);
+	}
+
 }
