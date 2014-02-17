@@ -69,14 +69,14 @@ abstract class AbstractFormatter implements Formatter {
 	// would need to include a check of 'view' array at some point to ensure fields are allowed to be access
 	private function buildFieldList($dataClass, $fields) {
 		if (!is_null($fields) && is_array($fields)) {
-			if (!in_array($fields, 'ID')) {
+			if (!in_array('ID', $fields)) {
 				array_unshift($fields, 'ID');
 			}
 		} else {
 			// assume null or invalid value in $fields
 			$fields = array('ID');
 
-			foreach (singleton($dataClass)->inheritedDatabaseFields() as $fieldName => $fieldType) {
+			foreach (array_keys(singleton($dataClass)->inheritedDatabaseFields()) as $fieldName) {
 				$fields[] = $fieldName;
 			}
 		}

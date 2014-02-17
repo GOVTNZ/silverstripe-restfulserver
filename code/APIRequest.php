@@ -47,6 +47,7 @@ class APIRequest {
 		$list = $list->limit($this->limit, $this->offset);
 
 		$this->setFormatterItemNames($className);
+		$this->setResponseFields($className);
 
 		$this->formatter->setResultsList($list);
 
@@ -180,6 +181,33 @@ class APIRequest {
 		if (isset($apiAccess['plural_name'])) {
 			$this->formatter->setPluralItemName($apiAccess['plural_name']);
 		}
+	}
+
+	private function setResponseFields($className) {
+		$actualFields = array_keys(singleton($className)->inheritedDatabaseFields());
+		$fields = $this->httpRequest->getVar('fields');
+
+		if ($fields) {
+			$fields = explode(',', $fields);
+
+			$invalidFields = array();
+
+			foreach ($fields as $fieldName) {
+				if (!in_array($fieldName, $actualFields)) {
+					$invalidFields[] = $fieldName;
+				}
+			}
+
+			if (count($invalidFields) > 0) {
+				return APIError::throw_formatted_error($this->formatter, 400, 'invalidField', array(
+					'fields' => implode(', ', $invalidFields)
+				));
+			}
+		} else {
+			$fields = $actualFields;
+		}
+
+		$this->formatter->setResultsFields($fields);
 	}
 
 	public function outputResourceDetail() {

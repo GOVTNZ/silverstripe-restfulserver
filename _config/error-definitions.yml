@@ -47,3 +47,12 @@ APIError:
         The relationship requested <% if $relation %>($relation) <% end_if %>does not exist.<br>
         Please check the documentation to see which relationships are available.
         </p>
+    invalidField:
+      name: 'The field requested does not exist'
+      developerMessage: 'The field requested ({fields}) does not exist.'
+      userMessage: 'Something went wrong'
+      description: |
+        <p>
+        The field requested <% if $fields %>($fields) <% end_if %>does not exist.<br>
+        Please check the documentation to see which fields are available for partial response.
+        </p>
