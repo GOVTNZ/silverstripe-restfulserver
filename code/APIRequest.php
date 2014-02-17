@@ -247,9 +247,18 @@ class APIRequest {
 		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
 		$this->setResource();
 
+		$relationMethod = $this->getRelationMethod($this->httpRequest->param('RelationName'));
+
+		$this->setRelationClassNameFromRelationName($relationMethod);
+		$list = $this->resource->$relationMethod();
+
+		return $this->outputList($list, $this->relationClassName);
+	}
+
+	private function getRelationMethod($relationName) {
 		$relationMethod = APIInfo::get_relation_method_from_name(
 			$this->resourceClassName,
-			$this->httpRequest->param('RelationName')
+			$relationName
 		);
 
 		if (is_null($relationMethod)) {
@@ -258,15 +267,12 @@ class APIRequest {
 				400,
 				'relationNotFound',
 				array(
-					'relation' => $this->httpRequest->param('RelationName')
+					'relation' => $relationName
 				)
 			);
 		}
 
-		$this->setRelationClassNameFromRelationName($relationMethod);
-		$list = $this->resource->$relationMethod();
-
-		return $this->outputList($list, $this->relationClassName);
+		return $relationMethod;
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {
