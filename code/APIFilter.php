@@ -3,7 +3,6 @@
 class APIFilter {
 
 	private $className;
-	private $invalidFields;
 
 	private static $reserved_get_vars = array(
 		'offset',
@@ -42,15 +41,15 @@ class APIFilter {
 		}
 
 		if (count($invalidFields) > 0) {
-			$this->invalidFields = $invalidFields;
-			return false;
+			throw new APIUserException(
+				'invalidFilterFields',
+				array(
+					'fields' => implode(', ', $invalidFields)
+				)
+			);
 		}
 
 		return $filterArray;
-	}
-
-	public function getInvalidFields() {
-		return $this->invalidFields;
 	}
 
 }

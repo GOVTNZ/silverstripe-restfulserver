@@ -90,18 +90,46 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function listResources() {
-		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-		return $apiRequest->outputResourceList();
+		try {
+			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			return $apiRequest->outputResourceList();
+		} catch (APIException $exception) {
+			return $this->throwFormattedAPIError($exception);
+		}
+	}
+
+	private function throwFormattedAPIError(APIException $exception) {
+		$this->formatter->setExtraData($exception->getErrorMessages());
+
+		$response = new SS_HTTPResponse();
+
+		$response->setStatusCode($exception->getStatusCode());
+		$response->addHeader('Content-Type', $this->formatter->getOutputContentType());
+		$response->setBody($this->formatter->format());
+
+		return $this->throwAPIError($response);
+	}
+
+	private function throwAPIError($response) {
+		throw new SS_HTTPResponse_Exception($response, $response->getStatusCode());
 	}
 
 	public function showResource() {
-		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-		return $apiRequest->outputResourceDetail();
+		try {
+			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			return $apiRequest->outputResourceDetail();
+		} catch (APIException $exception) {
+			return $this->throwFormattedAPIError($exception);
+		}
 	}
 
 	public function listRelations() {
-		$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-		return $apiRequest->outputRelationList();
+		try {
+			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			return $apiRequest->outputRelationList();
+		} catch (APIException $exception) {
+			return $this->throwFormattedAPIError($exception);
+		}
 	}
 
 	public function listErrors() {

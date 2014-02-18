@@ -15,7 +15,7 @@ class APIError extends Object {
 	}
 
 	/**
-	 * @param $key Error message key as in _config/error-definitions.yml (e.g. resourceNotFound)
+	 * @param string $key Error message key as in _config/error-definitions.yml (e.g. resourceNotFound)
 	 * @param array $context map of placeholders to values that should be replaced in the message
 	 * @return array|null Returns null on invalid key or an array containing all relevant error messages otherwise
 	 */

@@ -36,8 +36,12 @@ class APIInfo {
 			return $className;
 		}
 
-		// couldn't find class name for end point
-		return false;
+		throw new APIUserException(
+			'resourceNotFound',
+			array(
+				'resourceName' => $resourceName
+			)
+		);
 	}
 
 	private static function initialise_resource_name_cache() {
@@ -135,7 +139,12 @@ class APIInfo {
 			return $apiAccess['relation_aliases'][$relationName];
 		}
 
-		return null;
+		throw new APIUserException(
+			'relationNotFound',
+			array(
+				'relation' => $relationName
+			)
+		);
 	}
 
 	private static function class_has_relation_aliases($className) {

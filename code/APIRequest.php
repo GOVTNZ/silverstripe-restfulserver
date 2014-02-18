@@ -32,7 +32,7 @@ class APIRequest {
 	}
 
 	public function outputResourceList() {
-		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
 		$list = $className::get();
@@ -57,23 +57,6 @@ class APIRequest {
 		$this->formatter->setResultsList($list);
 
 		return $this->formatter->format();
-	}
-
-	private function setResourceClassNameFromResourceName($resourceName) {
-		$resourceClassName = APIInfo::get_class_name_by_resource_name($resourceName);
-
-		if ($resourceClassName === false) {
-			return APIError::throw_formatted_error(
-				$this->formatter,
-				400,
-				'resourceNotFound',
-				array(
-					'resourceName' => $resourceName
-				)
-			);
-		}
-
-		$this->resourceClassName = $resourceClassName;
 	}
 
 	private function setPagination() {
@@ -138,19 +121,6 @@ class APIRequest {
 		$filter = new APIFilter($list->dataClass());
 		$filterArray = $filter->parseGET($getVars);
 
-		if ($filterArray === false) {
-			$invalidFilterFields = $filter->getInvalidFields();
-
-			return APIError::throw_formatted_error(
-				$this->formatter,
-				400,
-				'invalidFilterFields',
-				array(
-					'fields' => implode(', ', $invalidFilterFields)
-				)
-			);
-		}
-
 		if (count($filterArray) > 0) {
 			$list = $list->filter($filterArray);
 		}
@@ -162,7 +132,7 @@ class APIRequest {
 		$this->totalCount = (int) $list->Count();
 
 		if ($this->totalCount > 0 && $this->offset >= $this->totalCount) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'offsetOutOfBounds');
+			throw new APIUserException('offsetOutOfBounds');
 		}
 	}
 
@@ -204,9 +174,12 @@ class APIRequest {
 			}
 
 			if (count($invalidFields) > 0) {
-				return APIError::throw_formatted_error($this->formatter, 400, 'invalidField', array(
-					'fields' => implode(', ', $invalidFields)
-				));
+				throw new APIUserException(
+					'invalidField',
+					array(
+						'fields' => implode(', ', $invalidFields)
+					)
+				);
 			}
 		} else {
 			$fields = $actualFields;
@@ -216,8 +189,9 @@ class APIRequest {
 	}
 
 	public function outputResourceDetail() {
-		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
-		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
+
 		$this->setResource();
 
 		$this->setFormatterItemNames($this->resourceClassName);
@@ -238,41 +212,25 @@ class APIRequest {
 		$this->resource = $className::get()->byID($this->resourceID);
 
 		if (!$this->resource) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'recordNotFound');
+			throw new APIUserException('recordNotFound');
 		}
 	}
 
 	public function outputRelationList() {
-		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
-		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
+
 		$this->setResource();
 
-		$relationMethod = $this->getRelationMethod($this->httpRequest->param('RelationName'));
+		$relationMethod = APIInfo::get_relation_method_from_name(
+			$this->resourceClassName,
+			$this->httpRequest->param('RelationName')
+		);
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
 		$list = $this->resource->$relationMethod();
 
 		return $this->outputList($list, $this->relationClassName);
-	}
-
-	private function getRelationMethod($relationName) {
-		$relationMethod = APIInfo::get_relation_method_from_name(
-			$this->resourceClassName,
-			$relationName
-		);
-
-		if (is_null($relationMethod)) {
-			return APIError::throw_formatted_error(
-				$this->formatter,
-				400,
-				'relationNotFound',
-				array(
-					'relation' => $relationName
-				)
-			);
-		}
-
-		return $relationMethod;
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {

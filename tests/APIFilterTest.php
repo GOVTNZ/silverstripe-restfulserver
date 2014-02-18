@@ -18,15 +18,21 @@ class APIFilterTest extends SapphireTest {
 	public function testParseGETWithInvalidFilter() {
 		$filter = new APIFilter('APITestObject');
 
-		$filterArray = $filter->parseGET(array(
-			'Name' => 'test value',
-			'InvalidField' => 'another test value'
-		));
+		$exceptionThrown = false;
 
-		$this->assertFalse($filterArray);
+		try {
+			$filterArray = $filter->parseGET(array(
+				'Name' => 'test value',
+				'InvalidField' => 'another test value'
+			));
+		} catch (APIException $exception) {
+			$exceptionThrown = true;
 
-		$invalidFields = $filter->getInvalidFields();
-		$this->assertContains('InvalidField', $invalidFields);
+			$messages = $exception->getErrorMessages();
+			$this->assertContains('InvalidField', $messages['developerMessage']);
+		}
+
+		$this->assertTrue($exceptionThrown);
 	}
 
 }
