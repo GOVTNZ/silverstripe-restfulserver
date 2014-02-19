@@ -51,12 +51,12 @@ class APIRequest {
 		$list = $list->sort($this->sort, $this->order);
 		$list = $list->limit($this->limit, $this->offset);
 
-		$this->setResponseFields($className);
-
 		$results = array();
 
 		foreach ($list as $item) {
-			$results[] = $item->toMap();
+			$itemFieldValueMap = $item->toMap();
+
+			$results[] = $this->applyPartialResponse($itemFieldValueMap);
 		}
 
 		$this->formatter->addResultsSet(
@@ -66,6 +66,47 @@ class APIRequest {
 		);
 
 		return $this->formatter->format();
+	}
+
+	private function applyPartialResponse($itemFieldValueMap) {
+		$excludeFields = array(
+			'ClassName',
+			'RecordClassName',
+			'Created',
+			'LastEdited'
+		);
+
+		$result = array();
+		$partialResponseFields = $this->httpRequest->getVar('fields');
+
+		if ($partialResponseFields) {
+			$partialResponseFields = explode(',', $partialResponseFields);
+		} else {
+			$partialResponseFields = array_keys($itemFieldValueMap);
+		}
+
+		// we always want ID
+		$result['ID'] = $itemFieldValueMap['ID'];
+		unset($itemFieldValueMap['ID']);
+		$partialResponseFields = array_diff($partialResponseFields, array('ID'));
+
+		// remove excluded fields
+		$partialResponseFields = array_diff($partialResponseFields, $excludeFields);
+
+		foreach ($itemFieldValueMap as $fieldName => $value) {
+			if (in_array($fieldName, $partialResponseFields) && !in_array($fieldName, $excludeFields)) {
+				$result[$fieldName] = $value;
+				// remove the field name from partialResponseFields
+				$partialResponseFields = array_diff($partialResponseFields, array($fieldName));
+			}
+		}
+
+		// check for any fields that don't exist on our object
+		if (count($partialResponseFields) > 0) {
+			throw new APIUserException('invalidField', array('fields' => implode(', ', $partialResponseFields)));
+		}
+
+		return $result;
 	}
 
 	private function setPagination() {
@@ -155,36 +196,6 @@ class APIRequest {
 		));
 	}
 
-	private function setResponseFields($className) {
-		$actualFields = array_keys(singleton($className)->inheritedDatabaseFields());
-		$fields = $this->httpRequest->getVar('fields');
-
-		if ($fields) {
-			$fields = explode(',', $fields);
-
-			$invalidFields = array();
-
-			foreach ($fields as $fieldName) {
-				if (!in_array($fieldName, $actualFields)) {
-					$invalidFields[] = $fieldName;
-				}
-			}
-
-			if (count($invalidFields) > 0) {
-				throw new APIUserException(
-					'invalidField',
-					array(
-						'fields' => implode(', ', $invalidFields)
-					)
-				);
-			}
-		} else {
-			$fields = $actualFields;
-		}
-
-		// $this->formatter->setResultsFields($fields);
-	}
-
 	private function getPluralName($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
@@ -211,10 +222,8 @@ class APIRequest {
 
 		$this->setResource();
 
-		$this->setResponseFields($this->resourceClassName);
-
 		$this->formatter->addExtraData(array(
-			$this->getSingularName($this->resourceClassName) => $this->resource->toMap()
+			$this->getSingularName($this->resourceClassName) => $this->applyPartialResponse($this->resource->toMap())
 		));
 
 		return $this->formatter->format();
@@ -243,6 +252,12 @@ class APIRequest {
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
 		$list = $this->resource->$relationMethod();
+
+		foreach ($list as $item) {
+			$itemFieldValueMap = $item->toMap();
+
+			$results[] = $this->applyPartialResponse($itemFieldValueMap);
+		}
 
 		return $this->outputList($list, $this->relationClassName);
 	}
