@@ -51,10 +51,19 @@ class APIRequest {
 		$list = $list->sort($this->sort, $this->order);
 		$list = $list->limit($this->limit, $this->offset);
 
-		$this->setFormatterItemNames($className);
 		$this->setResponseFields($className);
 
-		$this->formatter->setResultsList($list);
+		$results = array();
+
+		foreach ($list as $item) {
+			$results[] = $item->toMap();
+		}
+
+		$this->formatter->addResultsSet(
+			$results,
+			$this->getPluralName($className),
+			$this->getSingularName($className)
+		);
 
 		return $this->formatter->format();
 	}
@@ -137,25 +146,13 @@ class APIRequest {
 	}
 
 	private function setMetaData() {
-		$this->formatter->setExtraData(array(
+		$this->formatter->addExtraData(array(
 			'_metadata' => array(
 				'totalCount' => $this->totalCount,
 				'limit' => $this->limit,
 				'offset' => $this->offset
 			)
 		));
-	}
-
-	private function setFormatterItemNames($className) {
-		$apiAccess = singleton($className)->stat('api_access');
-
-		if (isset($apiAccess['singular_name'])) {
-			$this->formatter->setSingularItemName($apiAccess['singular_name']);
-		}
-
-		if (isset($apiAccess['plural_name'])) {
-			$this->formatter->setPluralItemName($apiAccess['plural_name']);
-		}
 	}
 
 	private function setResponseFields($className) {
@@ -185,7 +182,27 @@ class APIRequest {
 			$fields = $actualFields;
 		}
 
-		$this->formatter->setResultsFields($fields);
+		// $this->formatter->setResultsFields($fields);
+	}
+
+	private function getPluralName($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['plural_name'])) {
+			return $apiAccess['plural_name'];
+		}
+
+		return 'items';
+	}
+
+	private function getSingularName($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['singular_name'])) {
+			return $apiAccess['singular_name'];
+		}
+
+		return 'item';
 	}
 
 	public function outputResourceDetail() {
@@ -194,16 +211,13 @@ class APIRequest {
 
 		$this->setResource();
 
-		$this->setFormatterItemNames($this->resourceClassName);
 		$this->setResponseFields($this->resourceClassName);
 
-		$this->formatter->setResultsItem($this->resource);
+		$this->formatter->addExtraData(array(
+			$this->getSingularName($this->resourceClassName) => $this->resource->toMap()
+		));
 
 		return $this->formatter->format();
-	}
-
-	private function setResourceID($resourceID) {
-		$this->resourceID = $resourceID;
 	}
 
 	private function setResource() {
