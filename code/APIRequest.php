@@ -54,9 +54,11 @@ class APIRequest {
 		$results = array();
 
 		foreach ($list as $item) {
-			$itemFieldValueMap = $item->toMap();
+			$result = $item->toMap();
+			$result = $this->applyPartialResponse($result);
+			$result = $this->applyFieldNameAliasTransformation($result, $className);
 
-			$results[] = $this->applyPartialResponse($itemFieldValueMap);
+			$results[] = $result;
 		}
 
 		$this->formatter->addResultsSet(
@@ -68,45 +70,25 @@ class APIRequest {
 		return $this->formatter->format();
 	}
 
-	private function applyPartialResponse($itemFieldValueMap) {
-		$excludeFields = array(
-			'ClassName',
-			'RecordClassName',
-			'Created',
-			'LastEdited'
-		);
+	private function applyFieldNameAliasTransformation($response, $className) {
+		$apiAccess = singleton($className)->stat('api_access');
 
-		$result = array();
-		$partialResponseFields = $this->httpRequest->getVar('fields');
-
-		if ($partialResponseFields) {
-			$partialResponseFields = explode(',', $partialResponseFields);
-		} else {
-			$partialResponseFields = array_keys($itemFieldValueMap);
+		if (!isset($apiAccess['field_aliases'])) {
+			return $response;
 		}
 
-		// we always want ID
-		$result['ID'] = $itemFieldValueMap['ID'];
-		unset($itemFieldValueMap['ID']);
-		$partialResponseFields = array_diff($partialResponseFields, array('ID'));
+		$fieldNameAliases = array_flip($apiAccess['field_aliases']);
+		$aliasedResponse = array();
 
-		// remove excluded fields
-		$partialResponseFields = array_diff($partialResponseFields, $excludeFields);
-
-		foreach ($itemFieldValueMap as $fieldName => $value) {
-			if (in_array($fieldName, $partialResponseFields) && !in_array($fieldName, $excludeFields)) {
-				$result[$fieldName] = $value;
-				// remove the field name from partialResponseFields
-				$partialResponseFields = array_diff($partialResponseFields, array($fieldName));
+		foreach ($response as $fieldName => $value) {
+			if (isset($fieldNameAliases[$fieldName])) {
+				$aliasedResponse[$fieldNameAliases[$fieldName]] = $value;
+			} else {
+				$aliasedResponse[$fieldName] = $value;
 			}
 		}
 
-		// check for any fields that don't exist on our object
-		if (count($partialResponseFields) > 0) {
-			throw new APIUserException('invalidField', array('fields' => implode(', ', $partialResponseFields)));
-		}
-
-		return $result;
+		return $aliasedResponse;
 	}
 
 	private function setPagination() {
@@ -194,6 +176,47 @@ class APIRequest {
 				'offset' => $this->offset
 			)
 		));
+	}
+
+	private function applyPartialResponse($itemFieldValueMap) {
+		$excludeFields = array(
+			'ClassName',
+			'RecordClassName',
+			'Created',
+			'LastEdited'
+		);
+
+		$result = array();
+		$partialResponseFields = $this->httpRequest->getVar('fields');
+
+		if ($partialResponseFields) {
+			$partialResponseFields = explode(',', $partialResponseFields);
+		} else {
+			$partialResponseFields = array_keys($itemFieldValueMap);
+		}
+
+		// we always want ID
+		$result['ID'] = $itemFieldValueMap['ID'];
+		unset($itemFieldValueMap['ID']);
+		$partialResponseFields = array_diff($partialResponseFields, array('ID'));
+
+		// remove excluded fields
+		$partialResponseFields = array_diff($partialResponseFields, $excludeFields);
+
+		foreach ($itemFieldValueMap as $fieldName => $value) {
+			if (in_array($fieldName, $partialResponseFields) && !in_array($fieldName, $excludeFields)) {
+				$result[$fieldName] = $value;
+				// remove the field name from partialResponseFields
+				$partialResponseFields = array_diff($partialResponseFields, array($fieldName));
+			}
+		}
+
+		// check for any fields that don't exist on our object
+		if (count($partialResponseFields) > 0) {
+			throw new APIUserException('invalidField', array('fields' => implode(', ', $partialResponseFields)));
+		}
+
+		return $result;
 	}
 
 	private function getPluralName($className) {
