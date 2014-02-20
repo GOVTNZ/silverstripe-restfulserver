@@ -99,6 +99,7 @@ class RestfulServerV2 extends Controller {
 	}
 
 	private function throwFormattedAPIError(APIException $exception) {
+		$this->formatter->clearData();
 		$this->formatter->addExtraData($exception->getErrorMessages());
 
 		$response = new SS_HTTPResponse();

@@ -27,5 +27,9 @@ abstract class AbstractFormatter implements Formatter {
 		$this->extraData[] = $data;
 	}
 
+	public function clearData() {
+		$this->resultsSets = array();
+		$this->extraData = array();
+	}
 
 }
