@@ -105,18 +105,6 @@ class APIInfo {
 		return false;
 	}
 
-	public static function get_dataobject_field_alias_map($className) {
-		$fields = array();
-
-		$fields['id'] = 'ID';
-
-		foreach (DataObject::custom_database_fields($className) as $fieldName => $fieldType) {
-			$fields[strtolower($fieldName)] = $fieldName;
-		}
-
-		return $fields;
-	}
-
 	public static function class_can_be_filtered_by($className, $fieldName) {
 		$validFields = array_keys(singleton($className)->inheritedDatabaseFields());
 		$validFields['id'] = 'ID';
