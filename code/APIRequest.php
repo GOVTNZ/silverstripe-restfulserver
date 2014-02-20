@@ -8,6 +8,8 @@ class APIRequest {
 	private $resourceID = null;
 	private $relationClassName = null;
 
+	private $resultClassName = null;
+
 	private $resource = null;
 
 	private $formatter = null;
@@ -35,6 +37,7 @@ class APIRequest {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
+		$this->resultClassName = $className;
 		$list = $className::get();
 
 		return $this->outputList($list, $className);
@@ -218,10 +221,12 @@ class APIRequest {
 		);
 
 		$result = array();
+
 		$partialResponseFields = $this->httpRequest->getVar('fields');
 
 		if ($partialResponseFields) {
 			$partialResponseFields = explode(',', $partialResponseFields);
+			$partialResponseFields = $this->getPartialResponseFields($partialResponseFields);
 		} else {
 			$partialResponseFields = array_keys($itemFieldValueMap);
 		}
@@ -250,6 +255,29 @@ class APIRequest {
 		return $result;
 	}
 
+	private function getPartialResponseFields($aliasedFields) {
+		$instance = singleton($this->resultClassName);
+		$apiAccess = $instance->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases'])) {
+			return $aliasedFields;
+		} else {
+			$aliasFieldMap = $apiAccess['field_aliases'];
+		}
+
+		$fields = array();
+
+		foreach ($aliasedFields as $fieldName) {
+			if (isset($aliasFieldMap[$fieldName])) {
+				$fields[] = $aliasFieldMap[$fieldName];
+			} else {
+				$fields[] = $fieldName;
+			}
+		}
+
+		return $fields;
+	}
+
 	private function getPluralName($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
@@ -274,6 +302,8 @@ class APIRequest {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
 
+		$this->resultClassName = $this->resourceClassName;
+
 		$this->setResource();
 
 		$this->formatter->addExtraData(array(
@@ -296,6 +326,8 @@ class APIRequest {
 	public function outputRelationList() {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
+
+		$this->resultClassName = $this->resourceClassName;
 
 		$this->setResource();
 
