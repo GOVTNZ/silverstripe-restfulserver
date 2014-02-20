@@ -8,5 +8,5 @@ StaffTestObjectWithFieldAliases:
     Manager: =>StaffTestObjectWithFieldAliases.one
   three:
     Name: Bob Jones
-    JobTitle: Developer
+    JobTitle: Senior Developer
     Manager: =>StaffTestObjectWithFieldAliases.one

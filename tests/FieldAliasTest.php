@@ -18,7 +18,17 @@ class FieldAliasTest extends SapphireTest {
 		$this->assertArrayHasKey('staff', $output);
 		$this->assertArrayHasKey('id', $output['staff'][0]);
 		$this->assertArrayHasKey('name', $output['staff'][0]);
-		$this->assertArrayHasKey('jobTitle', $output['staff'][0]);
+		$this->assertArrayHasKey('jobTitleAlias', $output['staff'][0]);
+	}
+
+	public function testFieldAliasesWithSort() {
+		$response = Director::test('/api/v2/stafftestfieldalias?sort=jobTitleAlias&order=asc');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$output = json_decode($response->getBody(), true);
+
+		$this->assertEquals('Developer', $output['staff'][0]['jobTitleAlias']);
 	}
 
 }

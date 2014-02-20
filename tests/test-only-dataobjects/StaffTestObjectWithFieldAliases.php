@@ -30,7 +30,7 @@ class StaffTestObjectWithFieldAliases extends DataObject implements TestOnly {
 		'field_aliases' => array(
 			'id' => 'ID',
 			'name' => 'Name',
-			'jobTitle' => 'JobTitle'
+			'jobTitleAlias' => 'JobTitle'
 		),
 		'relation_aliases' => array(
 			'direct-reports' => 'DirectReports',

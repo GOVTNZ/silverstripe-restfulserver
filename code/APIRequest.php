@@ -122,15 +122,46 @@ class APIRequest {
 	}
 
 	private function setSort($sortClassName) {
-		$fieldMap = APIInfo::get_dataobject_field_alias_map($sortClassName);
+		$sort = $this->httpRequest->getVar('sort');
 
-		$sort = strtolower($this->httpRequest->getVar('sort'));
-
-		if (isset($fieldMap[$sort])) {
-			$this->sort = $fieldMap[$sort];
-		} else {
+		if (!$sort) {
 			$this->sort = self::DEFAULT_SORT;
+			return;
 		}
+
+		$sort = $this->transformSort($sort, $sortClassName);
+
+		if (!$this->isValidSortField($sort, $sortClassName)) {
+			$this->sort = self::DEFAULT_SORT;
+		} else {
+			$this->sort = $sort;
+		}
+	}
+
+	private function isValidSortField($sort, $sortClassName) {
+		$fields = $this->getClassFields($sortClassName);
+
+		return in_array($sort, $fields);
+	}
+
+	private function getClassFields($className) {
+		$fields = array(
+			'ID',
+			'Created',
+			'LastEdited'
+		);
+
+		return array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
+	}
+
+	private function transformSort($sort, $sortClassName) {
+		$apiAccess = singleton($sortClassName)->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases']) && !isset($apiAccess['field_aliases'][$sort])) {
+			return $sort;
+		}
+
+		return $apiAccess['field_aliases'][$sort];
 	}
 
 	private function setOrder() {
