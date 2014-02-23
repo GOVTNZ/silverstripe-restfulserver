@@ -4,8 +4,22 @@ class JSONFormatter extends AbstractFormatter {
 
 	protected $outputContentType = 'application/json';
 
+	public function format() {
+		$response = array();
+
+		foreach ($this->resultsSets as $resultsSet) {
+			$response[$resultsSet['pluralName']] = $resultsSet['set'];
+		}
+
+		foreach ($this->extraData as $data) {
+			$response = array_merge($response, $data);
+		}
+
+		return $this->generateOutput($response);
+	}
+
 	protected function generateOutput($response) {
-		if (phpversion() && phpversion() >= 5.4) {
+		if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
 			return json_encode($response, JSON_PRETTY_PRINT);
 		} else {
 			return $this->jsonFormat($response);

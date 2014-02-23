@@ -8,6 +8,8 @@ class APIRequest {
 	private $resourceID = null;
 	private $relationClassName = null;
 
+	private $resultClassName = null;
+
 	private $resource = null;
 
 	private $formatter = null;
@@ -32,9 +34,10 @@ class APIRequest {
 	}
 
 	public function outputResourceList() {
-		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
+		$this->resultClassName = $className;
 		$list = $className::get();
 
 		return $this->outputList($list, $className);
@@ -51,29 +54,44 @@ class APIRequest {
 		$list = $list->sort($this->sort, $this->order);
 		$list = $list->limit($this->limit, $this->offset);
 
-		$this->setFormatterItemNames($className);
-		$this->setResponseFields($className);
+		$results = array();
 
-		$this->formatter->setResultsList($list);
+		foreach ($list as $item) {
+			$result = $item->toMap();
+			$result = $this->applyPartialResponse($result);
+			$result = $this->applyFieldNameAliasTransformation($result, $className);
+
+			$results[] = $result;
+		}
+
+		$this->formatter->addResultsSet(
+			$results,
+			$this->getPluralName($className),
+			$this->getSingularName($className)
+		);
 
 		return $this->formatter->format();
 	}
 
-	private function setResourceClassNameFromResourceName($resourceName) {
-		$resourceClassName = APIInfo::get_class_name_by_resource_name($resourceName);
+	private function applyFieldNameAliasTransformation($response, $className) {
+		$apiAccess = singleton($className)->stat('api_access');
 
-		if ($resourceClassName === false) {
-			return APIError::throw_formatted_error(
-				$this->formatter,
-				400,
-				'resourceNotFound',
-				array(
-					'resourceName' => $resourceName
-				)
-			);
+		if (!isset($apiAccess['field_aliases'])) {
+			return $response;
 		}
 
-		$this->resourceClassName = $resourceClassName;
+		$fieldNameAliases = array_flip($apiAccess['field_aliases']);
+		$aliasedResponse = array();
+
+		foreach ($response as $fieldName => $value) {
+			if (isset($fieldNameAliases[$fieldName])) {
+				$aliasedResponse[$fieldNameAliases[$fieldName]] = $value;
+			} else {
+				$aliasedResponse[$fieldName] = $value;
+			}
+		}
+
+		return $aliasedResponse;
 	}
 
 	private function setPagination() {
@@ -107,15 +125,46 @@ class APIRequest {
 	}
 
 	private function setSort($sortClassName) {
-		$fieldMap = APIInfo::get_dataobject_field_alias_map($sortClassName);
+		$sort = $this->httpRequest->getVar('sort');
 
-		$sort = strtolower($this->httpRequest->getVar('sort'));
-
-		if (isset($fieldMap[$sort])) {
-			$this->sort = $fieldMap[$sort];
-		} else {
+		if (!$sort) {
 			$this->sort = self::DEFAULT_SORT;
+			return;
 		}
+
+		$sort = $this->transformSort($sort, $sortClassName);
+
+		if (!$this->isValidSortField($sort, $sortClassName)) {
+			$this->sort = self::DEFAULT_SORT;
+		} else {
+			$this->sort = $sort;
+		}
+	}
+
+	private function isValidSortField($sort, $sortClassName) {
+		$fields = $this->getClassFields($sortClassName);
+
+		return in_array($sort, $fields);
+	}
+
+	private function getClassFields($className) {
+		$fields = array(
+			'ID',
+			'Created',
+			'LastEdited'
+		);
+
+		return array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
+	}
+
+	private function transformSort($sort, $sortClassName) {
+		$apiAccess = singleton($sortClassName)->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases']) && !isset($apiAccess['field_aliases'][$sort])) {
+			return $sort;
+		}
+
+		return $apiAccess['field_aliases'][$sort];
 	}
 
 	private function setOrder() {
@@ -135,21 +184,9 @@ class APIRequest {
 
 	private function applyFilters(DataList $list) {
 		$getVars = $this->httpRequest->getVars();
+		$filterValues = $this->transformAliases($getVars, $list->dataClass());
 		$filter = new APIFilter($list->dataClass());
-		$filterArray = $filter->parseGET($getVars);
-
-		if ($filterArray === false) {
-			$invalidFilterFields = $filter->getInvalidFields();
-
-			return APIError::throw_formatted_error(
-				$this->formatter,
-				400,
-				'invalidFilterFields',
-				array(
-					'fields' => implode(', ', $invalidFilterFields)
-				)
-			);
-		}
+		$filterArray = $filter->parseGET($filterValues);
 
 		if (count($filterArray) > 0) {
 			$list = $list->filter($filterArray);
@@ -158,16 +195,37 @@ class APIRequest {
 		return $list;
 	}
 
+	private function transformAliases($aliasValueMap, $className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases'])) {
+			return $aliasValueMap;
+		}
+
+		$aliasToFieldNameMap = $apiAccess['field_aliases'];
+		$fieldValueMap = array();
+
+		foreach ($aliasValueMap as $aliasOrFieldName => $value) {
+			if (isset($aliasToFieldNameMap[$aliasOrFieldName])) {
+				$fieldValueMap[$aliasToFieldNameMap[$aliasOrFieldName]] = $value;
+			} else {
+				$fieldValueMap[$aliasOrFieldName] = $value;
+			}
+		}
+
+		return $fieldValueMap;
+	}
+
 	private function setTotalCount(DataList $list) {
 		$this->totalCount = (int) $list->Count();
 
 		if ($this->totalCount > 0 && $this->offset >= $this->totalCount) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'offsetOutOfBounds');
+			throw new APIUserException('offsetOutOfBounds');
 		}
 	}
 
 	private function setMetaData() {
-		$this->formatter->setExtraData(array(
+		$this->formatter->addExtraData(array(
 			'_metadata' => array(
 				'totalCount' => $this->totalCount,
 				'limit' => $this->limit,
@@ -176,60 +234,105 @@ class APIRequest {
 		));
 	}
 
-	private function setFormatterItemNames($className) {
+	private function applyPartialResponse($itemFieldValueMap) {
+		$excludeFields = array(
+			'ClassName',
+			'RecordClassName',
+			'Created',
+			'LastEdited'
+		);
+
+		$result = array();
+
+		$partialResponseFields = $this->httpRequest->getVar('fields');
+
+		if ($partialResponseFields) {
+			$partialResponseFields = explode(',', $partialResponseFields);
+			$partialResponseFields = $this->getPartialResponseFields($partialResponseFields);
+		} else {
+			$partialResponseFields = array_keys($itemFieldValueMap);
+		}
+
+		// we always want ID
+		$result['ID'] = $itemFieldValueMap['ID'];
+		unset($itemFieldValueMap['ID']);
+		$partialResponseFields = array_diff($partialResponseFields, array('ID'));
+
+		// remove excluded fields
+		$partialResponseFields = array_diff($partialResponseFields, $excludeFields);
+
+		foreach ($itemFieldValueMap as $fieldName => $value) {
+			if (in_array($fieldName, $partialResponseFields) && !in_array($fieldName, $excludeFields)) {
+				$result[$fieldName] = $value;
+				// remove the field name from partialResponseFields
+				$partialResponseFields = array_diff($partialResponseFields, array($fieldName));
+			}
+		}
+
+		// check for any fields that don't exist on our object
+		if (count($partialResponseFields) > 0) {
+			throw new APIUserException('invalidField', array('fields' => implode(', ', $partialResponseFields)));
+		}
+
+		return $result;
+	}
+
+	private function getPartialResponseFields($aliasedFields) {
+		$instance = singleton($this->resultClassName);
+		$apiAccess = $instance->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases'])) {
+			return $aliasedFields;
+		} else {
+			$aliasFieldMap = $apiAccess['field_aliases'];
+		}
+
+		$fields = array();
+
+		foreach ($aliasedFields as $fieldName) {
+			if (isset($aliasFieldMap[$fieldName])) {
+				$fields[] = $aliasFieldMap[$fieldName];
+			} else {
+				$fields[] = $fieldName;
+			}
+		}
+
+		return $fields;
+	}
+
+	private function getPluralName($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['plural_name'])) {
+			return $apiAccess['plural_name'];
+		}
+
+		return 'items';
+	}
+
+	private function getSingularName($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
 		if (isset($apiAccess['singular_name'])) {
-			$this->formatter->setSingularItemName($apiAccess['singular_name']);
+			return $apiAccess['singular_name'];
 		}
 
-		if (isset($apiAccess['plural_name'])) {
-			$this->formatter->setPluralItemName($apiAccess['plural_name']);
-		}
-	}
-
-	private function setResponseFields($className) {
-		$actualFields = array_keys(singleton($className)->inheritedDatabaseFields());
-		$fields = $this->httpRequest->getVar('fields');
-
-		if ($fields) {
-			$fields = explode(',', $fields);
-
-			$invalidFields = array();
-
-			foreach ($fields as $fieldName) {
-				if (!in_array($fieldName, $actualFields)) {
-					$invalidFields[] = $fieldName;
-				}
-			}
-
-			if (count($invalidFields) > 0) {
-				return APIError::throw_formatted_error($this->formatter, 400, 'invalidField', array(
-					'fields' => implode(', ', $invalidFields)
-				));
-			}
-		} else {
-			$fields = $actualFields;
-		}
-
-		$this->formatter->setResultsFields($fields);
+		return 'item';
 	}
 
 	public function outputResourceDetail() {
-		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
-		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
+
+		$this->resultClassName = $this->resourceClassName;
+
 		$this->setResource();
 
-		$this->setFormatterItemNames($this->resourceClassName);
-		$this->setResponseFields($this->resourceClassName);
-
-		$this->formatter->setResultsItem($this->resource);
+		$this->formatter->addExtraData(array(
+			$this->getSingularName($this->resourceClassName) => $this->applyPartialResponse($this->resource->toMap())
+		));
 
 		return $this->formatter->format();
-	}
-
-	private function setResourceID($resourceID) {
-		$this->resourceID = $resourceID;
 	}
 
 	private function setResource() {
@@ -238,41 +341,33 @@ class APIRequest {
 		$this->resource = $className::get()->byID($this->resourceID);
 
 		if (!$this->resource) {
-			return APIError::throw_formatted_error($this->formatter, 400, 'recordNotFound');
+			throw new APIUserException('recordNotFound');
 		}
 	}
 
 	public function outputRelationList() {
-		$this->setResourceClassNameFromResourceName($this->httpRequest->param('ResourceName'));
-		$this->setResourceID((int) $this->httpRequest->param('ResourceID'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
+
+		$this->resultClassName = $this->resourceClassName;
+
 		$this->setResource();
 
-		$relationMethod = $this->getRelationMethod($this->httpRequest->param('RelationName'));
+		$relationMethod = APIInfo::get_relation_method_from_name(
+			$this->resourceClassName,
+			$this->httpRequest->param('RelationName')
+		);
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
 		$list = $this->resource->$relationMethod();
 
-		return $this->outputList($list, $this->relationClassName);
-	}
+		foreach ($list as $item) {
+			$itemFieldValueMap = $item->toMap();
 
-	private function getRelationMethod($relationName) {
-		$relationMethod = APIInfo::get_relation_method_from_name(
-			$this->resourceClassName,
-			$relationName
-		);
-
-		if (is_null($relationMethod)) {
-			return APIError::throw_formatted_error(
-				$this->formatter,
-				400,
-				'relationNotFound',
-				array(
-					'relation' => $relationName
-				)
-			);
+			$results[] = $this->applyPartialResponse($itemFieldValueMap);
 		}
 
-		return $relationMethod;
+		return $this->outputList($list, $this->relationClassName);
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {

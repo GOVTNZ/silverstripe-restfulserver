@@ -34,6 +34,19 @@ class PartialResponseTest extends SapphireTest {
 		);
 	}
 
+	public function testPartialResponseWithInvalidFieldsHoldsNoOtherData() {
+		$response = Director::test('/api/v2/stafftest?fields=Name,InvalidField');
+
+		$this->assertEquals(400, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(3, count($results));
+		$this->assertArrayHasKey('userMessage', $results);
+		$this->assertArrayHasKey('developerMessage', $results);
+		$this->assertArrayHasKey('moreInfo', $results);
+	}
+
 	public function testPartialResponseForShowDetail() {
 		$staffMember = $this->objFromFixture('StaffTestObject', 'one');
 		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '?fields=JobTitle');

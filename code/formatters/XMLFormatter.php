@@ -4,27 +4,27 @@ class XMLFormatter extends AbstractFormatter {
 
 	protected $outputContentType = 'application/xml';
 
-	protected function generateOutput($response) {
+	public function format() {
 		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 		$xml .= '<root>';
 
-		if (isset($response[$this->pluralItemName])) {
-			$xml .= '<' . $this->pluralItemName . '>';
+		foreach ($this->resultsSets as $resultSet) {
+			$xml .= '<' . $resultSet['pluralName'] . '>';
 
-			foreach ($response[$this->pluralItemName] as $singleItem) {
-				$xml .= '<' . $this->singularItemName . '>';
-
-				foreach ($singleItem as $fieldName => $value) {
-					$xml .= '<' . $fieldName . '>';
-					$xml .= Convert::raw2xml($value);
-					$xml .= '</' . $fieldName . '>';
-				}
-
-				$xml .= '</' . $this->singularItemName . '>';
+			foreach ($resultSet['set'] as $resultItem) {
+				$xml .= $this->generateXML($resultSet['singularName'], $resultItem);
 			}
 
-			$xml .= '</' . $this->pluralItemName . '>';
+			$xml .= '</' . $resultSet['pluralName'] . '>';
 		}
+
+		foreach ($this->extraData as $data) {
+			foreach ($data as $key => $value) {
+				$xml .= $this->generateXML($key, $value);
+			}
+		}
+
+		return $xml . '</root>';
 
 		foreach ($response as $key => $value) {
 			if ($key === $this->pluralItemName) {

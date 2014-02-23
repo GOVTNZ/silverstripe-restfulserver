@@ -27,9 +27,15 @@ class APIInfoTest extends SapphireTest {
 	}
 
 	public function testGetRelationMethodFromNameWithInvalidName() {
-		$relationMethod = APIInfo::get_relation_method_from_name('StaffTestObject', 'invalid-name');
+		$exceptionThrown = false;
 
-		$this->assertNull($relationMethod);
+		try {
+			APIInfo::get_relation_method_from_name('StaffTestObject', 'invalid-name');
+		} catch (APIException $exception) {
+			$exceptionThrown = true;
+		}
+
+		$this->assertTrue($exceptionThrown);
 	}
 
 	public function testGetRelationMethodFromNameWithNoRelationAlias() {
@@ -39,9 +45,15 @@ class APIInfoTest extends SapphireTest {
 	}
 
 	public function testGetRelationMethodFromNameWithInvalidNameAndNoRelationAlias() {
-		$relationMethod = APIInfo::get_relation_method_from_name('APITestPageObject', 'InvalidRelation');
+		$exceptionThrown = false;
 
-		$this->assertNull($relationMethod);
+		try {
+			APIInfo::get_relation_method_from_name('APITestPageObject', 'InvalidRelation');
+		} catch (APIException $exception) {
+			$exceptionThrown = true;
+		}
+
+		$this->assertTrue($exceptionThrown);
 	}
 
 }

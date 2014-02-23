@@ -12,7 +12,7 @@ class JSONFormatterTest extends SapphireTest {
 	public function testExtraData() {
 		$formatter = new JSONFormatter();
 
-		$formatter->setExtraData(array(
+		$formatter->addExtraData(array(
 			'_metadata' => array(
 				'totalCount' => 5,
 				'limit' => 10,
@@ -37,9 +37,15 @@ class JSONFormatterTest extends SapphireTest {
 
 		$formatter = new JSONFormatter();
 
-		$formatter->setResultsList($pagedResults);
+		$results = array();
 
-		$formatter->setExtraData(array(
+		foreach ($pagedResults as $testObject) {
+			$results[] = $testObject->toMap();
+		}
+
+		$formatter->addResultsSet($results);
+
+		$formatter->addExtraData(array(
 			'_metadata' => array(
 				'totalCount' => $totalCount,
 				'limit' => 10,
@@ -60,7 +66,7 @@ class JSONFormatterTest extends SapphireTest {
 
 		$formatter = new JSONFormatter();
 
-		$formatter->setExtraData(array(
+		$formatter->addExtraData(array(
 			'developerMessage' => $developerMessage,
 			'userMessage' => $userMessage,
 			'moreInfo' => $moreInfo
@@ -83,13 +89,21 @@ class JSONFormatterTest extends SapphireTest {
 		$totalCount   = $testObjects->Count();
 		$pagedResults = $testObjects->limit(10, 0);
 
+		$results = array();
+
+		foreach ($pagedResults as $testObject) {
+			$results[] = $testObject->toMap();
+		}
+
 		$formatter = new JSONFormatter();
 
-		$formatter->setPluralItemName('results');
+		$formatter->addResultsSet(
+			$results,
+			'results',
+			'result'
+		);
 
-		$formatter->setResultsList($pagedResults);
-
-		$formatter->setExtraData(array(
+		$formatter->addExtraData(array(
 			'_metadata' => array(
 				'totalCount' => $totalCount,
 				'limit' => 10,

@@ -1,0 +1,12 @@
+StaffTestObjectWithFieldAliases:
+  one:
+    Name: Jane Doe
+    JobTitle: Team Lead
+  two:
+    Name: John Smith
+    JobTitle: Developer
+    Manager: =>StaffTestObjectWithFieldAliases.one
+  three:
+    Name: Bob Jones
+    JobTitle: Senior Developer
+    Manager: =>StaffTestObjectWithFieldAliases.one
