@@ -184,14 +184,36 @@ class APIRequest {
 
 	private function applyFilters(DataList $list) {
 		$getVars = $this->httpRequest->getVars();
+		$filterValues = $this->transformAliases($getVars, $list->dataClass());
 		$filter = new APIFilter($list->dataClass());
-		$filterArray = $filter->parseGET($getVars);
+		$filterArray = $filter->parseGET($filterValues);
 
 		if (count($filterArray) > 0) {
 			$list = $list->filter($filterArray);
 		}
 
 		return $list;
+	}
+
+	private function transformAliases($aliasValueMap, $className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases'])) {
+			return $aliasValueMap;
+		}
+
+		$aliasToFieldNameMap = $apiAccess['field_aliases'];
+		$fieldValueMap = array();
+
+		foreach ($aliasValueMap as $aliasOrFieldName => $value) {
+			if (isset($aliasToFieldNameMap[$aliasOrFieldName])) {
+				$fieldValueMap[$aliasToFieldNameMap[$aliasOrFieldName]] = $value;
+			} else {
+				$fieldValueMap[$aliasOrFieldName] = $value;
+			}
+		}
+
+		return $fieldValueMap;
 	}
 
 	private function setTotalCount(DataList $list) {

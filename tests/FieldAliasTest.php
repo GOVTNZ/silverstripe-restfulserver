@@ -41,4 +41,14 @@ class FieldAliasTest extends SapphireTest {
 		$this->assertEquals(2, count($output['staff'][0]));
 	}
 
+	public function testFieldAliasesWithFilter() {
+		$response = Director::test('/api/v2/stafftestfieldalias?jobTitleAlias=Senior');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$output = json_decode($response->getBody(), true);
+
+		$this->assertEquals(1, count($output['staff']));
+	}
+
 }
