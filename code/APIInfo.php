@@ -115,16 +115,16 @@ class APIInfo {
 		}
 
 		foreach ($classNames as $className) {
-			$apiAccess = singleton($className)->stat('api_access');
+			$apiAccess = singleton($className)->uninherited('api_access');
 
 			if ($apiAccess === true) {
-				$endPoints[$className] = true;
+				$endPoints[$className] = $className;
 			} else if (is_array($apiAccess) && isset($apiAccess['end_point_alias'])) {
-				$endPoints[$apiAccess['end_point_alias']] = true;
+				$endPoints[$apiAccess['end_point_alias']] = $className;
 			}
 		}
 
-		return array_keys($endPoints);
+		return array_flip($endPoints);
 	}
 
 	private static function get_classes_for_test() {

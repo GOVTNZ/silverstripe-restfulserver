@@ -22,6 +22,8 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		$this->assertContains('/api/v2/testpages', $body);
 		$this->assertContains('/api/v2/stafftest', $body);
 		$this->assertContains('/api/v2/stafftestfieldalias', $body);
+
+		$this->assertContains('test object description', $body);
 	}
 
 }

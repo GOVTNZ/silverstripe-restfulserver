@@ -176,16 +176,27 @@ class RestfulServerV2 extends Controller {
 
 		$arrayData = new ArrayList();
 
-		foreach ($endPoints as $endPoint) {
+		foreach ($endPoints as $className => $endPoint) {
 			$arrayData->push(new ArrayData(array(
 				'Name' => $endPoint,
-				'Link' => self::get_base_url() . '/' . $endPoint . '.html'
+				'Link' => self::get_base_url() . '/' . $endPoint . '.html',
+				'Description' => $this->getEndPointDescription($className)
 			)));
 		}
 
 		return $this->customise(array(
 			'EndPoints' => $arrayData
 		))->renderWith('DocumentationBase');
+	}
+
+	private function getEndPointDescription($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['description'])) {
+			return $apiAccess['description'];
+		} else {
+			return null;
+		}
 	}
 
 	public static function add_format($extension, $formatterClassName) {
