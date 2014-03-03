@@ -170,16 +170,22 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function index() {
-		$this->formatter->setExtraData(array(
-			'developerMessage' => 'Base documentation not yet implemented',
-			'userMessage' => 'Something went wrong',
-			'moreInfo' => 'coming soon'
-		));
+		$this->getResponse()->addHeader('Content-Type', 'text/html');
 
-		return APIError::throw_error(
-			500,
-			$this->formatter->format()
-		);
+		$endPoints = APIInfo::get_all_end_points();
+
+		$arrayData = new ArrayList();
+
+		foreach ($endPoints as $endPoint) {
+			$arrayData->push(new ArrayData(array(
+				'Name' => $endPoint,
+				'Link' => self::get_base_url() . '/' . $endPoint . '.html'
+			)));
+		}
+
+		return $this->customise(array(
+			'EndPoints' => $arrayData
+		))->renderWith('DocumentationBase');
 	}
 
 	public static function add_format($extension, $formatterClassName) {

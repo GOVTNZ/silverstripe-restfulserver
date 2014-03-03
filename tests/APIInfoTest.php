@@ -1,6 +1,6 @@
 <?php
 
-class APIInfoTest extends SapphireTest {
+class APIInfoTest extends BaseRestfulServerTest {
 
 	protected $extraDataObjects = array(
 		'APITestObject',
@@ -54,6 +54,12 @@ class APIInfoTest extends SapphireTest {
 		}
 
 		$this->assertTrue($exceptionThrown);
+	}
+
+	public function testGetAllAPIEndPoints() {
+		$endPoints = APIInfo::get_all_end_points();
+
+		$this->assertEquals(3, count($endPoints));
 	}
 
 }

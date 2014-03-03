@@ -105,6 +105,50 @@ class APIInfo {
 		return false;
 	}
 
+	public static function get_all_end_points() {
+		$endPoints = array();
+
+		if (SapphireTest::is_running_test()) {
+			$classNames = self::get_classes_for_test();
+		} else {
+			$classNames = self::get_classes();
+		}
+
+		foreach ($classNames as $className) {
+			$apiAccess = singleton($className)->stat('api_access');
+
+			if ($apiAccess === true) {
+				$endPoints[$className] = true;
+			} else if (is_array($apiAccess) && isset($apiAccess['end_point_alias'])) {
+				$endPoints[$apiAccess['end_point_alias']] = true;
+			}
+		}
+
+		return array_keys($endPoints);
+	}
+
+	private static function get_classes_for_test() {
+		$testClass = BaseRestfulServerTest::get_current_test_class();
+		return singleton($testClass)->getExtraDataObjects();
+	}
+
+	private static function get_classes() {
+		$allClassNames = ClassInfo::subclassesFor('DataObject');
+		$classNames = array();
+
+		foreach ($allClassNames as $className) {
+			$instance = singleton($className);
+
+			if ($instance instanceof TestOnly) {
+				continue;
+			}
+
+			$classNames[] = $className;
+		}
+
+		return $classNames;
+	}
+
 	public static function class_can_be_filtered_by($className, $fieldName) {
 		$validFields = array_keys(singleton($className)->inheritedDatabaseFields());
 		$validFields['id'] = 'ID';
