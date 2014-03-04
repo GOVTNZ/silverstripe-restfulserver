@@ -24,6 +24,12 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		$this->assertContains('/api/v2/stafftestfieldalias', $body);
 
 		$this->assertContains('test object description', $body);
+
+		$this->assertContains('Available formats', $body);
+
+		foreach (RestfulServerV2::get_available_formats() as $format) {
+			$this->assertContains('<li>' . $format . '</li>', $body);
+		}
 	}
 
 }

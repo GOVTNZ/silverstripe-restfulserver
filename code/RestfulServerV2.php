@@ -172,20 +172,29 @@ class RestfulServerV2 extends Controller {
 	public function index() {
 		$this->getResponse()->addHeader('Content-Type', 'text/html');
 
-		$endPoints = APIInfo::get_all_end_points();
+		$endPointClassMap = APIInfo::get_all_end_points();
 
-		$arrayData = new ArrayList();
+		$endPoints = new ArrayList();
 
-		foreach ($endPoints as $className => $endPoint) {
-			$arrayData->push(new ArrayData(array(
+		foreach ($endPointClassMap as $className => $endPoint) {
+			$endPoints->push(new ArrayData(array(
 				'Name' => $endPoint,
 				'Link' => self::get_base_url() . '/' . $endPoint . '.html',
 				'Description' => $this->getEndPointDescription($className)
 			)));
 		}
 
+		$formats = new ArrayList();
+
+		foreach (self::get_available_formats() as $format) {
+			$formats->push(array(
+				'Extension' => $format
+			));
+		}
+
 		return $this->customise(array(
-			'EndPoints' => $arrayData
+			'EndPoints' => $endPoints,
+			'Formats' => $formats
 		))->renderWith('DocumentationBase');
 	}
 
