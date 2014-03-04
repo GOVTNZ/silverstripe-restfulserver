@@ -9,7 +9,7 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		'StaffTestObjectWithFieldAliases'
 	);
 
-	public function testListEndPoints() {
+	public function testBaseDocumentation() {
 		$response = Director::test('/api/v2');
 
 		$this->assertEquals(200, $response->getStatusCode());
@@ -32,4 +32,9 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		}
 	}
 
+	public function testListDocumentation() {
+		$response = Director::test('/api/v2/stafftest.html');
+
+		$this->assertEquals(200, $response->getStatusCode());
+	}
 }

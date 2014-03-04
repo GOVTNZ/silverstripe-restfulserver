@@ -23,7 +23,8 @@ class RestfulServerV2 extends Controller {
 
 	private static $valid_formats = array(
 		'json' => 'JSONFormatter',
-		'xml' => 'XMLFormatter'
+		'xml' => 'XMLFormatter',
+		'html' => 'DocumentationFormatter'
 	);
 
 	private static $base_url = null;
