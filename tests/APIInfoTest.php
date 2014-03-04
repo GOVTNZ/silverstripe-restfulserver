@@ -31,7 +31,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 
 		try {
 			APIInfo::get_relation_method_from_name('StaffTestObject', 'invalid-name');
-		} catch (APIException $exception) {
+		} catch (RestfulServer\Exception $exception) {
 			$exceptionThrown = true;
 		}
 
@@ -49,7 +49,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 
 		try {
 			APIInfo::get_relation_method_from_name('APITestPageObject', 'InvalidRelation');
-		} catch (APIException $exception) {
+		} catch (RestfulServer\Exception $exception) {
 			$exceptionThrown = true;
 		}
 

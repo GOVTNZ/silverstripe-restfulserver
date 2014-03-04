@@ -1,6 +1,8 @@
 <?php
 
-abstract class APIException extends Exception {
+namespace RestfulServer;
+
+abstract class Exception extends \Exception {
 
 	protected $statusCode;
 
@@ -13,7 +15,7 @@ abstract class APIException extends Exception {
 	 * @param array $context
 	 */
 	public function __construct($errorKey, $context = array()) {
-		$errors = APIError::get_messages_for($errorKey, $context);
+		$errors = \APIError::get_messages_for($errorKey, $context);
 
 		$this->userMessage = $errors['userMessage'];
 		$this->developerMessage = $errors['developerMessage'];
@@ -37,17 +39,5 @@ abstract class APIException extends Exception {
 			'moreInfo' => $this->moreInfo
 		);
 	}
-
-}
-
-class APIUserException extends APIException {
-
-	protected $statusCode = 400;
-
-}
-
-class APIServerException extends APIException {
-
-	protected $statusCode = 500;
 
 }

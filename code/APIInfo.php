@@ -36,7 +36,7 @@ class APIInfo {
 			return $className;
 		}
 
-		throw new APIUserException(
+		throw new RestfulServer\UserException(
 			'resourceNotFound',
 			array(
 				'resourceName' => $resourceName
@@ -171,7 +171,7 @@ class APIInfo {
 			return $apiAccess['relation_aliases'][$relationName];
 		}
 
-		throw new APIUserException(
+		throw new RestfulServer\UserException(
 			'relationNotFound',
 			array(
 				'relation' => $relationName

@@ -220,7 +220,7 @@ class APIRequest {
 		$this->totalCount = (int) $list->Count();
 
 		if ($this->totalCount > 0 && $this->offset >= $this->totalCount) {
-			throw new APIUserException('offsetOutOfBounds');
+			throw new RestfulServer\UserException('offsetOutOfBounds');
 		}
 	}
 
@@ -271,7 +271,12 @@ class APIRequest {
 
 		// check for any fields that don't exist on our object
 		if (count($partialResponseFields) > 0) {
-			throw new APIUserException('invalidField', array('fields' => implode(', ', $partialResponseFields)));
+			throw new RestfulServer\UserException(
+				'invalidField',
+				array(
+					'fields' => implode(', ', $partialResponseFields)
+				)
+			);
 		}
 
 		return $result;
@@ -341,7 +346,7 @@ class APIRequest {
 		$this->resource = $className::get()->byID($this->resourceID);
 
 		if (!$this->resource) {
-			throw new APIUserException('recordNotFound');
+			throw new RestfulServer\UserException('recordNotFound');
 		}
 	}
 

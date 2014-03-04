@@ -25,7 +25,7 @@ class APIFilterTest extends SapphireTest {
 				'Name' => 'test value',
 				'InvalidField' => 'another test value'
 			));
-		} catch (APIException $exception) {
+		} catch (RestfulServer\Exception $exception) {
 			$exceptionThrown = true;
 
 			$messages = $exception->getErrorMessages();

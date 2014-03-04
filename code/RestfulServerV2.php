@@ -94,12 +94,12 @@ class RestfulServerV2 extends Controller {
 		try {
 			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputResourceList();
-		} catch (APIException $exception) {
+		} catch (RestfulServer\Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
 
-	private function throwFormattedAPIError(APIException $exception) {
+	private function throwFormattedAPIError(RestfulServer\Exception $exception) {
 		$this->formatter->clearData();
 		$this->formatter->addExtraData($exception->getErrorMessages());
 
@@ -120,7 +120,7 @@ class RestfulServerV2 extends Controller {
 		try {
 			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputResourceDetail();
-		} catch (APIException $exception) {
+		} catch (RestfulServer\Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
@@ -129,7 +129,7 @@ class RestfulServerV2 extends Controller {
 		try {
 			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputRelationList();
-		} catch (APIException $exception) {
+		} catch (RestfulServer\Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}

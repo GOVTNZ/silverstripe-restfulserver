@@ -41,7 +41,7 @@ class APIFilter {
 		}
 
 		if (count($invalidFields) > 0) {
-			throw new APIUserException(
+			throw new RestfulServer\UserException(
 				'invalidFilterFields',
 				array(
 					'fields' => implode(', ', $invalidFields)
