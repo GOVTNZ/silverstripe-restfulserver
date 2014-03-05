@@ -28,7 +28,7 @@ class APIRequest {
 	const DEFAULT_SORT   = 'ID';
 	const DEFAULT_ORDER  = 'ASC';
 
-	public function __construct(SS_HTTPRequest $request, Formatter $formatter) {
+	public function __construct(\SS_HTTPRequest $request, \RestfulServer\Formatter $formatter) {
 		$this->httpRequest = $request;
 		$this->formatter = $formatter;
 	}

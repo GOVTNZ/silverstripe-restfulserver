@@ -1,5 +1,7 @@
 <?php
 
+namespace RestfulServer;
+
 class DocumentationFormatter extends AbstractFormatter implements Formatter {
 
 	protected $outputContentType = 'text/html';

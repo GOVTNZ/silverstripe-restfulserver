@@ -1,5 +1,7 @@
 <?php
 
+use RestfulServer\JSONFormatter;
+
 class JSONFormatterTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
@@ -120,7 +122,7 @@ class JSONFormatterTest extends SapphireTest {
 	public function testJsonFormat() {
 		$formatter = new JSONFormatter();
 
-		$method = new ReflectionMethod('JSONFormatter', 'jsonFormat');
+		$method = new ReflectionMethod('\\RestfulServer\\JSONFormatter', 'jsonFormat');
 		$method->setAccessible(true);
 		$formattedJSON = $method->invoke($formatter, array('test' => array(
 			'one' => 'one',

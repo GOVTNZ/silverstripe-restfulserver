@@ -1,5 +1,7 @@
 <?php
 
+namespace RestfulServer;
+
 interface Formatter {
 
 	public function format();

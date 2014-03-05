@@ -1,5 +1,7 @@
 <?php
 
+use RestfulServer\XMLFormatter;
+
 class XMLFormatterTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';

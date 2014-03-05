@@ -1,5 +1,9 @@
 <?php
 
+namespace RestfulServer;
+
+use \Convert;
+
 class XMLFormatter extends AbstractFormatter {
 
 	protected $outputContentType = 'application/xml';
@@ -22,16 +26,6 @@ class XMLFormatter extends AbstractFormatter {
 			foreach ($data as $key => $value) {
 				$xml .= $this->generateXML($key, $value);
 			}
-		}
-
-		return $xml . '</root>';
-
-		foreach ($response as $key => $value) {
-			if ($key === $this->pluralItemName) {
-				continue;
-			}
-
-			$xml .= $this->generateXML($key, $value);
 		}
 
 		return $xml . '</root>';
