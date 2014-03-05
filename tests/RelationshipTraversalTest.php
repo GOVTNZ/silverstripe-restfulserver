@@ -66,7 +66,7 @@ class RelationshipTraversalTest extends SapphireTest {
 
 		$this->assertEquals(400, $response->getStatusCode());
 		$this->assertEquals(
-			APIError::get_developer_message_for('relationNotFound', array('relation' => 'non-existent-relation')),
+			\RestfulServer\APIError::get_developer_message_for('relationNotFound', array('relation' => 'non-existent-relation')),
 			$results['developerMessage']
 		);
 	}

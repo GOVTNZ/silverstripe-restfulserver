@@ -3,7 +3,7 @@
 class APIErrorTest extends SapphireTest {
 
 	public function testGetMessagesFor() {
-		$errors = APIError::get_messages_for('resourceNotFound');
+		$errors = \RestfulServer\APIError::get_messages_for('resourceNotFound');
 
 		$this->assertInternalType('array', $errors);
 		$this->assertEquals(3, count($errors));
@@ -14,13 +14,13 @@ class APIErrorTest extends SapphireTest {
 	}
 
 	public function testGetMessagesForWithInvalidKey() {
-		$errors = APIError::get_messages_for('incorrectKey');
+		$errors = \RestfulServer\APIError::get_messages_for('incorrectKey');
 
 		$this->assertNull($errors);
 	}
 
 	public function testGetMessagesForWithContext() {
-		$errors = APIError::get_messages_for('resourceNotFound', array('resourceName' => 'testResource'));
+		$errors = \RestfulServer\APIError::get_messages_for('resourceNotFound', array('resourceName' => 'testResource'));
 
 		$this->assertContains('testResource', $errors['developerMessage']);
 	}
@@ -32,7 +32,7 @@ class APIErrorTest extends SapphireTest {
 	}
 
 	private function invokeGetMessage($type, $key, $context = array()) {
-		$method = new ReflectionMethod('APIError', 'get_message');
+		$method = new ReflectionMethod('\RestfulServer\APIError', 'get_message');
 		$method->setAccessible(true);
 
 		return $method->invokeArgs(null, array(
@@ -61,7 +61,7 @@ class APIErrorTest extends SapphireTest {
 	}
 
 	public function testGetMoreInfoLink() {
-		$link = APIError::get_more_info_link_for('resourceNotFound');
+		$link = \RestfulServer\APIError::get_more_info_link_for('resourceNotFound');
 		$expectedLink = Director::absoluteBaseURL() . 'api/v2/errors/resourceNotFound';
 
 		$this->assertEquals($expectedLink, $link);
@@ -79,7 +79,7 @@ class APIErrorTest extends SapphireTest {
 		Config::inst()->remove('Director', 'rules');
 		Config::inst()->update('Director', 'rules', array());
 
-		$link = APIError::get_more_info_link_for('resourceNotFound');
+		$link = \RestfulServer\APIError::get_more_info_link_for('resourceNotFound');
 		$expectedLink = Director::absoluteBaseURL() . 'RestfulServerV2/errors/resourceNotFound';
 
 		$this->assertEquals($expectedLink, $link);

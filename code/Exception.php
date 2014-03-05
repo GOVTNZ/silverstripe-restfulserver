@@ -15,7 +15,7 @@ abstract class Exception extends \Exception {
 	 * @param array $context
 	 */
 	public function __construct($errorKey, $context = array()) {
-		$errors = \APIError::get_messages_for($errorKey, $context);
+		$errors = APIError::get_messages_for($errorKey, $context);
 
 		$this->userMessage = $errors['userMessage'];
 		$this->developerMessage = $errors['developerMessage'];

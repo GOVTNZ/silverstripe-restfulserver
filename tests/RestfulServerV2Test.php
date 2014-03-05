@@ -67,7 +67,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$results = json_decode($response->getBody(), true);
 
 		$this->assertEquals(
-			APIError::get_developer_message_for('invalidFilterFields', array('fields' => 'InvalidField')),
+			\RestfulServer\APIError::get_developer_message_for('invalidFilterFields', array('fields' => 'InvalidField')),
 			$results['developerMessage']
 		);
 	}
@@ -120,7 +120,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertArrayHasKey('moreInfo', $output);
 
 		$this->assertEquals(
-			APIError::get_developer_message_for('recordNotFound'),
+			\RestfulServer\APIError::get_developer_message_for('recordNotFound'),
 			$output['developerMessage']
 		);
 	}
@@ -152,7 +152,7 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertArrayHasKey('developerMessage', $body, 'Developer message not set');
 		$this->assertEquals(
-			APIError::get_developer_message_for('offsetOutOfBounds'),
+			\RestfulServer\APIError::get_developer_message_for('offsetOutOfBounds'),
 			$body['developerMessage'],
 			'Incorrect developer message supplied'
 		);
@@ -207,7 +207,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertEquals(200, $response->getStatusCode());
 
 		$body = $response->getBody();
-		$errors = APIError::config()->get('errors');
+		$errors = \RestfulServer\APIError::config()->get('errors');
 
 		foreach ($errors as $error) {
 			$this->assertContains($error['name'], $body);
@@ -215,14 +215,14 @@ class RestfulServerV2Test extends SapphireTest {
 	}
 
 	public function testShowError() {
-		$errors = APIError::config()->get('errors');
+		$errors = \RestfulServer\APIError::config()->get('errors');
 
 		foreach ($errors as $key => $error) {
 			$response = Director::test('/api/v2/errors/' . $key);
 			$body = $response->getBody();
 
 			$this->assertEquals(200, $response->getStatusCode());
-			$this->assertContains(APIError::get_description($key)->forTemplate(), $body);
+			$this->assertContains(\RestfulServer\APIError::get_description($key)->forTemplate(), $body);
 		}
 	}
 
@@ -235,7 +235,7 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertEquals(200, $response->getStatusCode());
 		$this->assertContains(
-			APIError::get_description('resourceNotFound', $context)->forTemplate(),
+			\RestfulServer\APIError::get_description('resourceNotFound', $context)->forTemplate(),
 			$response->getBody()
 		);
 	}

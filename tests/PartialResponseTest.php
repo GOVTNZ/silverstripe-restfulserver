@@ -29,7 +29,7 @@ class PartialResponseTest extends SapphireTest {
 		$results = json_decode($response->getBody(), true);
 
 		$this->assertEquals(
-			APIError::get_developer_message_for('invalidField', array('fields' => 'InvalidField')),
+			\RestfulServer\APIError::get_developer_message_for('invalidField', array('fields' => 'InvalidField')),
 			$results['developerMessage']
 		);
 	}
