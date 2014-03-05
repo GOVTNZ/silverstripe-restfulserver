@@ -185,7 +185,7 @@ class APIRequest {
 	private function applyFilters(DataList $list) {
 		$getVars = $this->httpRequest->getVars();
 		$filterValues = $this->transformAliases($getVars, $list->dataClass());
-		$filter = new APIFilter($list->dataClass());
+		$filter = new \RestfulServer\ResponseFilter($list->dataClass());
 		$filterArray = $filter->parseGET($filterValues);
 
 		if (count($filterArray) > 0) {

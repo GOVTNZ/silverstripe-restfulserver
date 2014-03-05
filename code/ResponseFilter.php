@@ -1,6 +1,8 @@
 <?php
 
-class APIFilter {
+namespace RestfulServer;
+
+class ResponseFilter {
 
 	private $className;
 
@@ -28,7 +30,7 @@ class APIFilter {
 				continue; // we don't filter on any reserved get variables
 			}
 
-			if (!APIInfo::class_can_be_filtered_by($this->className, $key)) {
+			if (!\APIInfo::class_can_be_filtered_by($this->className, $key)) {
 				$invalidFields[] = $key;
 				continue;
 			}
@@ -41,7 +43,7 @@ class APIFilter {
 		}
 
 		if (count($invalidFields) > 0) {
-			throw new RestfulServer\UserException(
+			throw new UserException(
 				'invalidFilterFields',
 				array(
 					'fields' => implode(', ', $invalidFields)
