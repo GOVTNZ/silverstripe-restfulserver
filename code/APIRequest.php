@@ -34,7 +34,7 @@ class APIRequest {
 	}
 
 	public function outputResourceList() {
-		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = \RestfulServer\APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
 		$this->resultClassName = $className;
@@ -326,7 +326,7 @@ class APIRequest {
 	}
 
 	public function outputResourceDetail() {
-		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = \RestfulServer\APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
 
 		$this->resultClassName = $this->resourceClassName;
@@ -351,14 +351,14 @@ class APIRequest {
 	}
 
 	public function outputRelationList() {
-		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = \RestfulServer\APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
 
 		$this->resultClassName = $this->resourceClassName;
 
 		$this->setResource();
 
-		$relationMethod = APIInfo::get_relation_method_from_name(
+		$relationMethod = \RestfulServer\APIInfo::get_relation_method_from_name(
 			$this->resourceClassName,
 			$this->httpRequest->param('RelationName')
 		);

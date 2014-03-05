@@ -9,19 +9,19 @@ class APIInfoTest extends BaseRestfulServerTest {
 	);
 
 	public function testClassCanBeFilteredBy() {
-		$result = APIInfo::class_can_be_filtered_by('APITestObject', 'Name');
+		$result = \RestfulServer\APIInfo::class_can_be_filtered_by('APITestObject', 'Name');
 
 		$this->assertTrue($result);
 	}
 
 	public function testClassCanBeFilteredByWithInvalidFieldName() {
-		$result = APIInfo::class_can_be_filtered_by('APITestObject', 'NonExistentField');
+		$result = \RestfulServer\APIInfo::class_can_be_filtered_by('APITestObject', 'NonExistentField');
 
 		$this->assertFalse($result);
 	}
 
 	public function testGetRelationMethodFromName() {
-		$relationMethod = APIInfo::get_relation_method_from_name('StaffTestObject', 'direct-reports');
+		$relationMethod = \RestfulServer\APIInfo::get_relation_method_from_name('StaffTestObject', 'direct-reports');
 
 		$this->assertEquals('DirectReports', $relationMethod);
 	}
@@ -30,7 +30,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 		$exceptionThrown = false;
 
 		try {
-			APIInfo::get_relation_method_from_name('StaffTestObject', 'invalid-name');
+			\RestfulServer\APIInfo::get_relation_method_from_name('StaffTestObject', 'invalid-name');
 		} catch (RestfulServer\Exception $exception) {
 			$exceptionThrown = true;
 		}
@@ -39,7 +39,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 	}
 
 	public function testGetRelationMethodFromNameWithNoRelationAlias() {
-		$relationMethod = APIInfo::get_relation_method_from_name('APITestPageObject', 'Children');
+		$relationMethod = \RestfulServer\APIInfo::get_relation_method_from_name('APITestPageObject', 'Children');
 
 		$this->assertEquals('Children', $relationMethod);
 	}
@@ -48,7 +48,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 		$exceptionThrown = false;
 
 		try {
-			APIInfo::get_relation_method_from_name('APITestPageObject', 'InvalidRelation');
+			\RestfulServer\APIInfo::get_relation_method_from_name('APITestPageObject', 'InvalidRelation');
 		} catch (RestfulServer\Exception $exception) {
 			$exceptionThrown = true;
 		}
@@ -57,7 +57,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 	}
 
 	public function testGetAllAPIEndPoints() {
-		$endPoints = APIInfo::get_all_end_points();
+		$endPoints = \RestfulServer\APIInfo::get_all_end_points();
 
 		$this->assertEquals(3, count($endPoints));
 	}

@@ -22,7 +22,7 @@ class APIAliasTest extends SapphireTest {
 	}
 
 	private function cleanAliasCache() {
-		$aliasCache = SS_Cache::factory(APIInfo::RESOURCE_NAME_CACHE_KEY);
+		$aliasCache = SS_Cache::factory(\RestfulServer\APIInfo::RESOURCE_NAME_CACHE_KEY);
 		$aliasCache->clean();
 	}
 

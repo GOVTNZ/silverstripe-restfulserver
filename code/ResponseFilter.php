@@ -30,7 +30,7 @@ class ResponseFilter {
 				continue; // we don't filter on any reserved get variables
 			}
 
-			if (!\APIInfo::class_can_be_filtered_by($this->className, $key)) {
+			if (!APIInfo::class_can_be_filtered_by($this->className, $key)) {
 				$invalidFields[] = $key;
 				continue;
 			}

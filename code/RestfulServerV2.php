@@ -173,7 +173,7 @@ class RestfulServerV2 extends Controller {
 	public function index() {
 		$this->getResponse()->addHeader('Content-Type', 'text/html');
 
-		$endPointClassMap = APIInfo::get_all_end_points();
+		$endPointClassMap = \RestfulServer\APIInfo::get_all_end_points();
 
 		$endPoints = new ArrayList();
 
