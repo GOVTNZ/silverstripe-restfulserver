@@ -92,7 +92,7 @@ class RestfulServerV2 extends Controller {
 
 	public function listResources() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			$apiRequest = new \RestfulServer\APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputResourceList();
 		} catch (RestfulServer\Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
@@ -118,7 +118,7 @@ class RestfulServerV2 extends Controller {
 
 	public function showResource() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			$apiRequest = new \RestfulServer\APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputResourceDetail();
 		} catch (RestfulServer\Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
@@ -127,7 +127,7 @@ class RestfulServerV2 extends Controller {
 
 	public function listRelations() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			$apiRequest = new \RestfulServer\APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputRelationList();
 		} catch (RestfulServer\Exception $exception) {
 			return $this->throwFormattedAPIError($exception);

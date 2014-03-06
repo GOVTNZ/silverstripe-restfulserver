@@ -1,5 +1,7 @@
 <?php
 
+namespace RestfulServer;
+
 class APIRequest {
 
 	private $httpRequest = null;
@@ -28,13 +30,13 @@ class APIRequest {
 	const DEFAULT_SORT   = 'ID';
 	const DEFAULT_ORDER  = 'ASC';
 
-	public function __construct(\SS_HTTPRequest $request, \RestfulServer\Formatter $formatter) {
+	public function __construct(\SS_HTTPRequest $request, Formatter $formatter) {
 		$this->httpRequest = $request;
 		$this->formatter = $formatter;
 	}
 
 	public function outputResourceList() {
-		$this->resourceClassName = \RestfulServer\APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 
 		$className = $this->resourceClassName;
 		$this->resultClassName = $className;
@@ -43,7 +45,7 @@ class APIRequest {
 		return $this->outputList($list, $className);
 	}
 
-	private function outputList(DataList $list, $className) {
+	private function outputList(\DataList $list, $className) {
 		$this->setPagination();
 		$this->setSorting($className);
 
@@ -182,10 +184,10 @@ class APIRequest {
 		}
 	}
 
-	private function applyFilters(DataList $list) {
+	private function applyFilters(\DataList $list) {
 		$getVars = $this->httpRequest->getVars();
 		$filterValues = $this->transformAliases($getVars, $list->dataClass());
-		$filter = new \RestfulServer\ResponseFilter($list->dataClass());
+		$filter = new ResponseFilter($list->dataClass());
 		$filterArray = $filter->parseGET($filterValues);
 
 		if (count($filterArray) > 0) {
@@ -216,11 +218,11 @@ class APIRequest {
 		return $fieldValueMap;
 	}
 
-	private function setTotalCount(DataList $list) {
+	private function setTotalCount(\DataList $list) {
 		$this->totalCount = (int) $list->Count();
 
 		if ($this->totalCount > 0 && $this->offset >= $this->totalCount) {
-			throw new RestfulServer\UserException('offsetOutOfBounds');
+			throw new UserException('offsetOutOfBounds');
 		}
 	}
 
@@ -271,7 +273,7 @@ class APIRequest {
 
 		// check for any fields that don't exist on our object
 		if (count($partialResponseFields) > 0) {
-			throw new RestfulServer\UserException(
+			throw new UserException(
 				'invalidField',
 				array(
 					'fields' => implode(', ', $partialResponseFields)
@@ -326,7 +328,7 @@ class APIRequest {
 	}
 
 	public function outputResourceDetail() {
-		$this->resourceClassName = \RestfulServer\APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
 
 		$this->resultClassName = $this->resourceClassName;
@@ -346,19 +348,19 @@ class APIRequest {
 		$this->resource = $className::get()->byID($this->resourceID);
 
 		if (!$this->resource) {
-			throw new RestfulServer\UserException('recordNotFound');
+			throw new UserException('recordNotFound');
 		}
 	}
 
 	public function outputRelationList() {
-		$this->resourceClassName = \RestfulServer\APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
 
 		$this->resultClassName = $this->resourceClassName;
 
 		$this->setResource();
 
-		$relationMethod = \RestfulServer\APIInfo::get_relation_method_from_name(
+		$relationMethod = APIInfo::get_relation_method_from_name(
 			$this->resourceClassName,
 			$this->httpRequest->param('RelationName')
 		);
