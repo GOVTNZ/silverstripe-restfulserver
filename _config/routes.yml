@@ -8,4 +8,4 @@ Director:
   rules:
    'api/v1/live': 'VersionedRestfulServer'
    'api/v1': 'RestfulServer'
-   'api/v2//$ResourceName/$ResourceID/$RelationName': 'RestfulServerV2'
+   'api/v2//$ResourceName/$ResourceID/$RelationName': 'RestfulServer\ControllerV2'

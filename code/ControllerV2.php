@@ -1,6 +1,16 @@
 <?php
 
-class RestfulServerV2 extends Controller {
+namespace RestfulServer;
+
+use Controller;
+use ArrayList;
+use ArrayData;
+use Director;
+use SS_HTTPResponse;
+use SS_HTTPResponse_Exception;
+use Config;
+
+class ControllerV2 extends Controller {
 
 	public static $default_extension = 'json';
 
@@ -29,7 +39,7 @@ class RestfulServerV2 extends Controller {
 
 	private static $base_url = null;
 
-	/** @var null|RestfulServer\Formatter  */
+	/** @var null|Formatter  */
 	private $formatter = null;
 
 	const MIN_LIMIT      = 1;
@@ -54,7 +64,7 @@ class RestfulServerV2 extends Controller {
 			// within the init method - doesn't seem to affect normal operation
 			$this->popCurrent();
 
-			$message = \RestfulServer\APIError::get_developer_message_for(
+			$message = APIError::get_developer_message_for(
 				'invalidFormat',
 				array(
 					'extension' => $this->getRequest()->getExtension()
@@ -62,14 +72,14 @@ class RestfulServerV2 extends Controller {
 			);
 
 			$message .= "\n";
-			$message .= \RestfulServer\APIError::get_more_info_link_for(
+			$message .= APIError::get_more_info_link_for(
 				'invalidFormat',
 				array(
 					'extension' => $this->getRequest()->getExtension()
 				)
 			);
 
-			return \RestfulServer\APIError::throw_error(400, $message);
+			return APIError::throw_error(400, $message);
 		}
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
@@ -92,14 +102,14 @@ class RestfulServerV2 extends Controller {
 
 	public function listResources() {
 		try {
-			$apiRequest = new \RestfulServer\APIRequest($this->getRequest(), $this->formatter);
+			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputResourceList();
-		} catch (RestfulServer\Exception $exception) {
+		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
 
-	private function throwFormattedAPIError(RestfulServer\Exception $exception) {
+	private function throwFormattedAPIError(Exception $exception) {
 		$this->formatter->clearData();
 		$this->formatter->addExtraData($exception->getErrorMessages());
 
@@ -118,31 +128,31 @@ class RestfulServerV2 extends Controller {
 
 	public function showResource() {
 		try {
-			$apiRequest = new \RestfulServer\APIRequest($this->getRequest(), $this->formatter);
+			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputResourceDetail();
-		} catch (RestfulServer\Exception $exception) {
+		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
 
 	public function listRelations() {
 		try {
-			$apiRequest = new \RestfulServer\APIRequest($this->getRequest(), $this->formatter);
+			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
 			return $apiRequest->outputRelationList();
-		} catch (RestfulServer\Exception $exception) {
+		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
 
 	public function listErrors() {
-		$errors = \RestfulServer\APIError::config()->get('errors');
+		$errors = APIError::config()->get('errors');
 		$errorOutput = array();
 
 		foreach ($errors as $key => $error) {
 			$temp = array();
 
 			$temp['Name'] = $error['name'];
-			$temp['Link'] = \RestfulServer\APIError::get_more_info_link_for($key);
+			$temp['Link'] = APIError::get_more_info_link_for($key);
 
 			$errorOutput[] = $temp;
 		}
@@ -153,7 +163,7 @@ class RestfulServerV2 extends Controller {
 	public function showError() {
 		$errorID = $this->getRequest()->param('ErrorID');
 
-		if (!\RestfulServer\APIError::valid_key($errorID)) {
+		if (!APIError::valid_key($errorID)) {
 			$this->getResponse()->setStatusCode(404);
 			return 'Error detail not found';
 		}
@@ -165,15 +175,15 @@ class RestfulServerV2 extends Controller {
 		}
 
 		return $this->renderWith('ErrorDetail', array(
-			'Name' => \RestfulServer\APIError::get_name($errorID),
-			'Description' => \RestfulServer\APIError::get_description($errorID, $context)
+			'Name' => APIError::get_name($errorID),
+			'Description' => APIError::get_description($errorID, $context)
 		));
 	}
 
 	public function index() {
 		$this->getResponse()->addHeader('Content-Type', 'text/html');
 
-		$endPointClassMap = \RestfulServer\APIInfo::get_all_end_points();
+		$endPointClassMap = APIInfo::get_all_end_points();
 
 		$endPoints = new ArrayList();
 

@@ -27,7 +27,7 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 
 		$this->assertContains('Available formats', $body);
 
-		foreach (RestfulServerV2::get_available_formats() as $format) {
+		foreach (RestfulServer\ControllerV2::get_available_formats() as $format) {
 			$this->assertContains('<li>' . $format . '</li>', $body);
 		}
 	}

@@ -69,7 +69,7 @@ class APIErrorTest extends SapphireTest {
 
 	public function testGetMoreInfoLinkWithNoRestfulServerV2Route() {
 		// clear static base_url value
-		$reflectionProperty = new ReflectionProperty('RestfulServerV2', 'base_url');
+		$reflectionProperty = new ReflectionProperty('RestfulServer\ControllerV2', 'base_url');
 		$reflectionProperty->setAccessible(true);
 		$reflectionProperty->setValue(null);
 

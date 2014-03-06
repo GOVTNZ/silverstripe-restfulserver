@@ -2,7 +2,9 @@
 
 namespace RestfulServer;
 
-class APIError extends \Object {
+use Object;
+
+class APIError extends Object {
 
 	public static function throw_formatted_error($formatter, $statusCode, $errorKey, $context = array()) {
 		$formatter->setExtraData(self::get_messages_for($errorKey, $context));
@@ -68,7 +70,7 @@ class APIError extends \Object {
 			return null;
 		}
 
-		$apiBaseURL = \RestfulServerV2::get_base_url();
+		$apiBaseURL = ControllerV2::get_base_url();
 
 		$errorsURL = $apiBaseURL . '/errors';
 		$errorURL = $errorsURL . '/' . $key;
