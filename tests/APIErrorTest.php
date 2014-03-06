@@ -71,6 +71,9 @@ class APIErrorTest extends SapphireTest {
 		// clear static base_url value
 		$reflectionProperty = new ReflectionProperty('RestfulServer\ControllerV2', 'base_url');
 		$reflectionProperty->setAccessible(true);
+
+		$originalBaseURL = $reflectionProperty->getValue();
+
 		$reflectionProperty->setValue(null);
 
 		$originalRules = Config::inst()->get('Director', 'rules');
@@ -80,11 +83,13 @@ class APIErrorTest extends SapphireTest {
 		Config::inst()->update('Director', 'rules', array());
 
 		$link = \RestfulServer\APIError::get_more_info_link_for('resourceNotFound');
-		$expectedLink = Director::absoluteBaseURL() . 'RestfulServerV2/errors/resourceNotFound';
+		$expectedLink = Director::absoluteBaseURL() . 'RestfulServer\ControllerV2/errors/resourceNotFound';
+
+		$reflectionProperty->setValue($originalBaseURL);
+		$reflectionProperty->setAccessible(false);
+		Config::inst()->update('Director', 'rules', $originalRules);
 
 		$this->assertEquals($expectedLink, $link);
-
-		Config::inst()->update('Director', 'rules', $originalRules);
 	}
 
 }

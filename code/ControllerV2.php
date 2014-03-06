@@ -257,7 +257,7 @@ class ControllerV2 extends Controller {
 			$matchedRoute = explode('//', $matchedRoute);
 			$matchedRoute = $matchedRoute[0];
 		} else {
-			$matchedRoute = 'RestfulServerV2';
+			$matchedRoute = __CLASS__;
 		}
 
 		self::$base_url = Director::absoluteBaseURL() . $matchedRoute;
