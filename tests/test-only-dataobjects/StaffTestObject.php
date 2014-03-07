@@ -1,6 +1,8 @@
 <?php
 
-class StaffTestObject extends DataObject implements TestOnly {
+namespace RestfulServer;
+
+class StaffTestObject extends \DataObject implements \TestOnly {
 
 	private static $db = array(
 		'Name' => 'Text',
@@ -8,19 +10,19 @@ class StaffTestObject extends DataObject implements TestOnly {
 	);
 
 	private static $has_one = array(
-		'Manager' => 'StaffTestObject'
+		'Manager' => 'RestfulServer\StaffTestObject'
 	);
 
 	private static $has_many = array(
-		'DirectReports' => 'StaffTestObject'
+		'DirectReports' => 'RestfulServer\StaffTestObject'
 	);
 
 	private static $many_many = array(
-		'Friends' => 'StaffTestObject'
+		'Friends' => 'RestfulServer\StaffTestObject'
 	);
 
 	private static $belongs_many_many = array(
-		'InverseFriends' => 'StaffTestObject'
+		'InverseFriends' => 'RestfulServer\StaffTestObject'
 	);
 
 	private static $api_access = array(

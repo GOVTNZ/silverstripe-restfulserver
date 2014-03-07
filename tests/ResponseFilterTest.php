@@ -1,13 +1,17 @@
 <?php
 
+namespace RestfulServer;
+
+use SapphireTest;
+
 class ResponseFilterTest extends SapphireTest {
 
 	protected $extraDataObjects = array(
-		'APITestObject'
+		'RestfulServer\APITestObject'
 	);
 
 	public function testParseGET() {
-		$filter = new \RestfulServer\ResponseFilter('APITestObject');
+		$filter = new ResponseFilter('RestfulServer\APITestObject');
 
 		$filterArray = $filter->parseGET(array('Name' => 'test value'));
 
@@ -16,16 +20,16 @@ class ResponseFilterTest extends SapphireTest {
 	}
 
 	public function testParseGETWithInvalidFilter() {
-		$filter = new \RestfulServer\ResponseFilter('APITestObject');
+		$filter = new ResponseFilter('RestfulServer\APITestObject');
 
 		$exceptionThrown = false;
 
 		try {
-			$filterArray = $filter->parseGET(array(
+			$filter->parseGET(array(
 				'Name' => 'test value',
 				'InvalidField' => 'another test value'
 			));
-		} catch (\RestfulServer\Exception $exception) {
+		} catch (Exception $exception) {
 			$exceptionThrown = true;
 
 			$messages = $exception->getErrorMessages();

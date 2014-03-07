@@ -1,5 +1,9 @@
 <?php
 
+namespace RestfulServer;
+
+use SapphireTest;
+
 class BaseRestfulServerTest extends SapphireTest {
 
 	private static $current_test_class = null;

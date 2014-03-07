@@ -1,12 +1,16 @@
 <?php
 
+namespace RestfulServer;
+
+use Director;
+
 class APIDocumentationTest extends BaseRestfulServerTest {
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject',
-		'StaffTestObject',
-		'StaffTestObjectWithFieldAliases'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject',
+		'RestfulServer\StaffTestObject',
+		'RestfulServer\StaffTestObjectWithFieldAliases'
 	);
 
 	public function testBaseDocumentation() {
@@ -27,7 +31,7 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 
 		$this->assertContains('Available formats', $body);
 
-		foreach (RestfulServer\ControllerV2::get_available_formats() as $format) {
+		foreach (ControllerV2::get_available_formats() as $format) {
 			$this->assertContains('<li>' . $format . '</li>', $body);
 		}
 	}

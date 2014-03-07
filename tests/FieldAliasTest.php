@@ -1,11 +1,15 @@
 <?php
 
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
 class FieldAliasTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/FieldAliasTest.yml';
 
 	protected $extraDataObjects = array(
-		'StaffTestObjectWithFieldAliases'
+		'RestfulServer\StaffTestObjectWithFieldAliases'
 	);
 
 	public function testFieldAliases() {

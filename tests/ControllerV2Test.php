@@ -1,12 +1,16 @@
 <?php
 
-class RestfulServerV2Test extends SapphireTest {
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
+class ControllerV2Test extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	public function testListJSONRequest() {
@@ -67,7 +71,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$results = json_decode($response->getBody(), true);
 
 		$this->assertEquals(
-			\RestfulServer\APIError::get_developer_message_for('invalidFilterFields', array('fields' => 'InvalidField')),
+			APIError::get_developer_message_for('invalidFilterFields', array('fields' => 'InvalidField')),
 			$results['developerMessage']
 		);
 	}
@@ -120,7 +124,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertArrayHasKey('moreInfo', $output);
 
 		$this->assertEquals(
-			\RestfulServer\APIError::get_developer_message_for('recordNotFound'),
+			APIError::get_developer_message_for('recordNotFound'),
 			$output['developerMessage']
 		);
 	}
@@ -140,7 +144,7 @@ class RestfulServerV2Test extends SapphireTest {
 	public function testPaginationNegativeOffset() {
 		$response = Director::test('/api/v2/testobjects?offset=-5');
 		$output = json_decode($response->getBody(), true);
-		$this->assertEquals(RestfulServer\ControllerV2::DEFAULT_OFFSET, $output['_metadata']['offset']);
+		$this->assertEquals(ControllerV2::DEFAULT_OFFSET, $output['_metadata']['offset']);
 	}
 
 	public function testPaginationOffsetOutOfBounds() {
@@ -152,21 +156,21 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertArrayHasKey('developerMessage', $body, 'Developer message not set');
 		$this->assertEquals(
-			\RestfulServer\APIError::get_developer_message_for('offsetOutOfBounds'),
+			APIError::get_developer_message_for('offsetOutOfBounds'),
 			$body['developerMessage'],
 			'Incorrect developer message supplied'
 		);
 	}
 
 	public function testPaginationInvalidLimit() {
-		$response = Director::test('/api/v2/testobjects?limit=' . (RestfulServer\ControllerV2::MAX_LIMIT + 1) . '&offset=0');
+		$response = Director::test('/api/v2/testobjects?limit=' . (ControllerV2::MAX_LIMIT + 1) . '&offset=0');
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
 
 		$body = json_decode($response->getBody(), true);
 
 		// when a request exceeds the max limit we use the default limit instead
-		$this->assertEquals(RestfulServer\ControllerV2::DEFAULT_LIMIT, $body['_metadata']['limit'], 'Incorrect limit returned');
+		$this->assertEquals(ControllerV2::DEFAULT_LIMIT, $body['_metadata']['limit'], 'Incorrect limit returned');
 	}
 
 	public function testSort() {
@@ -207,7 +211,7 @@ class RestfulServerV2Test extends SapphireTest {
 		$this->assertEquals(200, $response->getStatusCode());
 
 		$body = $response->getBody();
-		$errors = \RestfulServer\APIError::config()->get('errors');
+		$errors = APIError::config()->get('errors');
 
 		foreach ($errors as $error) {
 			$this->assertContains($error['name'], $body);
@@ -215,14 +219,14 @@ class RestfulServerV2Test extends SapphireTest {
 	}
 
 	public function testShowError() {
-		$errors = \RestfulServer\APIError::config()->get('errors');
+		$errors = APIError::config()->get('errors');
 
 		foreach ($errors as $key => $error) {
 			$response = Director::test('/api/v2/errors/' . $key);
 			$body = $response->getBody();
 
 			$this->assertEquals(200, $response->getStatusCode());
-			$this->assertContains(\RestfulServer\APIError::get_description($key)->forTemplate(), $body);
+			$this->assertContains(APIError::get_description($key)->forTemplate(), $body);
 		}
 	}
 
@@ -235,7 +239,7 @@ class RestfulServerV2Test extends SapphireTest {
 
 		$this->assertEquals(200, $response->getStatusCode());
 		$this->assertContains(
-			\RestfulServer\APIError::get_description('resourceNotFound', $context)->forTemplate(),
+			APIError::get_description('resourceNotFound', $context)->forTemplate(),
 			$response->getBody()
 		);
 	}

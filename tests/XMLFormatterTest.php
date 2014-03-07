@@ -1,14 +1,16 @@
 <?php
 
-use RestfulServer\XMLFormatter;
+namespace RestfulServer;
+
+use SapphireTest;
 
 class XMLFormatterTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	public function testAddResultSet() {

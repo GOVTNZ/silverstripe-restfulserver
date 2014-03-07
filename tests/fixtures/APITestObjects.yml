@@ -1,4 +1,4 @@
-APITestObject:
+RestfulServer\APITestObject:
   one:
     Name: Test One
   two:
@@ -25,7 +25,7 @@ APITestObject:
     Name: Test Twelve
   thirteen:
     Name: Test Thirteen
-APITestPageObject:
+RestfulServer\APITestPageObject:
   one:
     Name: Test page
     TestField: Test value

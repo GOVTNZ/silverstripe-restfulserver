@@ -1,14 +1,16 @@
 <?php
 
-use RestfulServer\JSONFormatter;
+namespace RestfulServer;
+
+use ReflectionMethod, SapphireTest;
 
 class JSONFormatterTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	public function testExtraData() {

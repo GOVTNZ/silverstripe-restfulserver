@@ -1,12 +1,16 @@
 <?php
 
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
 class APIFormatTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	// these tests fail until pagination is implemented
@@ -46,7 +50,7 @@ class APIFormatTest extends SapphireTest {
 
 		$this->assertEquals(400, $response->getStatusCode(), 'Incorrect status code received for invalid format');
 		$this->assertContains(
-			\RestfulServer\APIError::get_developer_message_for('invalidFormat', array('extension' => 'txt')),
+			APIError::get_developer_message_for('invalidFormat', array('extension' => 'txt')),
 			$response->getBody(),
 			'Incorrect error message received for invalid format'
 		);

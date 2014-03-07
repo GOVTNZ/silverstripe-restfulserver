@@ -1,6 +1,8 @@
 <?php
 
-class APITestObject extends DataObject implements TestOnly {
+namespace RestfulServer;
+
+class APITestObject extends \DataObject implements \TestOnly {
 
 	private static $db = array(
 		'Name' => 'Varchar(255)'

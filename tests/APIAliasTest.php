@@ -1,12 +1,16 @@
 <?php
 
+namespace RestfulServer;
+
+use SapphireTest, SS_Cache, Director;
+
 class APIAliasTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	public function setUpOnce() {
@@ -22,13 +26,13 @@ class APIAliasTest extends SapphireTest {
 	}
 
 	private function cleanAliasCache() {
-		$aliasCache = SS_Cache::factory(\RestfulServer\APIInfo::RESOURCE_NAME_CACHE_KEY);
+		$aliasCache = SS_Cache::factory(APIInfo::RESOURCE_NAME_CACHE_KEY);
 		$aliasCache->clean();
 	}
 
 	public function testAPIAlias() {
 		$aliasURL = '/api/v2/testobjects';
-		$defaultURL = '/api/v2/APITestObject';
+		$defaultURL = '/api/v2/RestfulServer\APITestObject';
 
 		$aliasResponse = Director::test($aliasURL, null, null, 'GET');
 		$defaultResponse = Director::test($defaultURL, null, null, 'GET');
@@ -68,7 +72,7 @@ class APIAliasTest extends SapphireTest {
 		$this->assertArrayHasKey('moreInfo', $output);
 
 		$this->assertEquals(
-			\RestfulServer\APIError::get_developer_message_for(
+			APIError::get_developer_message_for(
 				'resourceNotFound',
 				array('resourceName' => 'randomobjects.')
 			),

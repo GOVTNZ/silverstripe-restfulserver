@@ -1,11 +1,15 @@
 <?php
 
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
 class PartialResponseTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/PartialResponseTest.yml';
 
 	protected $extraDataObjects = array(
-		'StaffTestObject'
+		'RestfulServer\StaffTestObject'
 	);
 
 	public function testPartialResponse() {
@@ -29,7 +33,7 @@ class PartialResponseTest extends SapphireTest {
 		$results = json_decode($response->getBody(), true);
 
 		$this->assertEquals(
-			\RestfulServer\APIError::get_developer_message_for('invalidField', array('fields' => 'InvalidField')),
+			APIError::get_developer_message_for('invalidField', array('fields' => 'InvalidField')),
 			$results['developerMessage']
 		);
 	}
@@ -48,7 +52,7 @@ class PartialResponseTest extends SapphireTest {
 	}
 
 	public function testPartialResponseForShowDetail() {
-		$staffMember = $this->objFromFixture('StaffTestObject', 'one');
+		$staffMember = $this->objFromFixture('RestfulServer\StaffTestObject', 'one');
 		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '?fields=JobTitle');
 
 		$this->assertEquals(200, $response->getStatusCode());
@@ -62,7 +66,7 @@ class PartialResponseTest extends SapphireTest {
 	}
 
 	public function testPartialResponseForShowRelation() {
-		$staffMember = $this->objFromFixture('StaffTestObject', 'one');
+		$staffMember = $this->objFromFixture('RestfulServer\StaffTestObject', 'one');
 		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '/direct-reports?fields=JobTitle');
 
 		$this->assertEquals(200, $response->getStatusCode());

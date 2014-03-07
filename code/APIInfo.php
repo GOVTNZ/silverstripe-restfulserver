@@ -71,12 +71,12 @@ class APIInfo {
 			return false;
 		}
 
-		try {
-			self::$alias_cache->save($resourceName, $resourceName);
-		} catch (\Zend_Cache_Exception $exception) {
-			// not sure if we should do this or just allow uncached results...
-			user_error('The ' . $resourceName . ' DataObject has an invalid class name. Must only use: [a-zA-Z0-9_]');
-		}
+//		try {
+//			self::$alias_cache->save($resourceName, $resourceName);
+//		} catch (\Zend_Cache_Exception $exception) {
+//			// not sure if we should do this or just allow uncached results...
+//			user_error('The ' . $resourceName . ' DataObject has an invalid class name. Must only use: [a-zA-Z0-9_]');
+//		}
 
 		return $resourceName;
 	}
@@ -92,13 +92,13 @@ class APIInfo {
 				isset($apiAccess['end_point_alias']) &&
 				$apiAccess['end_point_alias'] == $resourceName
 			) {
-				try {
-					self::$alias_cache->save($className, $resourceName);
-				} catch (\Zend_Cache_Exception $exception) {
-					$message  = 'The ' . $className;
-					$message .=' DataObject has an invalid end_point_alias value. Must only use: [a-zA-Z0-9_]';
-					user_error($message);
-				}
+//				try {
+//					self::$alias_cache->save($className, $resourceName);
+//				} catch (\Zend_Cache_Exception $exception) {
+//					$message  = 'The ' . $className;
+//					$message .=' DataObject has an invalid end_point_alias value. Must only use: [a-zA-Z0-9_]';
+//					user_error($message);
+//				}
 
 				return $className;
 			}
@@ -130,7 +130,7 @@ class APIInfo {
 	}
 
 	private static function get_classes_for_test() {
-		$testClass = \BaseRestfulServerTest::get_current_test_class();
+		$testClass = BaseRestfulServerTest::get_current_test_class();
 		return singleton($testClass)->getExtraDataObjects();
 	}
 

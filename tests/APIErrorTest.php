@@ -1,9 +1,13 @@
 <?php
 
+namespace RestfulServer;
+
+use Config, Director, ReflectionMethod, ReflectionProperty, SapphireTest;
+
 class APIErrorTest extends SapphireTest {
 
 	public function testGetMessagesFor() {
-		$errors = \RestfulServer\APIError::get_messages_for('resourceNotFound');
+		$errors = APIError::get_messages_for('resourceNotFound');
 
 		$this->assertInternalType('array', $errors);
 		$this->assertEquals(3, count($errors));
@@ -14,13 +18,13 @@ class APIErrorTest extends SapphireTest {
 	}
 
 	public function testGetMessagesForWithInvalidKey() {
-		$errors = \RestfulServer\APIError::get_messages_for('incorrectKey');
+		$errors = APIError::get_messages_for('incorrectKey');
 
 		$this->assertNull($errors);
 	}
 
 	public function testGetMessagesForWithContext() {
-		$errors = \RestfulServer\APIError::get_messages_for('resourceNotFound', array('resourceName' => 'testResource'));
+		$errors = APIError::get_messages_for('resourceNotFound', array('resourceName' => 'testResource'));
 
 		$this->assertContains('testResource', $errors['developerMessage']);
 	}
@@ -61,7 +65,7 @@ class APIErrorTest extends SapphireTest {
 	}
 
 	public function testGetMoreInfoLink() {
-		$link = \RestfulServer\APIError::get_more_info_link_for('resourceNotFound');
+		$link = APIError::get_more_info_link_for('resourceNotFound');
 		$expectedLink = Director::absoluteBaseURL() . 'api/v2/errors/resourceNotFound';
 
 		$this->assertEquals($expectedLink, $link);
@@ -82,7 +86,7 @@ class APIErrorTest extends SapphireTest {
 		Config::inst()->remove('Director', 'rules');
 		Config::inst()->update('Director', 'rules', array());
 
-		$link = \RestfulServer\APIError::get_more_info_link_for('resourceNotFound');
+		$link = APIError::get_more_info_link_for('resourceNotFound');
 		$expectedLink = Director::absoluteBaseURL() . 'RestfulServer\ControllerV2/errors/resourceNotFound';
 
 		$reflectionProperty->setValue($originalBaseURL);
