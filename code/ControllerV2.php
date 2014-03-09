@@ -42,6 +42,9 @@ class ControllerV2 extends Controller {
 	/** @var null|Formatter  */
 	private $formatter = null;
 
+	/** @var null|APIRequest */
+	private $apiRequest = null;
+
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
 	const DEFAULT_LIMIT  = 10;
@@ -57,30 +60,7 @@ class ControllerV2 extends Controller {
 		}
 
 		$this->setFormatter();
-
-		if (is_null($this->formatter)) {
-			// errors are caused when running unit tests if we don't include $this->popCurrent() here
-			// I think it's related to needing to clean up the Controller stack when we kill a request
-			// within the init method - doesn't seem to affect normal operation
-			$this->popCurrent();
-
-			$message = APIError::get_developer_message_for(
-				'invalidFormat',
-				array(
-					'extension' => $this->getRequest()->getExtension()
-				)
-			);
-
-			$message .= "\n";
-			$message .= APIError::get_more_info_link_for(
-				'invalidFormat',
-				array(
-					'extension' => $this->getRequest()->getExtension()
-				)
-			);
-
-			return APIError::throw_error(400, $message);
-		}
+		$this->setAPIRequest();
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
 	}
@@ -94,16 +74,45 @@ class ControllerV2 extends Controller {
 		}
 
 		if (!in_array($extension, array_keys(self::$valid_formats))) {
-			return null;
+			return $this->formatterError();
 		}
 
 		$this->formatter = new self::$valid_formats[$extension]();
 	}
 
+	private function formatterError() {
+		// errors are caused when running unit tests if we don't include $this->popCurrent() here
+		// I think it's related to needing to clean up the Controller stack when we kill a request
+		// within the init method - doesn't seem to affect normal operation
+		$this->popCurrent();
+
+		$message = APIError::get_developer_message_for(
+			'invalidFormat',
+			array(
+				'extension' => $this->getRequest()->getExtension()
+			)
+		);
+
+		$message .= "\n";
+		$message .= APIError::get_more_info_link_for(
+			'invalidFormat',
+			array(
+				'extension' => $this->getRequest()->getExtension()
+			)
+		);
+
+		return APIError::throw_error(400, $message);
+	}
+
+	private function setAPIRequest() {
+		if ($this->getRequest()->isGET()) {
+			$this->apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+		}
+	}
+
 	public function listResources() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-			return $apiRequest->outputResourceList();
+			return $this->apiRequest->outputResourceList();
 		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
@@ -128,8 +137,7 @@ class ControllerV2 extends Controller {
 
 	public function showResource() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-			return $apiRequest->outputResourceDetail();
+			return $this->apiRequest->outputResourceDetail();
 		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
@@ -137,8 +145,7 @@ class ControllerV2 extends Controller {
 
 	public function listRelations() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-			return $apiRequest->outputRelationList();
+			return $this->apiRequest->outputRelationList();
 		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
