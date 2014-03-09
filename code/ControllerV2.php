@@ -42,7 +42,7 @@ class ControllerV2 extends Controller {
 	/** @var null|Formatter  */
 	private $formatter = null;
 
-	/** @var null|APIRequest */
+	/** @var null|GETRequest */
 	private $apiRequest = null;
 
 	const MIN_LIMIT      = 1;
@@ -106,7 +106,7 @@ class ControllerV2 extends Controller {
 
 	private function setAPIRequest() {
 		if ($this->getRequest()->isGET()) {
-			$this->apiRequest = new APIRequest($this->getRequest(), $this->formatter);
+			$this->apiRequest = new GETRequest($this->getRequest(), $this->formatter);
 		}
 	}
 
