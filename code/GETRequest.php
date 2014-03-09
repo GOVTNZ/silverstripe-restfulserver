@@ -2,7 +2,7 @@
 
 namespace RestfulServer;
 
-class GETRequest {
+class GETRequest extends Request {
 
 	private $httpRequest = null;
 

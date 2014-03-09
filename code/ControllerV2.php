@@ -42,7 +42,7 @@ class ControllerV2 extends Controller {
 	/** @var null|Formatter  */
 	private $formatter = null;
 
-	/** @var null|GETRequest */
+	/** @var null|Request */
 	private $apiRequest = null;
 
 	const MIN_LIMIT      = 1;
