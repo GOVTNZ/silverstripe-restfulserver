@@ -190,4 +190,36 @@ class APIInfo {
 		return (($instance->has_many($relationName) !== false) || (!is_null($instance->many_many($relationName))));
 	}
 
+	public static function get_fields_for($className) {
+		$fields = array(
+			'ID',
+			'Created',
+			'LastEdited'
+		);
+
+		$fields = array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
+
+		$aliasMap = array_flip(self::get_alias_map_for($className));
+
+		$fields = array_map(function ($item) use ($aliasMap) {
+			if (isset($aliasMap[$item])) {
+				return $aliasMap[$item];
+			} else {
+				return $item;
+			}
+		}, $fields);
+
+		return $fields;
+	}
+
+	private static function get_alias_map_for($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!$apiAccess || !isset($apiAccess['field_aliases']) || !is_array($apiAccess['field_aliases'])) {
+			return array();
+		}
+
+		return $apiAccess['field_aliases'];
+	}
+
 }

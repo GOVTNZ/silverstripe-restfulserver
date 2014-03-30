@@ -7,7 +7,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 	protected $extraDataObjects = array(
 		'RestfulServer\APITestObject',
 		'RestfulServer\APITestPageObject',
-		'RestfulServer\StaffTestObject'
+		'RestfulServer\StaffTestObject',
+		'RestfulServer\StaffTestObjectWithFieldAliases'
 	);
 
 	public function testClassCanBeFilteredBy() {
@@ -61,7 +62,27 @@ class APIInfoTest extends BaseRestfulServerTest {
 	public function testGetAllAPIEndPoints() {
 		$endPoints = APIInfo::get_all_end_points();
 
-		$this->assertEquals(3, count($endPoints));
+		$this->assertEquals(4, count($endPoints));
+	}
+
+	public function testGetFieldsFor() {
+		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObject');
+
+		$expectedFields = array('ID', 'Created', 'LastEdited', 'Name', 'JobTitle', 'ManagerID');
+
+		foreach ($expectedFields as $expectedField) {
+			$this->assertContains($expectedField, $fields);
+		}
+	}
+
+	public function testGetFieldsForWithAliases() {
+		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObjectWithFieldAliases');
+
+		$expectedFields = array('id', 'Created', 'LastEdited', 'name', 'jobTitleAlias', 'ManagerID');
+
+		foreach ($expectedFields as $expectedField) {
+			$this->assertContains($expectedField, $fields);
+		}
 	}
 
 }
