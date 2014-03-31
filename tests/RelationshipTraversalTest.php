@@ -9,13 +9,14 @@ class RelationshipTraversalTest extends SapphireTest {
 	protected static $fixture_file = 'fixtures/RelationshipTraversalTest.yml';
 
 	protected $extraDataObjects = array(
-		'RestfulServer\StaffTestObject'
+		'RestfulServer\StaffTestObject',
+		'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	public function testGetRelationList() {
-		$managerID = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+		$managerID = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
 
-		$response = Director::test('/api/v2/stafftest/' . $managerID . '/direct-reports');
+		$response = Director::test('/api/v2/stafftestalias/' . $managerID . '/direct-reports');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -31,9 +32,9 @@ class RelationshipTraversalTest extends SapphireTest {
 	}
 
 	public function testGetRelationListWithNoResults() {
-		$staffMemberId = $this->idFromFixture('RestfulServer\StaffTestObject', 'two');
+		$staffMemberId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'two');
 
-		$response = Director::test('/api/v2/stafftest/' . $staffMemberId . '/direct-reports');
+		$response = Director::test('/api/v2/stafftestalias/' . $staffMemberId . '/direct-reports');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -44,7 +45,7 @@ class RelationshipTraversalTest extends SapphireTest {
 	}
 
 	public function testGetRelationListWithNonExistentResourceID() {
-		$fixtureIDs = $this->allFixtureIDs('RestfulServer\StaffTestObject');
+		$fixtureIDs = $this->allFixtureIDs('RestfulServer\StaffTestObjectWithAliases');
 
 		$unusedID = 1;
 
@@ -56,7 +57,7 @@ class RelationshipTraversalTest extends SapphireTest {
 			}
 		}
 
-		$response = Director::test('/api/v2/stafftest/' . $unusedID . '/direct-reports');
+		$response = Director::test('/api/v2/stafftestalias/' . $unusedID . '/direct-reports');
 
 		$this->assertEquals(400, $response->getStatusCode());
 	}
@@ -76,17 +77,17 @@ class RelationshipTraversalTest extends SapphireTest {
 	}
 
 	public function testGetRelationListWithManyManyRelation() {
-		$staffID = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+		$staffID = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
 
-		$response = Director::test('/api/v2/stafftest/' . $staffID . '/friends');
+		$response = Director::test('/api/v2/stafftestalias/' . $staffID . '/friends');
 
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testGetRelationListWithFilter() {
-		$managerId = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
 
-		$response = Director::test('/api/v2/stafftest/' . $managerId . '/direct-reports?Name=bob');
+		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/direct-reports?Name=bob');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -96,29 +97,29 @@ class RelationshipTraversalTest extends SapphireTest {
 	}
 
 	public function testGetRelationListWithSort() {
-		$managerId = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
 
-		$response = Director::test('/api/v2/stafftest/' . $managerId . '/direct-reports?sort=Name&order=asc');
+		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/direct-reports?sort=Name&order=asc');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
 		$results = json_decode($response->getBody(), true);
 
-		$this->assertEquals('Bob Jones', $results['staff'][0]['Name']);
-		$this->assertEquals('John Smith', $results['staff'][1]['Name']);
+		$this->assertEquals('Bob Jones', $results['staff'][0]['name']);
+		$this->assertEquals('John Smith', $results['staff'][1]['name']);
 	}
 
 	public function testGetRelationListWithPagination() {
-		$managerId = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
 
-		$response = Director::test('/api/v2/stafftest/' . $managerId . '/direct-reports?limit=1&offset=1');
+		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/direct-reports?limit=1&offset=1');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
 		$results = json_decode($response->getBody(), true);
 
 		$this->assertEquals(1, count($results['staff']));
-		$this->assertEquals('Bob Jones', $results['staff'][0]['Name']);
+		$this->assertEquals('Bob Jones', $results['staff'][0]['name']);
 	}
 
 }

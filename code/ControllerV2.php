@@ -39,10 +39,10 @@ class ControllerV2 extends Controller {
 
 	private static $base_url = null;
 
-	/** @var null|Formatter  */
+	/** @var Formatter  */
 	private $formatter = null;
 
-	/** @var null|Request */
+	/** @var Request */
 	private $apiRequest = null;
 
 	const MIN_LIMIT      = 1;
@@ -105,7 +105,9 @@ class ControllerV2 extends Controller {
 	}
 
 	private function setAPIRequest() {
-		if ($this->getRequest()->isGET()) {
+		if ($this->formatter instanceof DocumentationFormatter) {
+			$this->apiRequest = new DocumentationRequest($this->getRequest(), $this->formatter);
+		} else if ($this->getRequest()->isGET()) {
 			$this->apiRequest = new GETRequest($this->getRequest(), $this->formatter);
 		}
 	}

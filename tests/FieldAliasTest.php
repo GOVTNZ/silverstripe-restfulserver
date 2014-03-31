@@ -9,11 +9,11 @@ class FieldAliasTest extends SapphireTest {
 	protected static $fixture_file = 'fixtures/FieldAliasTest.yml';
 
 	protected $extraDataObjects = array(
-		'RestfulServer\StaffTestObjectWithFieldAliases'
+		'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	public function testFieldAliases() {
-		$response = Director::test('/api/v2/stafftestfieldalias');
+		$response = Director::test('/api/v2/stafftestalias');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -26,7 +26,7 @@ class FieldAliasTest extends SapphireTest {
 	}
 
 	public function testFieldAliasesWithSort() {
-		$response = Director::test('/api/v2/stafftestfieldalias?sort=jobTitleAlias&order=asc');
+		$response = Director::test('/api/v2/stafftestalias?sort=jobTitleAlias&order=asc');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -36,7 +36,7 @@ class FieldAliasTest extends SapphireTest {
 	}
 
 	public function testFieldAliasesWithPartialResponse() {
-		$response = Director::test('/api/v2/stafftestfieldalias?fields=jobTitleAlias');
+		$response = Director::test('/api/v2/stafftestalias?fields=jobTitleAlias');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -46,7 +46,7 @@ class FieldAliasTest extends SapphireTest {
 	}
 
 	public function testFieldAliasesWithFilter() {
-		$response = Director::test('/api/v2/stafftestfieldalias?jobTitleAlias=Senior');
+		$response = Director::test('/api/v2/stafftestalias?jobTitleAlias=Senior');
 
 		$this->assertEquals(200, $response->getStatusCode());
 

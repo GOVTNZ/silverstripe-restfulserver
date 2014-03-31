@@ -10,3 +10,15 @@ RestfulServer\StaffTestObject:
     Name: Bob Jones
     JobTitle: Developer
     Manager: =>RestfulServer\StaffTestObject.one
+RestfulServer\StaffTestObjectWithAliases:
+  one:
+    Name: Jane Doe
+    JobTitle: Team Lead
+  two:
+    Name: John Smith
+    JobTitle: Developer
+    Manager: =>RestfulServer\StaffTestObjectWithAliases.one
+  three:
+    Name: Bob Jones
+    JobTitle: Developer
+    Manager: =>RestfulServer\StaffTestObjectWithAliases.one

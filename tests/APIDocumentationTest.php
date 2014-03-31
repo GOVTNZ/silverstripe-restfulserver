@@ -10,7 +10,7 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		'RestfulServer\APITestObject',
 		'RestfulServer\APITestPageObject',
 		'RestfulServer\StaffTestObject',
-		'RestfulServer\StaffTestObjectWithFieldAliases'
+		'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	public function testBaseDocumentation() {
@@ -25,7 +25,7 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		$this->assertContains('/api/v2/testobjects', $body);
 		$this->assertContains('/api/v2/testpages', $body);
 		$this->assertContains('/api/v2/stafftest', $body);
-		$this->assertContains('/api/v2/stafftestfieldalias', $body);
+		$this->assertContains('/api/v2/stafftestalias', $body);
 
 		$this->assertContains('test object description', $body);
 
@@ -40,5 +40,16 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		$response = Director::test('/api/v2/stafftest.html');
 
 		$this->assertEquals(200, $response->getStatusCode());
+
+		$body = $response->getBody();
+
+		$this->assertContains('Available fields', $body);
+		$this->assertContains('Name', $body);
+		$this->assertContains('JobTitle', $body);
+
+		$this->assertContains('Relations', $body);
+		$this->assertContains('DirectReports', $body);
+		$this->assertContains('Friends', $body);
+		$this->assertContains('InverseFriends', $body);
 	}
 }

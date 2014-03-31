@@ -28,11 +28,7 @@ class StaffTestObject extends \DataObject implements \TestOnly {
 	private static $api_access = array(
 		'end_point_alias' => 'stafftest',
 		'singular_name' => 'staffMember',
-		'plural_name' => 'staff',
-		'relation_aliases' => array(
-			'direct-reports' => 'DirectReports',
-			'friends' => 'Friends'
-		)
+		'plural_name' => 'staff'
 	);
 
 }

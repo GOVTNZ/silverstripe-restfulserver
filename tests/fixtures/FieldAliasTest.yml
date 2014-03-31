@@ -1,12 +1,12 @@
-RestfulServer\StaffTestObjectWithFieldAliases:
+RestfulServer\StaffTestObjectWithAliases:
   one:
     Name: Jane Doe
     JobTitle: Team Lead
   two:
     Name: John Smith
     JobTitle: Developer
-    Manager: =>RestfulServer\StaffTestObjectWithFieldAliases.one
+    Manager: =>RestfulServer\StaffTestObjectWithAliases.one
   three:
     Name: Bob Jones
     JobTitle: Senior Developer
-    Manager: =>RestfulServer\StaffTestObjectWithFieldAliases.one
+    Manager: =>RestfulServer\StaffTestObjectWithAliases.one

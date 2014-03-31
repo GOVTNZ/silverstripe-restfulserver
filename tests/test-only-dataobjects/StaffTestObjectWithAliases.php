@@ -2,7 +2,7 @@
 
 namespace RestfulServer;
 
-class StaffTestObjectWithFieldAliases extends \DataObject implements \TestOnly {
+class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 
 	private static $db = array(
 		'Name' => 'Text',
@@ -10,23 +10,23 @@ class StaffTestObjectWithFieldAliases extends \DataObject implements \TestOnly {
 	);
 
 	private static $has_one = array(
-		'Manager' => 'RestfulServer\StaffTestObjectWithFieldAliases'
+		'Manager' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $has_many = array(
-		'DirectReports' => 'RestfulServer\StaffTestObjectWithFieldAliases'
+		'DirectReports' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $many_many = array(
-		'Friends' => 'RestfulServer\StaffTestObjectWithFieldAliases'
+		'Friends' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $belongs_many_many = array(
-		'InverseFriends' => 'RestfulServer\StaffTestObjectWithFieldAliases'
+		'InverseFriends' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $api_access = array(
-		'end_point_alias' => 'stafftestfieldalias',
+		'end_point_alias' => 'stafftestalias',
 		'singular_name' => 'staffMember',
 		'plural_name' => 'staff',
 		'field_aliases' => array(

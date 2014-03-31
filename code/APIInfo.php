@@ -199,7 +199,7 @@ class APIInfo {
 
 		$fields = array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
 
-		$aliasMap = array_flip(self::get_alias_map_for($className));
+		$aliasMap = array_flip(self::get_field_alias_map_for($className));
 
 		$fields = array_map(function ($item) use ($aliasMap) {
 			if (isset($aliasMap[$item])) {
@@ -212,7 +212,7 @@ class APIInfo {
 		return $fields;
 	}
 
-	private static function get_alias_map_for($className) {
+	private static function get_field_alias_map_for($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
 		if (!$apiAccess || !isset($apiAccess['field_aliases']) || !is_array($apiAccess['field_aliases'])) {
@@ -220,6 +220,42 @@ class APIInfo {
 		}
 
 		return $apiAccess['field_aliases'];
+	}
+
+	public static function get_relations_for($className) {
+		$instance = singleton($className);
+
+		$hasMany = $instance->has_many();
+		$manyMany = $instance->many_many();
+
+		$hasManyManyMany = array_merge($hasMany, $manyMany);
+		$relations = array();
+
+		foreach ($hasManyManyMany as $relationName => $className) {
+			$relations[] = $relationName;
+		}
+
+		$aliasMap = array_flip(self::get_relation_alias_map_for($className));
+
+		$relations = array_map(function ($item) use ($aliasMap) {
+			if (isset($aliasMap[$item])) {
+				return $aliasMap[$item];
+			} else {
+				return $item;
+			}
+		}, $relations);
+
+		return $relations;
+	}
+
+	private static function get_relation_alias_map_for($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!$apiAccess || !isset($apiAccess['relation_aliases']) || !is_array($apiAccess['relation_aliases'])) {
+			return array();
+		}
+
+		return $apiAccess['relation_aliases'];
 	}
 
 }

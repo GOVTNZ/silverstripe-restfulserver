@@ -8,7 +8,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 		'RestfulServer\APITestObject',
 		'RestfulServer\APITestPageObject',
 		'RestfulServer\StaffTestObject',
-		'RestfulServer\StaffTestObjectWithFieldAliases'
+		'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	public function testClassCanBeFilteredBy() {
@@ -24,7 +24,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 	}
 
 	public function testGetRelationMethodFromName() {
-		$relationMethod = APIInfo::get_relation_method_from_name('RestfulServer\StaffTestObject', 'direct-reports');
+		$relationMethod = APIInfo::get_relation_method_from_name('RestfulServer\StaffTestObjectWithAliases', 'direct-reports');
 
 		$this->assertEquals('DirectReports', $relationMethod);
 	}
@@ -76,12 +76,40 @@ class APIInfoTest extends BaseRestfulServerTest {
 	}
 
 	public function testGetFieldsForWithAliases() {
-		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObjectWithFieldAliases');
+		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObjectWithAliases');
 
 		$expectedFields = array('id', 'Created', 'LastEdited', 'name', 'jobTitleAlias', 'ManagerID');
 
 		foreach ($expectedFields as $expectedField) {
 			$this->assertContains($expectedField, $fields);
+		}
+	}
+
+	public function testGetRelationsFor() {
+		$relations = APIInfo::get_relations_for('RestfulServer\StaffTestObject');
+
+		$expectedRelations = array(
+			'DirectReports',
+			'Friends',
+			'InverseFriends'
+		);
+
+		foreach ($expectedRelations as $expectedRelation) {
+			$this->assertContains($expectedRelation, $relations);
+		}
+	}
+
+	public function testGetRelationsForWithAliases() {
+		$relations = APIInfo::get_relations_for('RestfulServer\StaffTestObjectWithAliases');
+
+		$expectedRelations = array(
+			'direct-reports',
+			'friends',
+			'InverseFriends'
+		);
+
+		foreach ($expectedRelations as $expectedRelation) {
+			$this->assertContains($expectedRelation, $relations);
 		}
 	}
 

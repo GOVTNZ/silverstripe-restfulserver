@@ -4,8 +4,6 @@ namespace RestfulServer;
 
 class GETRequest extends Request {
 
-	private $httpRequest = null;
-
 	private $resourceClassName = null;
 	private $resourceID = null;
 	private $relationClassName = null;
@@ -13,8 +11,6 @@ class GETRequest extends Request {
 	private $resultClassName = null;
 
 	private $resource = null;
-
-	private $formatter = null;
 
 	private $limit = null;
 	private $offset = null;
@@ -29,11 +25,6 @@ class GETRequest extends Request {
 	const DEFAULT_OFFSET = 0;
 	const DEFAULT_SORT   = 'ID';
 	const DEFAULT_ORDER  = 'ASC';
-
-	public function __construct(\SS_HTTPRequest $request, Formatter $formatter) {
-		$this->httpRequest = $request;
-		$this->formatter = $formatter;
-	}
 
 	public function outputResourceList() {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
@@ -162,7 +153,7 @@ class GETRequest extends Request {
 	private function transformSort($sort, $sortClassName) {
 		$apiAccess = singleton($sortClassName)->stat('api_access');
 
-		if (!isset($apiAccess['field_aliases']) && !isset($apiAccess['field_aliases'][$sort])) {
+		if (!isset($apiAccess['field_aliases']) || !isset($apiAccess['field_aliases'][$sort])) {
 			return $sort;
 		}
 
