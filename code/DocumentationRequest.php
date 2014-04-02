@@ -50,7 +50,17 @@ class DocumentationRequest extends Request {
 	}
 
 	public function outputResourceDetail() {
-		return 'something';
+		$data = array();
+
+		$data['AvailableFields'] = $this->getAvailableFields();
+		$data['Relations'] = $this->getRelations();
+		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
+		$data['APIBaseURL'] = ControllerV2::get_base_url();
+		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
+
+		$template = new ViewableData();
+
+		return $template->customise($data)->renderWith('DocumentationDetail');
 	}
 
 	public function outputRelationList() {
