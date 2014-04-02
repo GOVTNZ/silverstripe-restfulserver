@@ -11,6 +11,8 @@ class DocumentationRequest extends Request {
 
 		$data['AvailableFields'] = $this->getAvailableFields();
 		$data['Relations'] = $this->getRelations();
+		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
+		$data['APIBaseURL'] = ControllerV2::get_base_url();
 
 		$template = new ViewableData();
 
