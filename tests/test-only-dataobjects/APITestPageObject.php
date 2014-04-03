@@ -1,17 +1,19 @@
 <?php
 
-class APITestPageObject extends APITestObject implements TestOnly {
+namespace RestfulServer;
+
+class APITestPageObject extends APITestObject implements \TestOnly {
 
 	private static $db = array(
 		'TestField' => 'Text'
 	);
 
 	private static $has_one = array(
-		'Parent' => 'APITestPageObject'
+		'Parent' => 'RestfulServer\APITestPageObject'
 	);
 
 	private static $has_many = array(
-		'Children' => 'APITestPageObject'
+		'Children' => 'RestfulServer\APITestPageObject'
 	);
 
 	private static $api_access = array(

@@ -1,6 +1,16 @@
 <?php
 
-class RestfulServerV2 extends Controller {
+namespace RestfulServer;
+
+use Controller;
+use ArrayList;
+use ArrayData;
+use Director;
+use SS_HTTPResponse;
+use SS_HTTPResponse_Exception;
+use Config;
+
+class ControllerV2 extends Controller {
 
 	public static $default_extension = 'json';
 
@@ -22,14 +32,18 @@ class RestfulServerV2 extends Controller {
 	);
 
 	private static $valid_formats = array(
-		'json' => 'JSONFormatter',
-		'xml' => 'XMLFormatter'
+		'json' => '\\RestfulServer\\JSONFormatter',
+		'xml' => '\\RestfulServer\\XMLFormatter',
+		'html' => '\\RestfulServer\\DocumentationFormatter'
 	);
 
 	private static $base_url = null;
 
-	/** @var null|Formatter  */
+	/** @var Formatter  */
 	private $formatter = null;
+
+	/** @var Request */
+	private $apiRequest = null;
 
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
@@ -46,30 +60,7 @@ class RestfulServerV2 extends Controller {
 		}
 
 		$this->setFormatter();
-
-		if (is_null($this->formatter)) {
-			// errors are caused when running unit tests if we don't include $this->popCurrent() here
-			// I think it's related to needing to clean up the Controller stack when we kill a request
-			// within the init method - doesn't seem to affect normal operation
-			$this->popCurrent();
-
-			$message = APIError::get_developer_message_for(
-				'invalidFormat',
-				array(
-					'extension' => $this->getRequest()->getExtension()
-				)
-			);
-
-			$message .= "\n";
-			$message .= APIError::get_more_info_link_for(
-				'invalidFormat',
-				array(
-					'extension' => $this->getRequest()->getExtension()
-				)
-			);
-
-			return APIError::throw_error(400, $message);
-		}
+		$this->setAPIRequest();
 
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
 	}
@@ -83,22 +74,53 @@ class RestfulServerV2 extends Controller {
 		}
 
 		if (!in_array($extension, array_keys(self::$valid_formats))) {
-			return null;
+			return $this->formatterError();
 		}
 
 		$this->formatter = new self::$valid_formats[$extension]();
 	}
 
+	private function formatterError() {
+		// errors are caused when running unit tests if we don't include $this->popCurrent() here
+		// I think it's related to needing to clean up the Controller stack when we kill a request
+		// within the init method - doesn't seem to affect normal operation
+		$this->popCurrent();
+
+		$message = APIError::get_developer_message_for(
+			'invalidFormat',
+			array(
+				'extension' => $this->getRequest()->getExtension()
+			)
+		);
+
+		$message .= "\n";
+		$message .= APIError::get_more_info_link_for(
+			'invalidFormat',
+			array(
+				'extension' => $this->getRequest()->getExtension()
+			)
+		);
+
+		return APIError::throw_error(400, $message);
+	}
+
+	private function setAPIRequest() {
+		if ($this->formatter instanceof DocumentationFormatter) {
+			$this->apiRequest = new DocumentationRequest($this->getRequest(), $this->formatter);
+		} else if ($this->getRequest()->isGET()) {
+			$this->apiRequest = new GETRequest($this->getRequest(), $this->formatter);
+		}
+	}
+
 	public function listResources() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-			return $apiRequest->outputResourceList();
-		} catch (APIException $exception) {
+			return $this->apiRequest->outputResourceList();
+		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
 
-	private function throwFormattedAPIError(APIException $exception) {
+	private function throwFormattedAPIError(Exception $exception) {
 		$this->formatter->clearData();
 		$this->formatter->addExtraData($exception->getErrorMessages());
 
@@ -117,18 +139,16 @@ class RestfulServerV2 extends Controller {
 
 	public function showResource() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-			return $apiRequest->outputResourceDetail();
-		} catch (APIException $exception) {
+			return $this->apiRequest->outputResourceDetail();
+		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
 
 	public function listRelations() {
 		try {
-			$apiRequest = new APIRequest($this->getRequest(), $this->formatter);
-			return $apiRequest->outputRelationList();
-		} catch (APIException $exception) {
+			return $this->apiRequest->outputRelationList();
+		} catch (Exception $exception) {
 			return $this->throwFormattedAPIError($exception);
 		}
 	}
@@ -170,16 +190,42 @@ class RestfulServerV2 extends Controller {
 	}
 
 	public function index() {
-		$this->formatter->setExtraData(array(
-			'developerMessage' => 'Base documentation not yet implemented',
-			'userMessage' => 'Something went wrong',
-			'moreInfo' => 'coming soon'
-		));
+		$this->getResponse()->addHeader('Content-Type', 'text/html');
 
-		return APIError::throw_error(
-			500,
-			$this->formatter->format()
-		);
+		$endPointClassMap = APIInfo::get_all_end_points();
+
+		$endPoints = new ArrayList();
+
+		foreach ($endPointClassMap as $className => $endPoint) {
+			$endPoints->push(new ArrayData(array(
+				'Name' => $endPoint,
+				'Link' => self::get_base_url() . '/' . $endPoint . '.html',
+				'Description' => $this->getEndPointDescription($className)
+			)));
+		}
+
+		$formats = new ArrayList();
+
+		foreach (self::get_available_formats() as $format) {
+			$formats->push(array(
+				'Extension' => $format
+			));
+		}
+
+		return $this->customise(array(
+			'EndPoints' => $endPoints,
+			'Formats' => $formats
+		))->renderWith('DocumentationBase');
+	}
+
+	private function getEndPointDescription($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (isset($apiAccess['description'])) {
+			return $apiAccess['description'];
+		} else {
+			return null;
+		}
 	}
 
 	public static function add_format($extension, $formatterClassName) {
@@ -220,7 +266,7 @@ class RestfulServerV2 extends Controller {
 			$matchedRoute = explode('//', $matchedRoute);
 			$matchedRoute = $matchedRoute[0];
 		} else {
-			$matchedRoute = 'RestfulServerV2';
+			$matchedRoute = __CLASS__;
 		}
 
 		self::$base_url = Director::absoluteBaseURL() . $matchedRoute;

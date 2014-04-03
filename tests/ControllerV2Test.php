@@ -1,12 +1,16 @@
 <?php
 
-class RestfulServerV2Test extends SapphireTest {
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
+class ControllerV2Test extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	public function testListJSONRequest() {
@@ -140,7 +144,7 @@ class RestfulServerV2Test extends SapphireTest {
 	public function testPaginationNegativeOffset() {
 		$response = Director::test('/api/v2/testobjects?offset=-5');
 		$output = json_decode($response->getBody(), true);
-		$this->assertEquals(RestfulServerV2::DEFAULT_OFFSET, $output['_metadata']['offset']);
+		$this->assertEquals(ControllerV2::DEFAULT_OFFSET, $output['_metadata']['offset']);
 	}
 
 	public function testPaginationOffsetOutOfBounds() {
@@ -159,14 +163,14 @@ class RestfulServerV2Test extends SapphireTest {
 	}
 
 	public function testPaginationInvalidLimit() {
-		$response = Director::test('/api/v2/testobjects?limit=' . (RestfulServerV2::MAX_LIMIT + 1) . '&offset=0');
+		$response = Director::test('/api/v2/testobjects?limit=' . (ControllerV2::MAX_LIMIT + 1) . '&offset=0');
 
 		$this->assertEquals(200, $response->getStatusCode(), 'Incorrect status code returned');
 
 		$body = json_decode($response->getBody(), true);
 
 		// when a request exceeds the max limit we use the default limit instead
-		$this->assertEquals(RestfulServerV2::DEFAULT_LIMIT, $body['_metadata']['limit'], 'Incorrect limit returned');
+		$this->assertEquals(ControllerV2::DEFAULT_LIMIT, $body['_metadata']['limit'], 'Incorrect limit returned');
 	}
 
 	public function testSort() {

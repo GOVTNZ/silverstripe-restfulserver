@@ -1,6 +1,8 @@
 <?php
 
-class APIFilter {
+namespace RestfulServer;
+
+class ResponseFilter {
 
 	private $className;
 
@@ -41,7 +43,7 @@ class APIFilter {
 		}
 
 		if (count($invalidFields) > 0) {
-			throw new APIUserException(
+			throw new UserException(
 				'invalidFilterFields',
 				array(
 					'fields' => implode(', ', $invalidFields)

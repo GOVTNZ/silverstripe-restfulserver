@@ -1,12 +1,16 @@
 <?php
 
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
 class APIFormatTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/APITestObjects.yml';
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject'
 	);
 
 	// these tests fail until pagination is implemented

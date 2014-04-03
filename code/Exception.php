@@ -1,6 +1,8 @@
 <?php
 
-abstract class APIException extends Exception {
+namespace RestfulServer;
+
+abstract class Exception extends \Exception {
 
 	protected $statusCode;
 
@@ -37,17 +39,5 @@ abstract class APIException extends Exception {
 			'moreInfo' => $this->moreInfo
 		);
 	}
-
-}
-
-class APIUserException extends APIException {
-
-	protected $statusCode = 400;
-
-}
-
-class APIServerException extends APIException {
-
-	protected $statusCode = 500;
 
 }

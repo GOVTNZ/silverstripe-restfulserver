@@ -1,27 +1,30 @@
 <?php
 
-class APIInfoTest extends SapphireTest {
+namespace RestfulServer;
+
+class APIInfoTest extends BaseRestfulServerTest {
 
 	protected $extraDataObjects = array(
-		'APITestObject',
-		'APITestPageObject',
-		'StaffTestObject'
+		'RestfulServer\APITestObject',
+		'RestfulServer\APITestPageObject',
+		'RestfulServer\StaffTestObject',
+		'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	public function testClassCanBeFilteredBy() {
-		$result = APIInfo::class_can_be_filtered_by('APITestObject', 'Name');
+		$result = APIInfo::class_can_be_filtered_by('RestfulServer\APITestObject', 'Name');
 
 		$this->assertTrue($result);
 	}
 
 	public function testClassCanBeFilteredByWithInvalidFieldName() {
-		$result = APIInfo::class_can_be_filtered_by('APITestObject', 'NonExistentField');
+		$result = APIInfo::class_can_be_filtered_by('RestfulServer\APITestObject', 'NonExistentField');
 
 		$this->assertFalse($result);
 	}
 
 	public function testGetRelationMethodFromName() {
-		$relationMethod = APIInfo::get_relation_method_from_name('StaffTestObject', 'direct-reports');
+		$relationMethod = APIInfo::get_relation_method_from_name('RestfulServer\StaffTestObjectWithAliases', 'direct-reports');
 
 		$this->assertEquals('DirectReports', $relationMethod);
 	}
@@ -30,8 +33,8 @@ class APIInfoTest extends SapphireTest {
 		$exceptionThrown = false;
 
 		try {
-			APIInfo::get_relation_method_from_name('StaffTestObject', 'invalid-name');
-		} catch (APIException $exception) {
+			APIInfo::get_relation_method_from_name('RestfulServer\StaffTestObject', 'invalid-name');
+		} catch (Exception $exception) {
 			$exceptionThrown = true;
 		}
 
@@ -39,7 +42,7 @@ class APIInfoTest extends SapphireTest {
 	}
 
 	public function testGetRelationMethodFromNameWithNoRelationAlias() {
-		$relationMethod = APIInfo::get_relation_method_from_name('APITestPageObject', 'Children');
+		$relationMethod = APIInfo::get_relation_method_from_name('RestfulServer\APITestPageObject', 'Children');
 
 		$this->assertEquals('Children', $relationMethod);
 	}
@@ -48,8 +51,85 @@ class APIInfoTest extends SapphireTest {
 		$exceptionThrown = false;
 
 		try {
-			APIInfo::get_relation_method_from_name('APITestPageObject', 'InvalidRelation');
-		} catch (APIException $exception) {
+			APIInfo::get_relation_method_from_name('RestfulServer\APITestPageObject', 'InvalidRelation');
+		} catch (Exception $exception) {
+			$exceptionThrown = true;
+		}
+
+		$this->assertTrue($exceptionThrown);
+	}
+
+	public function testGetAllAPIEndPoints() {
+		$endPoints = APIInfo::get_all_end_points();
+
+		$this->assertEquals(4, count($endPoints));
+	}
+
+	public function testGetFieldsFor() {
+		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObject');
+
+		$expectedFields = array('ID', 'Created', 'LastEdited', 'Name', 'JobTitle', 'ManagerID');
+
+		foreach ($expectedFields as $expectedField) {
+			$this->assertContains($expectedField, $fields);
+		}
+	}
+
+	public function testGetFieldsForWithAliases() {
+		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObjectWithAliases');
+
+		$expectedFields = array('id', 'Created', 'LastEdited', 'name', 'jobTitleAlias', 'ManagerID');
+
+		foreach ($expectedFields as $expectedField) {
+			$this->assertContains($expectedField, $fields);
+		}
+	}
+
+	public function testGetRelationsFor() {
+		$relations = APIInfo::get_relations_for('RestfulServer\StaffTestObject');
+
+		$expectedRelations = array(
+			'DirectReports',
+			'Friends',
+			'InverseFriends'
+		);
+
+		foreach ($expectedRelations as $expectedRelation) {
+			$this->assertContains($expectedRelation, $relations);
+		}
+	}
+
+	public function testGetRelationsForWithAliases() {
+		$relations = APIInfo::get_relations_for('RestfulServer\StaffTestObjectWithAliases');
+
+		$expectedRelations = array(
+			'direct-reports',
+			'friends',
+			'InverseFriends'
+		);
+
+		foreach ($expectedRelations as $expectedRelation) {
+			$this->assertContains($expectedRelation, $relations);
+		}
+	}
+
+	public function testGetClassNameByRelation() {
+		$className = APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'DirectReports');
+		$this->assertEquals($className, 'RestfulServer\StaffTestObjectWithAliases');
+
+		$className = APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'Friends');
+		$this->assertEquals($className, 'RestfulServer\StaffTestObjectWithAliases');
+
+		$className = APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'InverseFriends');
+		$this->assertEquals($className, 'RestfulServer\StaffTestObjectWithAliases');
+	}
+
+	public function testGetClassNameByRelationWithNonExistentRelation() {
+		$exceptionThrown = false;
+
+		try {
+			APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'NonExistent');
+		} catch (Exception $e) {
 			$exceptionThrown = true;
 		}
 

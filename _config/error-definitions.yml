@@ -1,4 +1,4 @@
-APIError:
+RestfulServer\APIError:
   errors:
     invalidFormat:
       name: 'Invalid response format'

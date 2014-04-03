@@ -1,11 +1,16 @@
 <?php
 
+namespace RestfulServer;
+
+use Director, SapphireTest;
+
 class PartialResponseTest extends SapphireTest {
 
 	protected static $fixture_file = 'fixtures/PartialResponseTest.yml';
 
 	protected $extraDataObjects = array(
-		'StaffTestObject'
+		'RestfulServer\StaffTestObject',
+		'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	public function testPartialResponse() {
@@ -48,7 +53,7 @@ class PartialResponseTest extends SapphireTest {
 	}
 
 	public function testPartialResponseForShowDetail() {
-		$staffMember = $this->objFromFixture('StaffTestObject', 'one');
+		$staffMember = $this->objFromFixture('RestfulServer\StaffTestObject', 'one');
 		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '?fields=JobTitle');
 
 		$this->assertEquals(200, $response->getStatusCode());
@@ -62,8 +67,8 @@ class PartialResponseTest extends SapphireTest {
 	}
 
 	public function testPartialResponseForShowRelation() {
-		$staffMember = $this->objFromFixture('StaffTestObject', 'one');
-		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '/direct-reports?fields=JobTitle');
+		$staffMember = $this->objFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
+		$response = Director::test('/api/v2/stafftestalias/' . $staffMember->ID . '/direct-reports?fields=jobTitleAlias');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
@@ -71,8 +76,8 @@ class PartialResponseTest extends SapphireTest {
 
 		$this->assertEquals(2, count($results['staff']));
 		$this->assertEquals(2, count($results['staff'][0]));
-		$this->assertArrayHasKey('ID', $results['staff'][0]);
-		$this->assertArrayHasKey('JobTitle', $results['staff'][0]);
+		$this->assertArrayHasKey('id', $results['staff'][0]);
+		$this->assertArrayHasKey('jobTitleAlias', $results['staff'][0]);
 	}
 
 }

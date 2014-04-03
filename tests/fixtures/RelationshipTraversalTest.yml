@@ -1,13 +1,26 @@
-StaffTestObject:
+RestfulServer\StaffTestObject:
   one:
     Name: Jane Doe
     JobTitle: Team Lead
   two:
     Name: John Smith
     JobTitle: Developer
-    Manager: =>StaffTestObject.one
+    Manager: =>RestfulServer\StaffTestObject.one
   three:
     Name: Bob Jones
     JobTitle: Developer
-    Manager: =>StaffTestObject.one
-    Friends: =>StaffTestObject.one,=>StaffTestObject.two
+    Manager: =>RestfulServer\StaffTestObject.one
+    Friends: =>RestfulServer\StaffTestObject.one,=>RestfulServer\StaffTestObject.two
+RestfulServer\StaffTestObjectWithAliases:
+  one:
+    Name: Jane Doe
+    JobTitle: Team Lead
+  two:
+    Name: John Smith
+    JobTitle: Developer
+    Manager: =>RestfulServer\StaffTestObjectWithAliases.one
+  three:
+    Name: Bob Jones
+    JobTitle: Developer
+    Manager: =>RestfulServer\StaffTestObjectWithAliases.one
+    Friends: =>RestfulServer\StaffTestObjectWithAliases.one,=>RestfulServer\StaffTestObjectWithAliases.two

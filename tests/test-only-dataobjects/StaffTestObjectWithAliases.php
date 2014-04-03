@@ -1,6 +1,8 @@
 <?php
 
-class StaffTestObjectWithFieldAliases extends DataObject implements TestOnly {
+namespace RestfulServer;
+
+class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 
 	private static $db = array(
 		'Name' => 'Text',
@@ -8,23 +10,23 @@ class StaffTestObjectWithFieldAliases extends DataObject implements TestOnly {
 	);
 
 	private static $has_one = array(
-		'Manager' => 'StaffTestObjectWithFieldAliases'
+		'Manager' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $has_many = array(
-		'DirectReports' => 'StaffTestObjectWithFieldAliases'
+		'DirectReports' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $many_many = array(
-		'Friends' => 'StaffTestObjectWithFieldAliases'
+		'Friends' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $belongs_many_many = array(
-		'InverseFriends' => 'StaffTestObjectWithFieldAliases'
+		'InverseFriends' => 'RestfulServer\StaffTestObjectWithAliases'
 	);
 
 	private static $api_access = array(
-		'end_point_alias' => 'stafftestfieldalias',
+		'end_point_alias' => 'stafftestalias',
 		'singular_name' => 'staffMember',
 		'plural_name' => 'staff',
 		'field_aliases' => array(

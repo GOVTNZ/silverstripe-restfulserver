@@ -1,5 +1,9 @@
 <?php
 
+namespace RestfulServer;
+
+use Object;
+
 class APIError extends Object {
 
 	public static function throw_formatted_error($formatter, $statusCode, $errorKey, $context = array()) {
@@ -8,10 +12,10 @@ class APIError extends Object {
 	}
 
 	public static function throw_error($statusCode, $message, $contentType = 'text/plain') {
-		$response = new SS_HTTPResponse();
+		$response = new \SS_HTTPResponse();
 		$response->addHeader('Content-Type', $contentType);
 		$response->setBody($message);
-		throw new SS_HTTPResponse_Exception($response, $statusCode);
+		throw new \SS_HTTPResponse_Exception($response, $statusCode);
 	}
 
 	/**
@@ -66,7 +70,7 @@ class APIError extends Object {
 			return null;
 		}
 
-		$apiBaseURL = RestfulServerV2::get_base_url();
+		$apiBaseURL = ControllerV2::get_base_url();
 
 		$errorsURL = $apiBaseURL . '/errors';
 		$errorURL = $errorsURL . '/' . $key;
@@ -100,10 +104,10 @@ class APIError extends Object {
 	public static function get_description($key, $context = array()) {
 		$descriptionText = self::get_message('description', $key);
 
-		$viewer = new SSViewer_FromString($descriptionText);
+		$viewer = new \SSViewer_FromString($descriptionText);
 
-		$description = new HTMLText();
-		$description->setValue(Controller::curr()->renderWith($viewer, $context));
+		$description = new \HTMLText();
+		$description->setValue(\Controller::curr()->renderWith($viewer, $context));
 
 		return $description;
 	}

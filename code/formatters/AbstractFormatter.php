@@ -1,5 +1,7 @@
 <?php
 
+namespace RestfulServer;
+
 abstract class AbstractFormatter implements Formatter {
 
 	protected $resultsSets = array();

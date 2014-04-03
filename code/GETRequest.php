@@ -1,8 +1,8 @@
 <?php
 
-class APIRequest {
+namespace RestfulServer;
 
-	private $httpRequest = null;
+class GETRequest extends Request {
 
 	private $resourceClassName = null;
 	private $resourceID = null;
@@ -11,8 +11,6 @@ class APIRequest {
 	private $resultClassName = null;
 
 	private $resource = null;
-
-	private $formatter = null;
 
 	private $limit = null;
 	private $offset = null;
@@ -28,11 +26,6 @@ class APIRequest {
 	const DEFAULT_SORT   = 'ID';
 	const DEFAULT_ORDER  = 'ASC';
 
-	public function __construct(SS_HTTPRequest $request, Formatter $formatter) {
-		$this->httpRequest = $request;
-		$this->formatter = $formatter;
-	}
-
 	public function outputResourceList() {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 
@@ -43,7 +36,7 @@ class APIRequest {
 		return $this->outputList($list, $className);
 	}
 
-	private function outputList(DataList $list, $className) {
+	private function outputList(\DataList $list, $className) {
 		$this->setPagination();
 		$this->setSorting($className);
 
@@ -160,7 +153,7 @@ class APIRequest {
 	private function transformSort($sort, $sortClassName) {
 		$apiAccess = singleton($sortClassName)->stat('api_access');
 
-		if (!isset($apiAccess['field_aliases']) && !isset($apiAccess['field_aliases'][$sort])) {
+		if (!isset($apiAccess['field_aliases']) || !isset($apiAccess['field_aliases'][$sort])) {
 			return $sort;
 		}
 
@@ -182,10 +175,10 @@ class APIRequest {
 		}
 	}
 
-	private function applyFilters(DataList $list) {
+	private function applyFilters(\DataList $list) {
 		$getVars = $this->httpRequest->getVars();
 		$filterValues = $this->transformAliases($getVars, $list->dataClass());
-		$filter = new APIFilter($list->dataClass());
+		$filter = new ResponseFilter($list->dataClass());
 		$filterArray = $filter->parseGET($filterValues);
 
 		if (count($filterArray) > 0) {
@@ -216,11 +209,11 @@ class APIRequest {
 		return $fieldValueMap;
 	}
 
-	private function setTotalCount(DataList $list) {
+	private function setTotalCount(\DataList $list) {
 		$this->totalCount = (int) $list->Count();
 
 		if ($this->totalCount > 0 && $this->offset >= $this->totalCount) {
-			throw new APIUserException('offsetOutOfBounds');
+			throw new UserException('offsetOutOfBounds');
 		}
 	}
 
@@ -271,7 +264,12 @@ class APIRequest {
 
 		// check for any fields that don't exist on our object
 		if (count($partialResponseFields) > 0) {
-			throw new APIUserException('invalidField', array('fields' => implode(', ', $partialResponseFields)));
+			throw new UserException(
+				'invalidField',
+				array(
+					'fields' => implode(', ', $partialResponseFields)
+				)
+			);
 		}
 
 		return $result;
@@ -341,7 +339,7 @@ class APIRequest {
 		$this->resource = $className::get()->byID($this->resourceID);
 
 		if (!$this->resource) {
-			throw new APIUserException('recordNotFound');
+			throw new UserException('recordNotFound');
 		}
 	}
 

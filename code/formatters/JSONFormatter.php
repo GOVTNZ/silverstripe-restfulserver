@@ -1,5 +1,7 @@
 <?php
 
+namespace RestfulServer;
+
 class JSONFormatter extends AbstractFormatter {
 
 	protected $outputContentType = 'application/json';
