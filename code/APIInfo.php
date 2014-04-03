@@ -258,4 +258,27 @@ class APIInfo {
 		return $apiAccess['relation_aliases'];
 	}
 
+	public static function get_class_name_by_relation($resourceClassName, $relationMethod) {
+		$instance = singleton($resourceClassName);
+
+		$hasMany = $instance->has_many($relationMethod);
+
+		if ($hasMany !== false && class_exists($hasMany)) {
+			return $hasMany;
+		}
+
+		$manyMany = $instance->many_many($relationMethod);
+
+		if (!is_null($manyMany) && class_exists($manyMany[1])) {
+			return $manyMany[1];
+		}
+
+		throw new UserException(
+			'relationNotFound',
+			array(
+				'relation' => $relationMethod
+			)
+		);
+	}
+
 }

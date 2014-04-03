@@ -113,4 +113,27 @@ class APIInfoTest extends BaseRestfulServerTest {
 		}
 	}
 
+	public function testGetClassNameByRelation() {
+		$className = APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'DirectReports');
+		$this->assertEquals($className, 'RestfulServer\StaffTestObjectWithAliases');
+
+		$className = APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'Friends');
+		$this->assertEquals($className, 'RestfulServer\StaffTestObjectWithAliases');
+
+		$className = APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'InverseFriends');
+		$this->assertEquals($className, 'RestfulServer\StaffTestObjectWithAliases');
+	}
+
+	public function testGetClassNameByRelationWithNonExistentRelation() {
+		$exceptionThrown = false;
+
+		try {
+			APIInfo::get_class_name_by_relation('RestfulServer\StaffTestObjectWithAliases', 'NonExistent');
+		} catch (Exception $e) {
+			$exceptionThrown = true;
+		}
+
+		$this->assertTrue($exceptionThrown);
+	}
+
 }

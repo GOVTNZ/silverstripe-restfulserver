@@ -7,9 +7,10 @@ use ArrayList, ViewableData;
 class DocumentationRequest extends Request {
 
 	public function outputResourceList() {
+		$className = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$data = array();
 
-		$data['AvailableFields'] = $this->getAvailableFields();
+		$data['AvailableFields'] = $this->getAvailableFields($className);
 		$data['Relations'] = $this->getRelations();
 		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['APIBaseURL'] = ControllerV2::get_base_url();
@@ -19,8 +20,7 @@ class DocumentationRequest extends Request {
 		return $template->customise($data)->renderWith('DocumentationList');
 	}
 
-	private function getAvailableFields() {
-		$className = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+	private function getAvailableFields($className) {
 		$fields = APIInfo::get_fields_for($className);
 
 		$availableFields = new ArrayList();
@@ -50,12 +50,13 @@ class DocumentationRequest extends Request {
 	}
 
 	public function outputResourceDetail() {
+		$className = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$data = array();
 
-		$data['AvailableFields'] = $this->getAvailableFields();
+		$data['AvailableFields'] = $this->getAvailableFields($className);
 		$data['Relations'] = $this->getRelations();
-		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['APIBaseURL'] = ControllerV2::get_base_url();
+		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
 
 		$template = new ViewableData();
@@ -64,7 +65,20 @@ class DocumentationRequest extends Request {
 	}
 
 	public function outputRelationList() {
-		return 'many related things';
+		$resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+		$relationMethod = APIInfo::get_relation_method_from_name($resourceClassName, $this->httpRequest->param('RelationName'));
+		$relationClassName = APIInfo::get_class_name_by_relation($resourceClassName, $relationMethod);
+		$data = array();
+
+		$data['AvailableFields'] = $this->getAvailableFields($relationClassName);
+		$data['APIBaseURL'] = ControllerV2::get_base_url();
+		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
+		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
+		$data['RelationName'] = $this->httpRequest->param('RelationName');
+
+		$template = new ViewableData();
+
+		return $template->customise($data)->renderWith('DocumentationRelations');
 	}
 
 }
