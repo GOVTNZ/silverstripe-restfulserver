@@ -274,4 +274,29 @@ class ControllerV2 extends Controller {
 		return self::$base_url;
 	}
 
+	public static function use_as_version_one_api() {
+		$routes = Config::inst()->get('Director', 'rules');
+
+		$routesToRemove = array(
+			'api/v1/live',
+			'api/v1',
+			'api/v2//$ResourceName/$ResourceID/$RelationName'
+		);
+
+		foreach ($routes as $route => $controllerName) {
+			if (in_array($route, $routesToRemove)) {
+				unset($routes[$route]);
+			}
+		}
+
+		$routes = array_merge(
+			array(
+				'api/v1//$ResourceName/$ResourceID/$RelationName' => 'RestfulServer\ControllerV2'
+			),
+			$routes
+		);
+
+		Config::inst()->update('Director', 'rules', $routes);
+	}
+
 }
