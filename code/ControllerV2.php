@@ -283,10 +283,8 @@ class ControllerV2 extends Controller {
 			'api/v2//$ResourceName/$ResourceID/$RelationName'
 		);
 
-		foreach ($routes as $route => $controllerName) {
-			if (in_array($route, $routesToRemove)) {
-				unset($routes[$route]);
-			}
+		foreach ($routesToRemove as $route) {
+			unset($routes[$route]);
 		}
 
 		$routes = array_merge(
