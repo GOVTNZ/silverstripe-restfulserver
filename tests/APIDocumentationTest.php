@@ -53,6 +53,25 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		$this->assertContains('InverseFriends', $body);
 	}
 
+	public function testListDocumentationWithAliases() {
+		$response = Director::test('/api/v2/stafftestalias.html');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$body = $response->getBody();
+
+		$this->assertContains('Available fields', $body);
+		$this->assertContains('name', $body);
+		$this->assertContains('jobTitleAlias', $body);
+
+		$this->assertContains('Relations', $body);
+		$this->assertContains('direct-reports', $body);
+		$this->assertContains('friends', $body);
+		$this->assertContains('InverseFriends', $body);
+		$this->assertContains('test-relations', $body);
+		$this->assertContains('inverse-test-relations', $body);
+	}
+
 	public function testDetailDocumentation() {
 		$staffMember = new StaffTestObject();
 		$staffMember->write();

@@ -18,11 +18,13 @@ class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 	);
 
 	private static $many_many = array(
-		'Friends' => 'RestfulServer\StaffTestObjectWithAliases'
+		'Friends' => 'RestfulServer\StaffTestObjectWithAliases',
+		'TestRelations' => 'RestfulServer\APITestObject'
 	);
 
 	private static $belongs_many_many = array(
-		'InverseFriends' => 'RestfulServer\StaffTestObjectWithAliases'
+		'InverseFriends' => 'RestfulServer\StaffTestObjectWithAliases',
+		'InverseTestRelations' => 'RestfulServer\APITestObject'
 	);
 
 	private static $api_access = array(
@@ -36,7 +38,9 @@ class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 		),
 		'relation_aliases' => array(
 			'direct-reports' => 'DirectReports',
-			'friends' => 'Friends'
+			'friends' => 'Friends',
+			'test-relations' => 'TestRelations',
+			'inverse-test-relations' => 'InverseTestRelations'
 		)
 	);
 

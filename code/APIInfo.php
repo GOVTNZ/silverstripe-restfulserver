@@ -231,7 +231,7 @@ class APIInfo {
 		$hasManyManyMany = array_merge($hasMany, $manyMany);
 		$relations = array();
 
-		foreach ($hasManyManyMany as $relationName => $className) {
+		foreach ($hasManyManyMany as $relationName => $relationClassName) {
 			$relations[] = $relationName;
 		}
 
