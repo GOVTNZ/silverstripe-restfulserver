@@ -61,6 +61,35 @@ A list of MyDataObjects related to by the OtherObjects has many relation:
 
 	/api/v2/my-data-objects/1/other-objects
 
+### Defining dynamic relationships
+
+If you need to make a relationship accessible via the API that isn't a typical has_many or many_many, the following
+example is how to achieve this:
+
+	class MyDataObject extends DataObject {
+
+		private static $db = array(
+			'Title' => 'Text',
+			'Description' => 'Text',
+			'AnotherField' => 'Boolean'
+		);
+
+		private static $api_access = array(
+			'end_point_alias' => 'my-data-objects',
+			'relation_aliases' => array(
+				'another-relation' => 'DynamicRelation'
+			)
+		);
+
+		public function DynamicRelation() {
+			return MyDataObject::get()->filter('AnotherField', true);
+		}
+
+	}
+
+The method that is referenced in relation_aliases (i.e. DynamicRelation) must return a DataList.
+If it does not, any requests to that end point will fail.
+
 ### Using the V2 API via /api/v1
 
 Add the following code to your mysite/_config.php file:
