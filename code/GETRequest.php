@@ -380,6 +380,14 @@ class GETRequest extends Request {
 		if (!is_null($relationClassName) && isset($relationClassName[1])) {
 			$this->relationClassName = $relationClassName[1];
 		}
+
+		if (method_exists($this->resource, $relationName)) {
+			$relationList = $this->resource->$relationName();
+
+			if ($relationList instanceof \DataList) {
+				$this->relationClassName = $relationList->dataClass();
+			}
+		}
 	}
 
 }
