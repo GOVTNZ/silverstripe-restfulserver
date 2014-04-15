@@ -212,7 +212,7 @@ class APIInfo {
 		return $fields;
 	}
 
-	private static function get_field_alias_map_for($className) {
+	public static function get_field_alias_map_for($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
 		if (!$apiAccess || !isset($apiAccess['field_aliases']) || !is_array($apiAccess['field_aliases'])) {

@@ -40,7 +40,6 @@ class GETRequest extends Request {
 		$this->setPagination();
 		$this->setSorting($className);
 
-
 		$list = $this->applyFilters($list);
 		$this->setTotalCount($list);
 		$this->setMetaData();
@@ -64,27 +63,6 @@ class GETRequest extends Request {
 		);
 
 		return $this->formatter->format();
-	}
-
-	private function applyFieldNameAliasTransformation($response, $className) {
-		$apiAccess = singleton($className)->stat('api_access');
-
-		if (!isset($apiAccess['field_aliases'])) {
-			return $response;
-		}
-
-		$fieldNameAliases = array_flip($apiAccess['field_aliases']);
-		$aliasedResponse = array();
-
-		foreach ($response as $fieldName => $value) {
-			if (isset($fieldNameAliases[$fieldName])) {
-				$aliasedResponse[$fieldNameAliases[$fieldName]] = $value;
-			} else {
-				$aliasedResponse[$fieldName] = $value;
-			}
-		}
-
-		return $aliasedResponse;
 	}
 
 	private function setPagination() {
@@ -230,9 +208,7 @@ class GETRequest extends Request {
 	private function applyPartialResponse($itemFieldValueMap) {
 		$excludeFields = array(
 			'ClassName',
-			'RecordClassName',
-			'Created',
-			'LastEdited'
+			'RecordClassName'
 		);
 
 		$result = array();
@@ -273,6 +249,27 @@ class GETRequest extends Request {
 		}
 
 		return $result;
+	}
+
+	private function applyFieldNameAliasTransformation($response, $className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!isset($apiAccess['field_aliases'])) {
+			return $response;
+		}
+
+		$fieldNameAliases = array_flip(APIInfo::get_field_alias_map_for($className));
+		$aliasedResponse = array();
+
+		foreach ($response as $fieldName => $value) {
+			if (isset($fieldNameAliases[$fieldName])) {
+				$aliasedResponse[$fieldNameAliases[$fieldName]] = $value;
+			} else {
+				$aliasedResponse[$fieldName] = $value;
+			}
+		}
+
+		return $aliasedResponse;
 	}
 
 	private function getPartialResponseFields($aliasedFields) {
