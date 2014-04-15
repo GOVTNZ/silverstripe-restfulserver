@@ -281,4 +281,8 @@ class APIInfo {
 		);
 	}
 
+	public static function has_api_access($className) {
+		return (bool) singleton($className)->stat('api_access');
+	}
+
 }

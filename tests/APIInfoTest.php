@@ -136,4 +136,9 @@ class APIInfoTest extends BaseRestfulServerTest {
 		$this->assertTrue($exceptionThrown);
 	}
 
+	public function testHasApiAccess() {
+		$this->assertTrue(APIInfo::has_api_access('RestfulServer\StaffTestObject'));
+		$this->assertFalse(APIInfo::has_api_access('RestfulServer\InaccessibleDataObject'));
+	}
+
 }

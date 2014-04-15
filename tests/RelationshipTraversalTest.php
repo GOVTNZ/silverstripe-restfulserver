@@ -10,7 +10,8 @@ class RelationshipTraversalTest extends SapphireTest {
 
 	protected $extraDataObjects = array(
 		'RestfulServer\StaffTestObject',
-		'RestfulServer\StaffTestObjectWithAliases'
+		'RestfulServer\StaffTestObjectWithAliases',
+		'RestfulServer\InaccessibleDataObject'
 	);
 
 	public function testGetRelationList() {
@@ -120,6 +121,42 @@ class RelationshipTraversalTest extends SapphireTest {
 
 		$this->assertEquals(1, count($results['staff']));
 		$this->assertEquals('Bob Jones', $results['staff'][0]['name']);
+	}
+
+	public function testInaccessibleRelation() {
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+
+		$response = Director::test('/api/v2/stafftest/' . $managerId . '/InaccessibleDataObjects');
+
+		$this->assertEquals(400, $response->getStatusCode());
+
+		$responseJSON = json_decode($response->getBody(), true);
+
+		$expectedError = APIError::get_messages_for('relationNotAccessible', array(
+			'class' => 'RestfulServer\InaccessibleDataObject'
+		));
+
+		$this->assertEquals($expectedError['developerMessage'], $responseJSON['developerMessage']);
+		$this->assertEquals($expectedError['userMessage'], $responseJSON['userMessage']);
+		$this->assertEquals($expectedError['moreInfo'], $responseJSON['moreInfo']);
+	}
+
+	public function testInaccessibleRelationWithAliases() {
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
+
+		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/inaccessible-relation');
+
+		$this->assertEquals(400, $response->getStatusCode());
+
+		$responseJSON = json_decode($response->getBody(), true);
+
+		$expectedError = APIError::get_messages_for('relationNotAccessible', array(
+			'class' => 'RestfulServer\InaccessibleDataObject'
+		));
+
+		$this->assertEquals($expectedError['developerMessage'], $responseJSON['developerMessage']);
+		$this->assertEquals($expectedError['userMessage'], $responseJSON['userMessage']);
+		$this->assertEquals($expectedError['moreInfo'], $responseJSON['moreInfo']);
 	}
 
 }

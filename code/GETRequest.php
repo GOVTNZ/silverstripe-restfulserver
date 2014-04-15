@@ -357,6 +357,16 @@ class GETRequest extends Request {
 		);
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
+
+		if (!APIInfo::has_api_access($this->relationClassName)) {
+			throw new UserException(
+				'relationNotAccessible',
+				array(
+					'class' => $this->relationClassName
+				)
+			);
+		}
+
 		$list = $this->resource->$relationMethod();
 
 		foreach ($list as $item) {

@@ -14,7 +14,8 @@ class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 	);
 
 	private static $has_many = array(
-		'DirectReports' => 'RestfulServer\StaffTestObjectWithAliases'
+		'DirectReports' => 'RestfulServer\StaffTestObjectWithAliases',
+		'InaccessibleDataObjects' => 'RestfulServer\InaccessibleDataObject'
 	);
 
 	private static $many_many = array(
@@ -40,7 +41,8 @@ class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 			'direct-reports' => 'DirectReports',
 			'friends' => 'Friends',
 			'test-relations' => 'TestRelations',
-			'inverse-test-relations' => 'InverseTestRelations'
+			'inverse-test-relations' => 'InverseTestRelations',
+			'inaccessible-relation' => 'InaccessibleDataObjects'
 		)
 	);
 

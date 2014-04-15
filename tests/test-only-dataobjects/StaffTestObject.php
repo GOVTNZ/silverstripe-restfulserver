@@ -14,7 +14,8 @@ class StaffTestObject extends \DataObject implements \TestOnly {
 	);
 
 	private static $has_many = array(
-		'DirectReports' => 'RestfulServer\StaffTestObject'
+		'DirectReports' => 'RestfulServer\StaffTestObject',
+		'InaccessibleDataObjects' => 'RestfulServer\InaccessibleDataObject'
 	);
 
 	private static $many_many = array(
