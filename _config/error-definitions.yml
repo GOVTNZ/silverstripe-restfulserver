@@ -49,11 +49,11 @@ RestfulServer\APIError:
         </p>
     relationNotAccessible:
       name: 'The relationship class requested is not accessible'
-      developerMessage: 'The class ({class}) is not accessible.'
+      developerMessage: 'The class ({relationClass}) is not accessible.'
       userMessage: 'Something went wrong'
       description: |
         <p>
-        The relationship requested <% if $class %>($class) <% end_if %>is not accessible.<br>
+        The relationship requested <% if $relationClass %>($relationClass) <% end_if %>is not accessible.<br>
         When accessing a relationship the class being accessed must also declare an api_access static.
         </p>
     invalidField:

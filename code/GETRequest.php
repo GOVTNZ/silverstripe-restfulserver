@@ -362,7 +362,7 @@ class GETRequest extends Request {
 			throw new UserException(
 				'relationNotAccessible',
 				array(
-					'class' => $this->relationClassName
+					'relationClass' => $this->relationClassName
 				)
 			);
 		}

@@ -133,7 +133,7 @@ class RelationshipTraversalTest extends SapphireTest {
 		$responseJSON = json_decode($response->getBody(), true);
 
 		$expectedError = APIError::get_messages_for('relationNotAccessible', array(
-			'class' => 'RestfulServer\InaccessibleDataObject'
+			'relationClass' => 'RestfulServer\InaccessibleDataObject'
 		));
 
 		$this->assertEquals($expectedError['developerMessage'], $responseJSON['developerMessage']);
@@ -151,7 +151,7 @@ class RelationshipTraversalTest extends SapphireTest {
 		$responseJSON = json_decode($response->getBody(), true);
 
 		$expectedError = APIError::get_messages_for('relationNotAccessible', array(
-			'class' => 'RestfulServer\InaccessibleDataObject'
+			'relationClass' => 'RestfulServer\InaccessibleDataObject'
 		));
 
 		$this->assertEquals($expectedError['developerMessage'], $responseJSON['developerMessage']);
