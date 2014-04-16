@@ -2,13 +2,7 @@
 
 namespace RestfulServer;
 
-use Controller;
-use ArrayList;
-use ArrayData;
-use Director;
-use SS_HTTPResponse;
-use SS_HTTPResponse_Exception;
-use Config;
+use Controller, ArrayList, ArrayData, Director, SS_HTTPResponse, SS_HTTPResponse_Exception, Config;
 
 class ControllerV2 extends Controller {
 
