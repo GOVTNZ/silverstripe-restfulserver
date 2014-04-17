@@ -27,7 +27,11 @@ class GETRequest extends Request {
 	const DEFAULT_ORDER  = 'ASC';
 
 	public function outputResourceList() {
+		// transform resource name into class name
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
+
+		// transform GET parameters (and replace httpRequest)
+		$this->httpRequest = Request::get_transformed_request($this->resourceClassName, $this->httpRequest);
 
 		$className = $this->resourceClassName;
 		$this->resultClassName = $className;
@@ -321,6 +325,9 @@ class GETRequest extends Request {
 
 		$this->resultClassName = $this->resourceClassName;
 
+		// transform GET parameters (and replace httpRequest)
+		$this->httpRequest = Request::get_transformed_request($this->resourceClassName, $this->httpRequest);
+
 		$this->setResource();
 
 		$this->formatter->addExtraData(array(
@@ -363,6 +370,9 @@ class GETRequest extends Request {
 				)
 			);
 		}
+
+		// transform GET parameters (and replace httpRequest)
+		$this->httpRequest = Request::get_transformed_request($this->relationClassName, $this->httpRequest);
 
 		$list = $this->resource->$relationMethod();
 

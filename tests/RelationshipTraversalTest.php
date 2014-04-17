@@ -88,7 +88,7 @@ class RelationshipTraversalTest extends SapphireTest {
 	public function testGetRelationListWithFilter() {
 		$managerId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
 
-		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/direct-reports?Name=bob');
+		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/direct-reports?name=bob');
 
 		$this->assertEquals(200, $response->getStatusCode());
 
