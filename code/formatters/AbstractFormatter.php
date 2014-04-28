@@ -9,8 +9,6 @@ abstract class AbstractFormatter implements Formatter {
 
 	protected $outputContentType = 'text/plain';
 
-	abstract public function format();
-
 	public function getOutputContentType() {
 		return $this->outputContentType;
 	}
