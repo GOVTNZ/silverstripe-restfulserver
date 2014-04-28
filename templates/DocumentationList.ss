@@ -1,28 +1,66 @@
 <h1>API Documentation</h1>
 <h2>Available fields</h2>
 
+<p>The following fields can be accessed on the $EndPoint end point. Results can be sorted and filtered by these fields.</p>
+
 <ul>
 	<% loop $AvailableFields %>
 		<li>$Name</li>
 	<% end_loop %>
 </ul>
 
-<h3>Examples</h3>
+<h2>Example Usage</h2>
 
-<dl>
-	<dt><strong>Pagination</strong> (use the start and limit parameters to page through lists)</dt>
-	<dd>$APIBaseURL/$EndPoint?start=10&limit=10</dd>
-	<dt><strong>Filtering</strong> (filter the response by a specific field query)</dt>
-	<dd>$APIBaseURL/$EndPoint?$AvailableFields.Last.Name=&lt;Search Query&gt;</dd>
-	<dt><strong>Sorting</strong> (sort the response by a field and choose a sort direction)</dt>
-	<dd>$APIBaseURL/$EndPoint?sort=$AvailableFields.Last.Name&order=asc</dd>
-	<dt><strong>Partial response</strong> (request a response containing only certain fields)</dt>
-	<dd>$APIBaseURL/$EndPoint?fields=$AvailableFields.Last.Name</dd>
-</dl>
+<h3>Pagination</h3>
+<p>To page through results, the <code>start</code> and <code>limit</code> parameters must be used.</p>
 
-<p>While these are all separate examples, a single request can make use of any of them.</p>
+<h4>Offset</h4>
+<p>The n<sup>th</sup> record from which to start displaying results.</p>
+
+<h4>Limit</h4>
+<p>Determines the number of records to show per page.</p>
+
+<h4>Example</h4>
+<p>$APIBaseURL/$EndPoint?offset=10&limit=10</p>
+
+<h3>Filtering</h3>
+<p>To filter results on a certain field use the name of the field you want to filter by as the parameter.</p>
+<p>A partial match will be done on your search query and any results matched will be returned.</p>
+
+<h4>Example</h4>
+<p>$APIBaseURL/$EndPoint?$AvailableFields.Last.Name=&lt;search_query&gt;</p>
+
+<h3>Sorting</h3>
+<p>To change the sorting of results the <code>sort</code> and <code>order</code> parameters are needed.</p>
+
+<h4>Sort</h4>
+<p>The name of the column to sort by</p>
+
+<h4>Order</h4>
+<p>The direction of the sorting. Valid options are <code>asc</code> and <code>desc</code>.</p>
+
+<h4>Example</h4>
+<p>$APIBaseURL/$EndPoint?sort=$AvailableFields.Last.Name&order=asc</p>
+
+<h3>Partial response</h3>
+<p>If you only need a subset of fields in the response you can use the <code>fields</code> parameter to get a partial response.</p>
+
+<h4>Fields</h4>
+<p>A comma separated list of fields. Only these fields will be returned in the response.</p>
+
+<h4>Example</h4>
+<p>$APIBaseURL/$EndPoint?fields=$AvailableFields.Last.Name</p>
+
+<h3>Combined example</h3>
+<p>Pagination, filtering, sorting, and partial response can be used individually or a combination of them can be used.</p>
+<p>
+	Here is an example using all of them:<br>
+	$APIBaseURL/$EndPoint?offset=10&limit=10&sort=$AvailableFields.Last.Name&order=desc&$AvailableFields.Last.Name=&lt;search_query&gt;&fields=$AvailableFields.Last.Name
+</p>
 
 <h2>Relations</h2>
+
+<p>The following relationships can be accessed through the $EndPoint end point:</p>
 
 <ul>
 	<% loop $Relations %>

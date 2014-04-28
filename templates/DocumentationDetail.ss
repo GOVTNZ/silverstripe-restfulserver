@@ -1,20 +1,22 @@
 <h1>API Documentation</h1>
 <h2>Available fields</h2>
 
+<p>The following fields can be accessed on the $EndPoint end point.</p>
+
 <ul>
 	<% loop $AvailableFields %>
 		<li>$Name</li>
 	<% end_loop %>
 </ul>
 
-<h3>Examples</h3>
+<h2>Example Usage</h2>
 
-<dl>
-	<dt><strong>Partial response</strong> (request a response containing only certain fields)</dt>
-	<dd>$APIBaseURL/$EndPoint/$ResourceID?fields=$AvailableFields.Last.Name</dd>
-</dl>
+<h3>Partial response</h3>
+<p>If you only need a subset of fields in the response you can use the <code>fields</code> parameter to get a partial response.</p>
 
 <h2>Relations</h2>
+
+<p>The following relationships can be accessed through the $EndPoint end point:</p>
 
 <ul>
 	<% loop $Relations %>

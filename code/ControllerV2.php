@@ -207,6 +207,7 @@ class ControllerV2 extends Controller {
 		}
 
 		return $this->customise(array(
+			'APIBaseURL' => ControllerV2::get_base_url(),
 			'EndPoints' => $endPoints,
 			'Formats' => $formats
 		))->renderWith('DocumentationBase');
