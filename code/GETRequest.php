@@ -54,7 +54,9 @@ class GETRequest extends Request {
 
 		foreach ($list as $item) {
 			$result = $item->toMap();
+
 			$result = $this->applyPartialResponse($result);
+			$result = $this->removeForbiddenFields($result, $className);
 			$result = $this->applyFieldNameAliasTransformation($result, $className);
 
 			$results[] = $result;
@@ -255,6 +257,23 @@ class GETRequest extends Request {
 		return $result;
 	}
 
+	private function removeForbiddenFields($result, $className) {
+		$viewableFields = APIInfo::get_viewable_fields($className);
+
+		// empty array means all fields visible
+		if (count($viewableFields) === 0) {
+			return $result;
+		}
+
+		foreach ($result as $fieldName => $value) {
+			if (!in_array($fieldName, $viewableFields)) {
+				unset($result[$fieldName]);
+			}
+		}
+
+		return $result;
+	}
+
 	private function applyFieldNameAliasTransformation($response, $className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
@@ -262,7 +281,7 @@ class GETRequest extends Request {
 			return $response;
 		}
 
-		$fieldNameAliases = array_flip(APIInfo::get_field_alias_map_for($className));
+		$fieldNameAliases = array_flip(APIInfo::get_alias_field_map_for($className));
 		$aliasedResponse = array();
 
 		foreach ($response as $fieldName => $value) {
@@ -330,8 +349,13 @@ class GETRequest extends Request {
 
 		$this->setResource();
 
+		$result = $this->resource->toMap();
+		$result = $this->applyPartialResponse($result);
+		$result = $this->removeForbiddenFields($result, $this->resultClassName);
+		$result = $this->applyFieldNameAliasTransformation($result, $this->resultClassName);
+
 		$this->formatter->addExtraData(array(
-			$this->getSingularName($this->resourceClassName) => $this->applyPartialResponse($this->resource->toMap())
+			$this->getSingularName($this->resourceClassName) => $result
 		));
 
 		return $this->formatter->format();

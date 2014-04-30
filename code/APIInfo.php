@@ -190,16 +190,20 @@ class APIInfo {
 		return (($instance->has_many($relationName) !== false) || (!is_null($instance->many_many($relationName))));
 	}
 
-	public static function get_fields_for($className) {
+	public static function get_database_fields_for($className) {
 		$fields = array(
 			'ID',
 			'Created',
 			'LastEdited'
 		);
 
-		$fields = array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
+		return array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
+	}
 
-		$aliasMap = array_flip(self::get_field_alias_map_for($className));
+	public static function get_aliased_fields_for($className) {
+		$fields = self::get_database_fields_for($className);
+
+		$aliasMap = array_flip(self::get_alias_field_map_for($className));
 
 		$fields = array_map(function ($item) use ($aliasMap) {
 			if (isset($aliasMap[$item])) {
@@ -213,6 +217,10 @@ class APIInfo {
 	}
 
 	public static function get_field_alias_map_for($className) {
+		return array_flip(self::get_alias_field_map_for($className));
+	}
+
+	public static function get_alias_field_map_for($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
 		if (!$apiAccess || !isset($apiAccess['field_aliases']) || !is_array($apiAccess['field_aliases'])) {
@@ -283,6 +291,22 @@ class APIInfo {
 
 	public static function has_api_access($className) {
 		return (bool) singleton($className)->stat('api_access');
+	}
+
+	/**
+	 * Get the viewable fields for a class
+	 *
+	 * @param $className The name of the class to get the viewable fields for
+	 * @return array An array of viewable fields
+	 */
+	public static function get_viewable_fields($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!isset($apiAccess['view'])) {
+			return array();
+		}
+
+		return $apiAccess['view'];
 	}
 
 }

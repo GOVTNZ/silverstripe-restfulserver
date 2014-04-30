@@ -65,8 +65,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 		$this->assertEquals(4, count($endPoints));
 	}
 
-	public function testGetFieldsFor() {
-		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObject');
+	public function testGetAliasedFieldsFor() {
+		$fields = APIInfo::get_aliased_fields_for('RestfulServer\StaffTestObject');
 
 		$expectedFields = array('ID', 'Created', 'LastEdited', 'Name', 'JobTitle', 'ManagerID');
 
@@ -75,8 +75,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 		}
 	}
 
-	public function testGetFieldsForWithAliases() {
-		$fields = APIInfo::get_fields_for('RestfulServer\StaffTestObjectWithAliases');
+	public function testGetAliasedFieldsForWithAliases() {
+		$fields = APIInfo::get_aliased_fields_for('RestfulServer\StaffTestObjectWithAliases');
 
 		$expectedFields = array('id', 'Created', 'LastEdited', 'name', 'jobTitleAlias', 'ManagerID');
 

@@ -38,8 +38,8 @@ abstract class Request {
 			'limit'
 		);
 
-		$fields = APIInfo::get_fields_for($className);
-		$aliasToFieldMap = APIInfo::get_field_alias_map_for($className);
+		$fields = APIInfo::get_aliased_fields_for($className);
+		$aliasToFieldMap = APIInfo::get_alias_field_map_for($className);
 
 		if (isset($originalGetVars['sort'])) {
 			$newGetVars['sort'] = self::transform_sort($originalGetVars['sort'], $aliasToFieldMap);
