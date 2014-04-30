@@ -53,7 +53,12 @@ class GETRequest extends Request {
 		$results = array();
 
 		foreach ($list as $item) {
-			$result = $item->toMap();
+			$result = array();
+			$fields = APIInfo::get_database_fields_for($item->ClassName);
+
+			foreach ($fields as $fieldName) {
+				$result[$fieldName] = $item->$fieldName;
+			}
 
 			$result = $this->applyPartialResponse($result);
 			$result = $this->removeForbiddenFields($result, $className);
@@ -212,11 +217,6 @@ class GETRequest extends Request {
 	}
 
 	private function applyPartialResponse($itemFieldValueMap) {
-		$excludeFields = array(
-			'ClassName',
-			'RecordClassName'
-		);
-
 		$result = array();
 
 		$partialResponseFields = $this->httpRequest->getVar('fields');
@@ -233,11 +233,8 @@ class GETRequest extends Request {
 		unset($itemFieldValueMap['ID']);
 		$partialResponseFields = array_diff($partialResponseFields, array('ID'));
 
-		// remove excluded fields
-		$partialResponseFields = array_diff($partialResponseFields, $excludeFields);
-
 		foreach ($itemFieldValueMap as $fieldName => $value) {
-			if (in_array($fieldName, $partialResponseFields) && !in_array($fieldName, $excludeFields)) {
+			if (in_array($fieldName, $partialResponseFields)) {
 				$result[$fieldName] = $value;
 				// remove the field name from partialResponseFields
 				$partialResponseFields = array_diff($partialResponseFields, array($fieldName));

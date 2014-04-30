@@ -194,7 +194,9 @@ class APIInfo {
 		$fields = array(
 			'ID',
 			'Created',
-			'LastEdited'
+			'LastEdited',
+			'ClassName',
+			'RecordClassName'
 		);
 
 		return array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
