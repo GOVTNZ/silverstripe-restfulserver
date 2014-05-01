@@ -8,7 +8,9 @@ class APIInfoTest extends BaseRestfulServerTest {
 		'RestfulServer\APITestObject',
 		'RestfulServer\APITestPageObject',
 		'RestfulServer\StaffTestObject',
-		'RestfulServer\StaffTestObjectWithAliases'
+		'RestfulServer\StaffTestObjectWithAliases',
+		'RestfulServer\StaffTestObjectWithView',
+		'RestfulServer\StaffTestObjectWithAliasesAndView'
 	);
 
 	public function testClassCanBeFilteredBy() {
@@ -62,7 +64,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 	public function testGetAllAPIEndPoints() {
 		$endPoints = APIInfo::get_all_end_points();
 
-		$this->assertEquals(4, count($endPoints));
+		$this->assertEquals(6, count($endPoints));
 	}
 
 	public function testGetAliasedFieldsFor() {
@@ -139,6 +141,82 @@ class APIInfoTest extends BaseRestfulServerTest {
 	public function testHasApiAccess() {
 		$this->assertTrue(APIInfo::has_api_access('RestfulServer\StaffTestObject'));
 		$this->assertFalse(APIInfo::has_api_access('RestfulServer\InaccessibleDataObject'));
+	}
+
+	public function testGetAvailableFieldsFor() {
+		$expectedWithoutView = array(
+			'ID',
+			'Created',
+			'LastEdited',
+			'ClassName',
+			'RecordClassName',
+			'Name',
+			'JobTitle',
+			'ManagerID'
+		);
+
+		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObject');
+		$this->assertEquals($expectedWithoutView, $availableFields);
+
+		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObjectWithAliases');
+		$this->assertEquals($expectedWithoutView, $availableFields);
+
+		$expectedWithView = array(
+			'ID',
+			'Name'
+		);
+
+		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObjectWithView');
+		$this->assertEquals($expectedWithView, $availableFields);
+
+		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObjectWithAliasesAndView');
+		$this->assertEquals($expectedWithView, $availableFields);
+	}
+
+	public function testGetAvailableFieldsWithAliasesFor() {
+		$expectedWithoutView = array(
+			'ID',
+			'Created',
+			'LastEdited',
+			'ClassName',
+			'RecordClassName',
+			'Name',
+			'JobTitle',
+			'ManagerID'
+		);
+
+		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObject');
+		$this->assertEquals($expectedWithoutView, $availableFields);
+
+		$expectedWithoutView = array(
+			'id',
+			'Created',
+			'LastEdited',
+			'ClassName',
+			'RecordClassName',
+			'name',
+			'jobTitleAlias',
+			'ManagerID'
+		);
+
+		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObjectWithAliases');
+		$this->assertEquals($expectedWithoutView, $availableFields);
+
+		$expectedWithView = array(
+			'ID',
+			'Name'
+		);
+
+		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObjectWithView');
+		$this->assertEquals($expectedWithView, $availableFields);
+
+		$expectedWithView = array(
+			'id',
+			'name'
+		);
+
+		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObjectWithAliasesAndView');
+		$this->assertEquals($expectedWithView, $availableFields);
 	}
 
 }

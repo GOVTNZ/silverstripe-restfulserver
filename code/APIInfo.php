@@ -311,4 +311,28 @@ class APIInfo {
 		return $apiAccess['view'];
 	}
 
+	public static function get_available_fields_for($className) {
+		$viewableFields = self::get_viewable_fields($className);
+		$allFields = self::get_database_fields_for($className);
+
+		if (count($viewableFields) === 0) {
+			return $allFields;
+		} else {
+			return $viewableFields;
+		}
+	}
+
+	public static function get_available_fields_with_aliases_for($className) {
+		$availableFields = self::get_available_fields_for($className);
+		$fieldAliasMap = self::get_field_alias_map_for($className);
+
+		foreach ($availableFields as $key => $fieldName) {
+			if (isset($fieldAliasMap[$fieldName])) {
+				$availableFields[$key] = $fieldAliasMap[$fieldName];
+			}
+		}
+
+		return $availableFields;
+	}
+
 }
