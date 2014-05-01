@@ -217,36 +217,36 @@ class GETRequest extends Request {
 	}
 
 	private function applyPartialResponse($itemFieldValueMap) {
-		$result = array();
-
 		$partialResponseFields = $this->httpRequest->getVar('fields');
 
 		if ($partialResponseFields) {
 			$partialResponseFields = explode(',', $partialResponseFields);
-			$partialResponseFields = $this->getPartialResponseFields($partialResponseFields);
 		} else {
-			$partialResponseFields = array_keys($itemFieldValueMap);
+			$partialResponseFields = APIInfo::get_available_fields_for($this->resultClassName);
 		}
 
 		// we always want ID
-		$result['ID'] = $itemFieldValueMap['ID'];
-		unset($itemFieldValueMap['ID']);
-		$partialResponseFields = array_diff($partialResponseFields, array('ID'));
+		$result = array(
+			'ID' => $itemFieldValueMap['ID']
+		);
 
-		foreach ($itemFieldValueMap as $fieldName => $value) {
-			if (in_array($fieldName, $partialResponseFields)) {
-				$result[$fieldName] = $value;
-				// remove the field name from partialResponseFields
-				$partialResponseFields = array_diff($partialResponseFields, array($fieldName));
+		$availableFields = APIInfo::get_available_fields_for($this->resultClassName);
+		$invalidFields = array();
+
+		foreach ($partialResponseFields as $fieldName) {
+			if (in_array($fieldName, $availableFields)) {
+				$result[$fieldName] = $itemFieldValueMap[$fieldName];
+			} else {
+				$invalidFields[] = $fieldName;
 			}
 		}
 
 		// check for any fields that don't exist on our object
-		if (count($partialResponseFields) > 0) {
+		if (count($invalidFields) > 0) {
 			throw new UserException(
 				'invalidField',
 				array(
-					'fields' => implode(', ', $partialResponseFields)
+					'fields' => implode(', ', $invalidFields)
 				)
 			);
 		}
@@ -255,15 +255,10 @@ class GETRequest extends Request {
 	}
 
 	private function removeForbiddenFields($result, $className) {
-		$viewableFields = APIInfo::get_viewable_fields($className);
-
-		// empty array means all fields visible
-		if (count($viewableFields) === 0) {
-			return $result;
-		}
+		$availableFields = APIInfo::get_available_fields_for($className);
 
 		foreach ($result as $fieldName => $value) {
-			if (!in_array($fieldName, $viewableFields)) {
+			if (!in_array($fieldName, $availableFields)) {
 				unset($result[$fieldName]);
 			}
 		}
@@ -290,29 +285,6 @@ class GETRequest extends Request {
 		}
 
 		return $aliasedResponse;
-	}
-
-	private function getPartialResponseFields($aliasedFields) {
-		$instance = singleton($this->resultClassName);
-		$apiAccess = $instance->stat('api_access');
-
-		if (!isset($apiAccess['field_aliases'])) {
-			return $aliasedFields;
-		} else {
-			$aliasFieldMap = $apiAccess['field_aliases'];
-		}
-
-		$fields = array();
-
-		foreach ($aliasedFields as $fieldName) {
-			if (isset($aliasFieldMap[$fieldName])) {
-				$fields[] = $aliasFieldMap[$fieldName];
-			} else {
-				$fields[] = $fieldName;
-			}
-		}
-
-		return $fields;
 	}
 
 	private function getPluralName($className) {

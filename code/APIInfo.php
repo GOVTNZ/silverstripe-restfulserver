@@ -301,7 +301,7 @@ class APIInfo {
 	 * @param $className The name of the class to get the viewable fields for
 	 * @return array An array of viewable fields
 	 */
-	public static function get_viewable_fields($className) {
+	private static function get_viewable_fields($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
 		if (!isset($apiAccess['view'])) {

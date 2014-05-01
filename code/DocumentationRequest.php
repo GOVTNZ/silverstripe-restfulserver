@@ -21,24 +21,13 @@ class DocumentationRequest extends Request {
 	}
 
 	private function getAvailableFields($className) {
-		$fields = APIInfo::get_aliased_fields_for($className);
-		$fieldAliasMap = APIInfo::get_field_alias_map_for($className);
-		$viewableFields = APIInfo::get_viewable_fields($className);
-
-		foreach ($viewableFields as $key => $viewableField) {
-			if (isset($fieldAliasMap[$viewableField])) {
-				$viewableFields[$key] = $fieldAliasMap[$viewableField];
-			}
-		}
-
+		$fields = APIInfo::get_available_fields_with_aliases_for($className);
 		$availableFields = new ArrayList();
 
 		foreach ($fields as $fieldName) {
-			if (count($viewableFields) === 0 || in_array($fieldName, $viewableFields)) {
-				$availableFields->push(array(
-					'Name' => $fieldName
-				));
-			}
+			$availableFields->push(array(
+				'Name' => $fieldName
+			));
 		}
 
 		return $availableFields;
