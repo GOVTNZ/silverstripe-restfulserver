@@ -301,7 +301,7 @@ class APIInfo {
 	 * @param $className The name of the class to get the viewable fields for
 	 * @return array An array of viewable fields
 	 */
-	private static function get_viewable_fields($className) {
+	private static function get_view_array_for($className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
 		if (!isset($apiAccess['view'])) {
@@ -311,8 +311,8 @@ class APIInfo {
 		return $apiAccess['view'];
 	}
 
-	public static function get_available_fields_for($className) {
-		$viewableFields = self::get_viewable_fields($className);
+	public static function get_viewable_fields_for($className) {
+		$viewableFields = self::get_view_array_for($className);
 		$allFields = self::get_database_fields_for($className);
 
 		if (count($viewableFields) === 0) {
@@ -322,8 +322,8 @@ class APIInfo {
 		}
 	}
 
-	public static function get_available_fields_with_aliases_for($className) {
-		$availableFields = self::get_available_fields_for($className);
+	public static function get_viewable_fields_with_aliases_for($className) {
+		$availableFields = self::get_viewable_fields_for($className);
 		$fieldAliasMap = self::get_field_alias_map_for($className);
 
 		foreach ($availableFields as $key => $fieldName) {
@@ -333,6 +333,37 @@ class APIInfo {
 		}
 
 		return $availableFields;
+	}
+
+	public static function get_available_relations_for($className) {
+		$instance = singleton($className);
+
+		$hasMany = $instance->has_many();
+		$manyMany = $instance->many_many();
+
+		$hasManyManyMany = array_merge($hasMany, $manyMany);
+		$relations = array();
+
+		foreach ($hasManyManyMany as $relationName => $relationClassName) {
+			if (singleton($relationClassName)->stat('api_access')) {
+				$relations[] = $relationName;
+			}
+		}
+
+		return $relations;
+	}
+
+	public static function get_available_relations_with_aliases_for($className) {
+		$availableRelations = self::get_available_relations_for($className);
+		$relationAliases = array_flip(self::get_relation_alias_map_for($className));
+
+		foreach ($availableRelations as $key => $relation) {
+			if (isset($relationAliases[$relation])) {
+				$availableRelations[$key] = $relationAliases[$relation];
+			}
+		}
+
+		return $availableRelations;
 	}
 
 }

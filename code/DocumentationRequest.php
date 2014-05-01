@@ -21,7 +21,7 @@ class DocumentationRequest extends Request {
 	}
 
 	private function getAvailableFields($className) {
-		$fields = APIInfo::get_available_fields_with_aliases_for($className);
+		$fields = APIInfo::get_viewable_fields_with_aliases_for($className);
 		$availableFields = new ArrayList();
 
 		foreach ($fields as $fieldName) {

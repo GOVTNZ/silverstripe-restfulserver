@@ -222,7 +222,7 @@ class GETRequest extends Request {
 		if ($partialResponseFields) {
 			$partialResponseFields = explode(',', $partialResponseFields);
 		} else {
-			$partialResponseFields = APIInfo::get_available_fields_for($this->resultClassName);
+			$partialResponseFields = APIInfo::get_viewable_fields_for($this->resultClassName);
 		}
 
 		// we always want ID
@@ -230,7 +230,7 @@ class GETRequest extends Request {
 			'ID' => $itemFieldValueMap['ID']
 		);
 
-		$availableFields = APIInfo::get_available_fields_for($this->resultClassName);
+		$availableFields = APIInfo::get_viewable_fields_for($this->resultClassName);
 		$invalidFields = array();
 
 		foreach ($partialResponseFields as $fieldName) {
@@ -255,7 +255,7 @@ class GETRequest extends Request {
 	}
 
 	private function removeForbiddenFields($result, $className) {
-		$availableFields = APIInfo::get_available_fields_for($className);
+		$availableFields = APIInfo::get_viewable_fields_for($className);
 
 		foreach ($result as $fieldName => $value) {
 			if (!in_array($fieldName, $availableFields)) {

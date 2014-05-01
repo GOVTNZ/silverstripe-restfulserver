@@ -155,10 +155,10 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'ManagerID'
 		);
 
-		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObject');
+		$availableFields = APIInfo::get_viewable_fields_for('RestfulServer\StaffTestObject');
 		$this->assertEquals($expectedWithoutView, $availableFields);
 
-		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObjectWithAliases');
+		$availableFields = APIInfo::get_viewable_fields_for('RestfulServer\StaffTestObjectWithAliases');
 		$this->assertEquals($expectedWithoutView, $availableFields);
 
 		$expectedWithView = array(
@@ -166,10 +166,10 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'Name'
 		);
 
-		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObjectWithView');
+		$availableFields = APIInfo::get_viewable_fields_for('RestfulServer\StaffTestObjectWithView');
 		$this->assertEquals($expectedWithView, $availableFields);
 
-		$availableFields = APIInfo::get_available_fields_for('RestfulServer\StaffTestObjectWithAliasesAndView');
+		$availableFields = APIInfo::get_viewable_fields_for('RestfulServer\StaffTestObjectWithAliasesAndView');
 		$this->assertEquals($expectedWithView, $availableFields);
 	}
 
@@ -185,7 +185,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'ManagerID'
 		);
 
-		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObject');
+		$availableFields = APIInfo::get_viewable_fields_with_aliases_for('RestfulServer\StaffTestObject');
 		$this->assertEquals($expectedWithoutView, $availableFields);
 
 		$expectedWithoutView = array(
@@ -199,7 +199,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'ManagerID'
 		);
 
-		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObjectWithAliases');
+		$availableFields = APIInfo::get_viewable_fields_with_aliases_for('RestfulServer\StaffTestObjectWithAliases');
 		$this->assertEquals($expectedWithoutView, $availableFields);
 
 		$expectedWithView = array(
@@ -207,7 +207,7 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'Name'
 		);
 
-		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObjectWithView');
+		$availableFields = APIInfo::get_viewable_fields_with_aliases_for('RestfulServer\StaffTestObjectWithView');
 		$this->assertEquals($expectedWithView, $availableFields);
 
 		$expectedWithView = array(
@@ -215,8 +215,68 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'name'
 		);
 
-		$availableFields = APIInfo::get_available_fields_with_aliases_for('RestfulServer\StaffTestObjectWithAliasesAndView');
+		$availableFields = APIInfo::get_viewable_fields_with_aliases_for('RestfulServer\StaffTestObjectWithAliasesAndView');
 		$this->assertEquals($expectedWithView, $availableFields);
+	}
+
+	public function testGetAvailableRelationsFor() {
+		$availableRelations = APIInfo::get_available_relations_for('RestfulServer\StaffTestObject');
+		$expectedRelations = array(
+			'DirectReports',
+			'InverseFriends',
+			'Friends'
+		);
+
+		$this->assertEquals(count($expectedRelations), count($availableRelations));
+
+		foreach ($expectedRelations as $relationName) {
+			$this->assertContains($relationName, $availableRelations);
+		}
+
+		$availableRelations = APIInfo::get_available_relations_for('RestfulServer\StaffTestObjectWithAliases');
+		$expectedRelations = array(
+			'DirectReports',
+			'InverseFriends',
+			'Friends',
+			'TestRelations',
+			'InverseTestRelations'
+		);
+
+		$this->assertEquals(count($expectedRelations), count($availableRelations));
+
+		foreach ($expectedRelations as $relationName) {
+			$this->assertContains($relationName, $availableRelations);
+		}
+	}
+
+	public function testGetAvailableRelationsWithAliasesFor() {
+		$availableRelations = APIInfo::get_available_relations_with_aliases_for('RestfulServer\StaffTestObject');
+		$expectedRelations = array(
+			'DirectReports',
+			'InverseFriends',
+			'Friends'
+		);
+
+		$this->assertEquals(count($expectedRelations), count($availableRelations));
+
+		foreach ($expectedRelations as $relationName) {
+			$this->assertContains($relationName, $availableRelations);
+		}
+
+		$availableRelations = APIInfo::get_available_relations_with_aliases_for('RestfulServer\StaffTestObjectWithAliases');
+		$expectedRelations = array(
+			'direct-reports',
+			'InverseFriends',
+			'friends',
+			'test-relations',
+			'inverse-test-relations'
+		);
+
+		$this->assertEquals(count($expectedRelations), count($availableRelations));
+
+		foreach ($expectedRelations as $relationName) {
+			$this->assertContains($relationName, $availableRelations);
+		}
 	}
 
 }
