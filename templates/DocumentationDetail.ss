@@ -14,14 +14,16 @@
 <h3>Partial response</h3>
 <p>If you only need a subset of fields in the response you can use the <code>fields</code> parameter to get a partial response.</p>
 
-<h2>Relations</h2>
+<% if $Relations %>
+	<h2>Relations</h2>
 
-<p>The following relationships can be accessed through the $EndPoint end point:</p>
+	<p>The following relationships can be accessed through the $EndPoint end point:</p>
 
-<ul>
-	<% loop $Relations %>
-		<li><a href="$Top.APIBaseURL/$Top.EndPoint/$Top.ResourceID/$Name">$Name</a></li>
-	<% end_loop %>
-</ul>
+	<ul>
+		<% loop $Relations %>
+			<li><a href="$Top.APIBaseURL/$Top.EndPoint/$Top.ResourceID/$Name">$Name</a></li>
+		<% end_loop %>
+	</ul>
 
-<p>Relations are accessed via: $APIBaseURL/$EndPoint/$ResourceID/&lt;Relation Name&gt;</p>
+	<p>Relations are accessed via: $APIBaseURL/$EndPoint/$ResourceID/&lt;Relation Name&gt;</p>
+<% end_if %>

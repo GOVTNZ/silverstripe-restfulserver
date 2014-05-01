@@ -35,7 +35,7 @@ class DocumentationRequest extends Request {
 
 	private function getRelations() {
 		$className = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
-		$relations = APIInfo::get_relations_for($className);
+		$relations = APIInfo::get_available_relations_with_aliases_for($className);
 
 		$availableRelations = new ArrayList();
 

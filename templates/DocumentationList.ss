@@ -57,14 +57,16 @@
 	$APIBaseURL/$EndPoint?offset=10&limit=10&sort=$AvailableFields.Last.Name&order=desc&$AvailableFields.Last.Name=&lt;search_query&gt;&fields=$AvailableFields.Last.Name
 </p>
 
-<h2>Relations</h2>
+<% if $Relations %>
+	<h2>Relations</h2>
 
-<p>These relationships can be accessed through the $EndPoint end point:</p>
+	<p>These relationships can be accessed through the $EndPoint end point:</p>
 
-<ul>
-	<% loop $Relations %>
-		<li>$Name</li>
-	<% end_loop %>
-</ul>
+	<ul>
+		<% loop $Relations %>
+			<li>$Name</li>
+		<% end_loop %>
+	</ul>
 
-<p>Access relations at: $APIBaseURL/$EndPoint/&lt;id&gt;/&lt;relation_name&gt;</p>
+	<p>Access relations at: $APIBaseURL/$EndPoint/&lt;id&gt;/&lt;relation_name&gt;</p>
+<% end_if %>
