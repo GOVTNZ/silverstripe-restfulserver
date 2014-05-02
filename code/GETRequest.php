@@ -344,8 +344,6 @@ class GETRequest extends Request {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
 
-		$this->resultClassName = $this->resourceClassName;
-
 		$this->setResource();
 
 		$relationMethod = APIInfo::get_relation_method_from_name(
@@ -354,6 +352,8 @@ class GETRequest extends Request {
 		);
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
+
+		$this->resultClassName = $this->relationClassName;
 
 		// transform GET parameters (and replace httpRequest)
 		$this->httpRequest = Request::get_transformed_request($this->relationClassName, $this->httpRequest);
