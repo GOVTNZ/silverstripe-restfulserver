@@ -160,14 +160,15 @@ class APIInfo {
 	}
 
 	public static function get_relation_method_from_name($className, $relationName) {
-		$apiAccess = singleton($className)->stat('api_access');
+		$relationAliasMap = APIInfo::get_relation_alias_map_for($className);
+		$availableRelations = APIInfo::get_available_relations_with_aliases_for($className);
 
-		if (!self::class_has_relation_aliases($className) && self::class_has_relation($className, $relationName)) {
-			return $relationName;
-		}
-
-		if (isset($apiAccess['relation_aliases'][$relationName])) {
-			return $apiAccess['relation_aliases'][$relationName];
+		if (in_array($relationName, $availableRelations)) {
+			if (isset($relationAliasMap[$relationName])) {
+				return $relationAliasMap[$relationName];
+			} else {
+				return $relationName;
+			}
 		}
 
 		throw new UserException(

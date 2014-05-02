@@ -355,15 +355,6 @@ class GETRequest extends Request {
 
 		$this->setRelationClassNameFromRelationName($relationMethod);
 
-		if (!APIInfo::has_api_access($this->relationClassName)) {
-			throw new UserException(
-				'relationNotAccessible',
-				array(
-					'relationClass' => $this->relationClassName
-				)
-			);
-		}
-
 		// transform GET parameters (and replace httpRequest)
 		$this->httpRequest = Request::get_transformed_request($this->relationClassName, $this->httpRequest);
 

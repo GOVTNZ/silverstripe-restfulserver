@@ -47,15 +47,6 @@ RestfulServer\APIError:
         The relationship requested <% if $relation %>($relation) <% end_if %>does not exist.<br>
         Please check the documentation to see which relationships are available.
         </p>
-    relationNotAccessible:
-      name: 'The relationship class requested is not accessible'
-      developerMessage: 'The class ({relationClass}) is not accessible.'
-      userMessage: 'Something went wrong'
-      description: |
-        <p>
-        The relationship requested <% if $relationClass %>($relationClass) <% end_if %>is not accessible.<br>
-        When accessing a relationship the class being accessed must also declare an api_access static.
-        </p>
     invalidField:
       name: 'The field requested does not exist'
       developerMessage: 'The field requested ({fields}) does not exist.'
