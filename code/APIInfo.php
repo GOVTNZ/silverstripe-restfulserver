@@ -341,17 +341,28 @@ class APIInfo {
 
 		$hasMany = $instance->has_many();
 		$manyMany = $instance->many_many();
+		$dynamicRelations = self::get_dynamic_relations_for($className);
 
-		$hasManyManyMany = array_merge($hasMany, $manyMany);
+		$allRelations = array_merge($hasMany, $manyMany, $dynamicRelations);
 		$relations = array();
 
-		foreach ($hasManyManyMany as $relationName => $relationClassName) {
+		foreach ($allRelations as $relationName => $relationClassName) {
 			if (singleton($relationClassName)->stat('api_access')) {
 				$relations[] = $relationName;
 			}
 		}
 
 		return $relations;
+	}
+
+	private static function get_dynamic_relations_for($className) {
+		$apiAccess = singleton($className)->stat('api_access');
+
+		if (!$apiAccess || !isset($apiAccess['dynamic_relations'])) {
+			return array();
+		}
+
+		return $apiAccess['dynamic_relations'];
 	}
 
 	public static function get_available_relations_with_aliases_for($className) {

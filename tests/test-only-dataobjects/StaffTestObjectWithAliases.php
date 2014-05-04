@@ -32,6 +32,9 @@ class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 		'end_point_alias' => 'stafftestalias',
 		'singular_name' => 'staffMember',
 		'plural_name' => 'staff',
+		'dynamic_relations' => array(
+			'AllStaff' => 'RestfulServer\StaffTestObjectWithAliases'
+		),
 		'field_aliases' => array(
 			'id' => 'ID',
 			'name' => 'Name',
@@ -42,8 +45,13 @@ class StaffTestObjectWithAliases extends \DataObject implements \TestOnly {
 			'friends' => 'Friends',
 			'test-relations' => 'TestRelations',
 			'inverse-test-relations' => 'InverseTestRelations',
-			'inaccessible-relation' => 'InaccessibleDataObjects'
+			'inaccessible-relation' => 'InaccessibleDataObjects',
+			'all-staff' => 'AllStaff'
 		)
 	);
+
+	public function AllStaff() {
+		return self::get();
+	}
 
 }

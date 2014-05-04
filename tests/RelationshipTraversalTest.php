@@ -159,4 +159,34 @@ class RelationshipTraversalTest extends SapphireTest {
 		$this->assertEquals($expectedError['moreInfo'], $responseJSON['moreInfo']);
 	}
 
+	public function testDynamicRelation() {
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObject', 'one');
+
+		$response = Director::test('/api/v2/stafftest/' . $managerId . '/AllStaff');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(
+			count($this->allFixtureIDs('RestfulServer\StaffTestObject')),
+			count($results['staff'])
+		);
+	}
+
+	public function testDynamicRelationWithAliases() {
+		$managerId = $this->idFromFixture('RestfulServer\StaffTestObjectWithAliases', 'one');
+
+		$response = Director::test('/api/v2/stafftestalias/' . $managerId . '/all-staff');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$results = json_decode($response->getBody(), true);
+
+		$this->assertEquals(
+			count($this->allFixtureIDs('RestfulServer\StaffTestObjectWithAliases')),
+			count($results['staff'])
+		);
+	}
+
 }

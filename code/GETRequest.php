@@ -360,12 +360,6 @@ class GETRequest extends Request {
 
 		$list = $this->resource->$relationMethod();
 
-		foreach ($list as $item) {
-			$itemFieldValueMap = $item->toMap();
-
-			$results[] = $this->applyPartialResponse($itemFieldValueMap);
-		}
-
 		return $this->outputList($list, $this->relationClassName);
 	}
 
@@ -382,12 +376,10 @@ class GETRequest extends Request {
 			$this->relationClassName = $relationClassName[1];
 		}
 
-		if (method_exists($this->resource, $relationName)) {
-			$relationList = $this->resource->$relationName();
+		$apiAccess = $this->resource->stat('api_access');
 
-			if ($relationList instanceof \DataList) {
-				$this->relationClassName = $relationList->dataClass();
-			}
+		if ($apiAccess && isset($apiAccess['dynamic_relations']) && isset($apiAccess['dynamic_relations'][$relationName])) {
+			$this->relationClassName =  $apiAccess['dynamic_relations'][$relationName];
 		}
 	}
 

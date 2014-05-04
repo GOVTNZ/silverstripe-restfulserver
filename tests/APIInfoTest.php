@@ -224,7 +224,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 		$expectedRelations = array(
 			'DirectReports',
 			'InverseFriends',
-			'Friends'
+			'Friends',
+			'AllStaff'
 		);
 
 		$this->assertEquals(count($expectedRelations), count($availableRelations));
@@ -239,7 +240,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'InverseFriends',
 			'Friends',
 			'TestRelations',
-			'InverseTestRelations'
+			'InverseTestRelations',
+			'AllStaff'
 		);
 
 		$this->assertEquals(count($expectedRelations), count($availableRelations));
@@ -254,7 +256,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 		$expectedRelations = array(
 			'DirectReports',
 			'InverseFriends',
-			'Friends'
+			'Friends',
+			'AllStaff'
 		);
 
 		$this->assertEquals(count($expectedRelations), count($availableRelations));
@@ -269,7 +272,8 @@ class APIInfoTest extends BaseRestfulServerTest {
 			'InverseFriends',
 			'friends',
 			'test-relations',
-			'inverse-test-relations'
+			'inverse-test-relations',
+			'all-staff'
 		);
 
 		$this->assertEquals(count($expectedRelations), count($availableRelations));

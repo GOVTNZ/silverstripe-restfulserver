@@ -29,7 +29,14 @@ class StaffTestObject extends \DataObject implements \TestOnly {
 	private static $api_access = array(
 		'end_point_alias' => 'stafftest',
 		'singular_name' => 'staffMember',
-		'plural_name' => 'staff'
+		'plural_name' => 'staff',
+		'dynamic_relations' => array(
+			'AllStaff' => 'RestfulServer\StaffTestObject'
+		)
 	);
+
+	public function AllStaff() {
+		return self::get();
+	}
 
 }
