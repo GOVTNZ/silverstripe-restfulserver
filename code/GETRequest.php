@@ -351,7 +351,7 @@ class GETRequest extends Request {
 			$this->httpRequest->param('RelationName')
 		);
 
-		$this->setRelationClassNameFromRelationName($relationMethod);
+		$this->relationClassName = APIInfo::get_class_name_by_relation($this->resourceClassName, $relationMethod);
 
 		$this->resultClassName = $this->relationClassName;
 
@@ -364,23 +364,6 @@ class GETRequest extends Request {
 	}
 
 	private function setRelationClassNameFromRelationName($relationName) {
-		$relationClassName = $this->resource->has_many($relationName);
-
-		if ($relationClassName !== false) {
-			$this->relationClassName = $relationClassName;
-		}
-
-		$relationClassName = $this->resource->many_many($relationName);
-
-		if (!is_null($relationClassName) && isset($relationClassName[1])) {
-			$this->relationClassName = $relationClassName[1];
-		}
-
-		$apiAccess = $this->resource->stat('api_access');
-
-		if ($apiAccess && isset($apiAccess['dynamic_relations']) && isset($apiAccess['dynamic_relations'][$relationName])) {
-			$this->relationClassName =  $apiAccess['dynamic_relations'][$relationName];
-		}
 	}
 
 }

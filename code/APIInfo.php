@@ -260,16 +260,22 @@ class APIInfo {
 	public static function get_class_name_by_relation($resourceClassName, $relationMethod) {
 		$instance = singleton($resourceClassName);
 
-		$hasMany = $instance->has_many($relationMethod);
+		$relationClassName = $instance->has_many($relationMethod);
 
-		if ($hasMany !== false && class_exists($hasMany)) {
-			return $hasMany;
+		if ($relationClassName !== false) {
+			return $relationClassName;
 		}
 
-		$manyMany = $instance->many_many($relationMethod);
+		$relationClassName = $instance->many_many($relationMethod);
 
-		if (!is_null($manyMany) && class_exists($manyMany[1])) {
-			return $manyMany[1];
+		if (!is_null($relationClassName) && isset($relationClassName[1])) {
+			return $relationClassName[1];
+		}
+
+		$apiAccess = $instance->stat('api_access');
+
+		if ($apiAccess && isset($apiAccess['dynamic_relations']) && isset($apiAccess['dynamic_relations'][$relationMethod])) {
+			return $apiAccess['dynamic_relations'][$relationMethod];
 		}
 
 		throw new UserException(

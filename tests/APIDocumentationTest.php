@@ -107,4 +107,19 @@ class APIDocumentationTest extends BaseRestfulServerTest {
 		$this->assertContains('JobTitle', $body);
 	}
 
+	public function testDynamicRelationDocumentation() {
+		$staffMember = new StaffTestObject();
+		$staffMember->write();
+
+		$response = Director::test('/api/v2/stafftest/' . $staffMember->ID . '/AllStaff.html');
+
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$body = $response->getBody();
+
+		$this->assertContains('Available fields', $body);
+		$this->assertContains('Name', $body);
+		$this->assertContains('JobTitle', $body);
+	}
+
 }
