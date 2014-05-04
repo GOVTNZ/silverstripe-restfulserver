@@ -2,7 +2,7 @@
 
 namespace RestfulServer;
 
-use Controller, ArrayList, ArrayData, Director, SS_HTTPResponse, SS_HTTPResponse_Exception, Config;
+use Controller, ArrayList, ArrayData, Director, SS_HTTPResponse, SS_HTTPResponse_Exception, Config, ContentController;
 
 class ControllerV2 extends Controller {
 
@@ -160,7 +160,7 @@ class ControllerV2 extends Controller {
 			$errorOutput[] = $temp;
 		}
 
-		$template = new \ContentController();
+		$template = new ContentController();
 
 		return $template->customise(
 			array('Errors' => new ArrayList($errorOutput))
@@ -181,7 +181,7 @@ class ControllerV2 extends Controller {
 			$context = json_decode($this->getRequest()->getVar('context'), true);
 		}
 
-		$template = new \ContentController();
+		$template = new ContentController();
 
 		return $template->customise(array(
 			'Name' => APIError::get_name($errorID),
@@ -212,7 +212,7 @@ class ControllerV2 extends Controller {
 			));
 		}
 
-		$template = new \ContentController();
+		$template = new ContentController();
 
 		return $template->customise(array(
 			'APIBaseURL' => ControllerV2::get_base_url(),
