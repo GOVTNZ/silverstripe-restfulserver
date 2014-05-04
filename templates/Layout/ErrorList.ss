@@ -1,4 +1,4 @@
-<h1>Error definitions for RestfulServerV2</h1>
+<h1>Error definitions</h1>
 <ul>
 	<% loop $Errors %>
 		<li>$Name (<a href="$Link">full description</a>)</li>

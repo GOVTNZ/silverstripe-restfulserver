@@ -2,7 +2,7 @@
 
 namespace RestfulServer;
 
-use ArrayList, ViewableData;
+use ArrayList, ContentController;
 
 class DocumentationRequest extends Request {
 
@@ -15,9 +15,9 @@ class DocumentationRequest extends Request {
 		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['APIBaseURL'] = ControllerV2::get_base_url();
 
-		$template = new ViewableData();
+		$template = new ContentController();
 
-		return $template->customise($data)->renderWith('DocumentationList');
+		return $template->customise($data)->renderWith(array('DocumentationList', 'Page'));
 	}
 
 	private function getAvailableFields($className) {
@@ -58,9 +58,9 @@ class DocumentationRequest extends Request {
 		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
 
-		$template = new ViewableData();
+		$template = new ContentController();
 
-		return $template->customise($data)->renderWith('DocumentationDetail');
+		return $template->customise($data)->renderWith(array('DocumentationDetail', 'Page'));
 	}
 
 	public function outputRelationList() {
@@ -75,9 +75,9 @@ class DocumentationRequest extends Request {
 		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
 		$data['RelationName'] = $this->httpRequest->param('RelationName');
 
-		$template = new ViewableData();
+		$template = new ContentController();
 
-		return $template->customise($data)->renderWith('DocumentationRelations');
+		return $template->customise($data)->renderWith(array('DocumentationRelations', 'Page'));
 	}
 
 }

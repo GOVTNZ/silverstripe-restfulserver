@@ -363,7 +363,4 @@ class GETRequest extends Request {
 		return $this->outputList($list, $this->relationClassName);
 	}
 
-	private function setRelationClassNameFromRelationName($relationName) {
-	}
-
 }

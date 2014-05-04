@@ -160,7 +160,11 @@ class ControllerV2 extends Controller {
 			$errorOutput[] = $temp;
 		}
 
-		return $this->renderWith('ErrorList', array('Errors' => new ArrayList($errorOutput)));
+		$template = new \ContentController();
+
+		return $template->customise(
+			array('Errors' => new ArrayList($errorOutput))
+		)->renderWith(array('ErrorList', 'Page'));
 	}
 
 	public function showError() {
@@ -177,10 +181,12 @@ class ControllerV2 extends Controller {
 			$context = json_decode($this->getRequest()->getVar('context'), true);
 		}
 
-		return $this->renderWith('ErrorDetail', array(
+		$template = new \ContentController();
+
+		return $template->customise(array(
 			'Name' => APIError::get_name($errorID),
 			'Description' => APIError::get_description($errorID, $context)
-		));
+		))->renderWith(array('ErrorDetail', 'Page'));
 	}
 
 	public function index() {
@@ -206,11 +212,13 @@ class ControllerV2 extends Controller {
 			));
 		}
 
-		return $this->customise(array(
+		$template = new \ContentController();
+
+		return $template->customise(array(
 			'APIBaseURL' => ControllerV2::get_base_url(),
 			'EndPoints' => $endPoints,
 			'Formats' => $formats
-		))->renderWith('DocumentationBase');
+		))->renderWith(array('DocumentationBase', 'Page'));
 	}
 
 	private function getEndPointDescription($className) {
