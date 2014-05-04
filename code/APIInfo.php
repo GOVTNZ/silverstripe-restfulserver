@@ -179,18 +179,6 @@ class APIInfo {
 		);
 	}
 
-	private static function class_has_relation_aliases($className) {
-		$apiAccess = singleton($className)->stat('api_access');
-
-		return is_array($apiAccess) && isset($apiAccess['relation_aliases']) && is_array($apiAccess['relation_aliases']);
-	}
-
-	private static function class_has_relation($className, $relationName) {
-		$instance = singleton($className);
-
-		return (($instance->has_many($relationName) !== false) || (!is_null($instance->many_many($relationName))));
-	}
-
 	public static function get_database_fields_for($className) {
 		$fields = array(
 			'ID',
