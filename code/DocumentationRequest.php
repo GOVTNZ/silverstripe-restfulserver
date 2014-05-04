@@ -2,9 +2,24 @@
 
 namespace RestfulServer;
 
-use ArrayList, ContentController;
+use ArrayList, SS_HTTPRequest;
 
 class DocumentationRequest extends Request {
+
+	public $templateRenderer;
+
+	public function __construct(SS_HTTPRequest $request, Formatter $formatter) {
+		parent::__construct($request, $formatter);
+		/*
+		 * Use ContentController if it is available as it provides a better output (default values like
+		 * $SiteConfig.Title become available) but fall back to ViewableData if cms module is not installed.
+		 */
+		if (class_exists('ContentController')) {
+			$this->templateRenderer = new \ContentController();
+		} else {
+			$this->templateRenderer = new \ViewableData();
+		}
+	}
 
 	public function outputResourceList() {
 		$className = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
@@ -15,9 +30,7 @@ class DocumentationRequest extends Request {
 		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['APIBaseURL'] = ControllerV2::get_base_url();
 
-		$template = new ContentController();
-
-		return $template->customise($data)->renderWith(array('DocumentationList', 'Page'));
+		return $this->templateRenderer->customise($data)->renderWith(array('DocumentationList', 'Page'));
 	}
 
 	private function getAvailableFields($className) {
@@ -58,9 +71,7 @@ class DocumentationRequest extends Request {
 		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
 		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
 
-		$template = new ContentController();
-
-		return $template->customise($data)->renderWith(array('DocumentationDetail', 'Page'));
+		return $this->templateRenderer->customise($data)->renderWith(array('DocumentationDetail', 'Page'));
 	}
 
 	public function outputRelationList() {
@@ -75,9 +86,7 @@ class DocumentationRequest extends Request {
 		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
 		$data['RelationName'] = $this->httpRequest->param('RelationName');
 
-		$template = new ContentController();
-
-		return $template->customise($data)->renderWith(array('DocumentationRelations', 'Page'));
+		return $this->templateRenderer->customise($data)->renderWith(array('DocumentationRelations', 'Page'));
 	}
 
 }

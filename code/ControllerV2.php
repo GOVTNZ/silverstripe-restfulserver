@@ -2,7 +2,7 @@
 
 namespace RestfulServer;
 
-use Controller, ArrayList, ArrayData, Director, SS_HTTPResponse, SS_HTTPResponse_Exception, Config, ContentController;
+use Controller, ArrayList, ArrayData, Director, SS_HTTPResponse, SS_HTTPResponse_Exception, Config;
 
 class ControllerV2 extends Controller {
 
@@ -39,6 +39,8 @@ class ControllerV2 extends Controller {
 	/** @var Request */
 	private $apiRequest = null;
 
+	public $templateRenderer;
+
 	const MIN_LIMIT      = 1;
 	const MAX_LIMIT      = 100;
 	const DEFAULT_LIMIT  = 10;
@@ -48,6 +50,16 @@ class ControllerV2 extends Controller {
 
 	public function init() {
 		parent::init();
+
+		/*
+		 * Use ContentController if it is available as it provides a better output (default values like
+		 * $SiteConfig.Title become available) but fall back to ViewableData if cms module is not installed.
+		 */
+		if (class_exists('ContentController')) {
+			$this->templateRenderer = new \ContentController();
+		} else {
+			$this->templateRenderer = new \ViewableData();
+		}
 
 		if ($this->getRequest()->param('ResourceName') === 'errors') {
 			return;
@@ -160,9 +172,7 @@ class ControllerV2 extends Controller {
 			$errorOutput[] = $temp;
 		}
 
-		$template = new ContentController();
-
-		return $template->customise(
+		return $this->templateRenderer->customise(
 			array('Errors' => new ArrayList($errorOutput))
 		)->renderWith(array('ErrorList', 'Page'));
 	}
@@ -181,9 +191,7 @@ class ControllerV2 extends Controller {
 			$context = json_decode($this->getRequest()->getVar('context'), true);
 		}
 
-		$template = new ContentController();
-
-		return $template->customise(array(
+		return $this->templateRenderer->customise(array(
 			'Name' => APIError::get_name($errorID),
 			'Description' => APIError::get_description($errorID, $context)
 		))->renderWith(array('ErrorDetail', 'Page'));
@@ -212,9 +220,7 @@ class ControllerV2 extends Controller {
 			));
 		}
 
-		$template = new ContentController();
-
-		return $template->customise(array(
+		return $this->templateRenderer->customise(array(
 			'APIBaseURL' => ControllerV2::get_base_url(),
 			'EndPoints' => $endPoints,
 			'Formats' => $formats
