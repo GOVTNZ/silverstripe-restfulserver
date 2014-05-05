@@ -114,8 +114,6 @@ class GETRequest extends Request {
 			return;
 		}
 
-		$sort = $this->transformSort($sort, $sortClassName);
-
 		if (!$this->isValidSortField($sort, $sortClassName)) {
 			$this->sort = self::DEFAULT_SORT;
 		} else {
@@ -137,16 +135,6 @@ class GETRequest extends Request {
 		);
 
 		return array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
-	}
-
-	private function transformSort($sort, $sortClassName) {
-		$apiAccess = singleton($sortClassName)->stat('api_access');
-
-		if (!isset($apiAccess['field_aliases']) || !isset($apiAccess['field_aliases'][$sort])) {
-			return $sort;
-		}
-
-		return $apiAccess['field_aliases'][$sort];
 	}
 
 	private function setOrder() {
