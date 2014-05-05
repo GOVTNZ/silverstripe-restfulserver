@@ -1,18 +1,10 @@
 <h1>API Documentation</h1>
-<h2>Available fields</h2>
 
-<p>The following fields can be accessed on the $EndPoint end point.</p>
+<% include AvailableFieldsDoc %>
 
-<ul>
-	<% loop $AvailableFields %>
-		<li>$Name</li>
-	<% end_loop %>
-</ul>
+<h2>Example usage</h2>
 
-<h2>Example Usage</h2>
-
-<h3>Partial response</h3>
-<p>If you only need a subset of fields in the response you can use the <code>fields</code> parameter to get a partial response.</p>
+<% include PartialResponseDoc %>
 
 <% if $Relations %>
 	<h2>Relations</h2>

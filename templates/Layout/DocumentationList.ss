@@ -1,51 +1,25 @@
 <h1>API Documentation</h1>
-<h2>Available fields</h2>
 
-<p>These fields can be accessed on the $EndPoint end point. Results can be sorted and filtered by each field.</p>
-
-<ul>
-	<% loop $AvailableFields %>
-		<li>$Name</li>
-	<% end_loop %>
-</ul>
+<% include AvailableFieldsDoc %>
 
 <h2>Example usage</h2>
 
-<h3>Pagination</h3>
-<p>To page through results, use the <code>offset</code> and <code>limit</code> parameters.</p>
-
-<ul>
-	<li>Use <code>offset</code> to pick which record to start displaying results from.</li>
-	<li>Use <code>limit</code> to determine the number of records to show on each page.</li>
-</ul>
+<% include PaginationDoc %>
 
 <h4>Example</h4>
 <p>$APIBaseURL/$EndPoint?offset=10&limit=10</p>
 
-<h3>Filtering</h3>
-<p>To filter results on a certain field, use the name of the field you want to filter by as the parameter.</p>
-<p>A partial match will be done on your search query and any results matched will be returned.</p>
+<% include FilterDoc %>
 
 <h4>Example</h4>
 <p>$APIBaseURL/$EndPoint?$AvailableFields.Last.Name=&lt;search_query&gt;</p>
 
-<h3>Sorting</h3>
-<p>To change the sorting of results, use the <code>sort</code> and <code>order</code> parameters.</p>
-
-<ul>
-	<li>Use <code>sort</code> to set the name of the column to sort by.</li>
-	<li>Use <code>order</code> to set the direction the results sort in &ndash; either <code>asc</code> or <code>desc</code>.</li>
-</ul>
+<% include SortingDoc %>
 
 <h4>Example</h4>
 <p>$APIBaseURL/$EndPoint?sort=$AvailableFields.Last.Name&order=asc</p>
 
-<h3>Partial response</h3>
-<p>If you only need a subset of fields, use the <code>fields</code> parameter to get a partial response.</p>
-
-<ul>
-	<li>Use <code>fields</code> to set the list of fields to return &ndash; separate each one with a comma.</li>
-</ul>
+<% include PartialResponseDoc %>
 
 <h4>Example</h4>
 <p>$APIBaseURL/$EndPoint?fields=$AvailableFields.Last.Name</p>
@@ -60,7 +34,7 @@
 <% if $Relations %>
 	<h2>Relations</h2>
 
-	<p>These relationships can be accessed through the $EndPoint end point:</p>
+	<p>These relationships can be accessed for each $SingularName:</p>
 
 	<ul>
 		<% loop $Relations %>
