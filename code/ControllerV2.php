@@ -172,9 +172,10 @@ class ControllerV2 extends Controller {
 			$errorOutput[] = $temp;
 		}
 
-		return $this->templateRenderer->customise(
-			array('Errors' => new ArrayList($errorOutput))
-		)->renderWith(array('ErrorList', 'Page'));
+		return $this->templateRenderer->customise(array(
+			'Title' => 'API error definitions',
+			'Errors' => new ArrayList($errorOutput)
+		))->renderWith(array('ErrorList', 'Page'));
 	}
 
 	public function showError() {
@@ -192,6 +193,7 @@ class ControllerV2 extends Controller {
 		}
 
 		return $this->templateRenderer->customise(array(
+			'Title' => 'API error (' . APIError::get_name($errorID) . ')',
 			'Name' => APIError::get_name($errorID),
 			'Description' => APIError::get_description($errorID, $context)
 		))->renderWith(array('ErrorDetail', 'Page'));
@@ -221,6 +223,7 @@ class ControllerV2 extends Controller {
 		}
 
 		return $this->templateRenderer->customise(array(
+			'Title' => 'API Documentation',
 			'APIBaseURL' => ControllerV2::get_base_url(),
 			'EndPoints' => $endPoints,
 			'Formats' => $formats

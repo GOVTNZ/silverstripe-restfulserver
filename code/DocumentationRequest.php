@@ -37,6 +37,7 @@ class DocumentationRequest extends Request {
 			$data['SingularName'] = $className;
 		}
 
+		$data['Title'] = 'API Documentation';
 		$data['AvailableFields'] = $this->getAvailableFields($className);
 		$data['Relations'] = $this->getRelations();
 		$data['EndPoint'] = $this->httpRequest->param('ResourceName');
