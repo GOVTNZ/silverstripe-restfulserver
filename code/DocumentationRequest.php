@@ -89,6 +89,7 @@ class DocumentationRequest extends Request {
 
 		$data = $this->getBaseData($relationClassName);
 
+		$data['ResourceID'] = $this->httpRequest->param('ResourceID');
 		$data['RelationName'] = $this->httpRequest->param('RelationName');
 
 		return $this->templateRenderer->customise($data)->renderWith(array('DocumentationRelations', 'Page'));
