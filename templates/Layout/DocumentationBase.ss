@@ -14,4 +14,4 @@
 		<li>$Extension</li>
 	<% end_loop %>
 </ul>
-<p>Add the extension you want to the URL of your request, eg https://govtnz-test1.cwp.govt.nz/api/v1/&lt;end_point&gt;.xml</p>
+<p>Add the extension you want to the URL of your request, eg $APIBaseURL/&lt;end_point&gt;.xml</p>
