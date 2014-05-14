@@ -306,7 +306,13 @@ class GETRequest extends Request {
 
 		$this->setResource();
 
-		$result = $this->resource->toMap();
+		$result = array();
+		$fields = APIInfo::get_database_fields_for($this->resource->ClassName);
+
+		foreach ($fields as $fieldName) {
+			$result[$fieldName] = $this->resource->$fieldName;
+		}
+
 		$result = $this->applyPartialResponse($result);
 		$result = $this->removeForbiddenFields($result, $this->resultClassName);
 		$result = $this->applyFieldNameAliasTransformation($result, $this->resultClassName);
