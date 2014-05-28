@@ -39,6 +39,9 @@ class ControllerV2 extends Controller {
 	/** @var Request */
 	private $apiRequest = null;
 
+	/** @var RequestLogger */
+	private $logger = null;
+
 	public $templateRenderer;
 
 	const MIN_LIMIT      = 1;
@@ -64,6 +67,12 @@ class ControllerV2 extends Controller {
 		if ($this->getRequest()->param('ResourceName') === 'errors') {
 			return;
 		}
+
+		if (is_null($this->logger)) {
+			$this->logger = new NullRequestLogger();
+		}
+
+		$this->logger->log($this->getRequest());
 
 		$this->setFormatter();
 		$this->setAPIRequest();
