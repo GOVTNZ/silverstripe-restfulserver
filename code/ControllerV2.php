@@ -40,7 +40,7 @@ class ControllerV2 extends Controller {
 	private $apiRequest = null;
 
 	/** @var RequestLogger */
-	private $logger = null;
+	private static $logger = null;
 
 	public $templateRenderer;
 
@@ -68,11 +68,11 @@ class ControllerV2 extends Controller {
 			return;
 		}
 
-		if (is_null($this->logger)) {
-			$this->logger = new NullRequestLogger();
+		if (is_null(self::$logger)) {
+			self::$logger = new NullRequestLogger();
 		}
 
-		$this->logger->log($this->getRequest());
+		self::$logger->log($this->getRequest());
 
 		$this->setFormatter();
 		$this->setAPIRequest();
@@ -316,6 +316,10 @@ class ControllerV2 extends Controller {
 		);
 
 		Config::inst()->update('Director', 'rules', $routes);
+	}
+
+	public static function set_request_logger(RequestLogger $logger) {
+		self::$logger = $logger;
 	}
 
 }
