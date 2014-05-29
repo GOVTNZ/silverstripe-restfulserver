@@ -10,7 +10,7 @@ class SyncGoogleAnalyticsLogger implements RequestLogger {
 		$getVars = $request->getVars();
 
 		$getVars['dp'] = $request->getURL(true);
-		$getVars['dt'] = $request->param('ResourceName');
+		$getVars['dt'] = $request->param('ResourceName') . ' endpoint';
 
 		$newRequest = new \SS_HTTPRequest(
 			$request->httpMethod(),
