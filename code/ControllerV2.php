@@ -39,6 +39,9 @@ class ControllerV2 extends Controller {
 	/** @var Request */
 	private $apiRequest = null;
 
+	/** @var RequestLogger */
+	private static $logger = null;
+
 	public $templateRenderer;
 
 	const MIN_LIMIT      = 1;
@@ -64,6 +67,12 @@ class ControllerV2 extends Controller {
 		if ($this->getRequest()->param('ResourceName') === 'errors') {
 			return;
 		}
+
+		if (is_null(self::$logger)) {
+			self::$logger = new NullRequestLogger();
+		}
+
+		self::$logger->log($this->getRequest());
 
 		$this->setFormatter();
 		$this->setAPIRequest();
@@ -307,6 +316,10 @@ class ControllerV2 extends Controller {
 		);
 
 		Config::inst()->update('Director', 'rules', $routes);
+	}
+
+	public static function set_request_logger(RequestLogger $logger) {
+		self::$logger = $logger;
 	}
 
 }
