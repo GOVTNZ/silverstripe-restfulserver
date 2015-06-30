@@ -5,8 +5,14 @@ namespace RestfulServer;
 use SS_HTTPRequest;
 
 abstract class Request {
-
+	/**
+	 * @var SS_HTTPRequest
+	 */
 	protected $httpRequest = null;
+
+	/**
+	 * @var Formatter
+	 */
 	protected $formatter = null;
 
 	public function __construct(SS_HTTPRequest $request, Formatter $formatter) {
@@ -18,6 +24,13 @@ abstract class Request {
 	abstract public function outputResourceDetail();
 	abstract public function outputRelationList();
 
+	/**
+	 * transforms a request
+	 *
+	 * @param  string         $className
+	 * @param  SS_HTTPRequest $originalRequest
+	 * @return SS_HTTPRequest
+	 */
 	public static function get_transformed_request($className, SS_HTTPRequest $originalRequest) {
 		$originalGetVars = $originalRequest->getVars();
 		$newGetVars = array();
@@ -110,5 +123,4 @@ abstract class Request {
 
 		return implode(',', $unaliasedFields);
 	}
-
 }
