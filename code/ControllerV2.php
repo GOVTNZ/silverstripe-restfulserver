@@ -5,9 +5,14 @@ namespace RestfulServer;
 use Controller, ArrayList, ArrayData, Director, SS_HTTPResponse, SS_HTTPResponse_Exception, Config;
 
 class ControllerV2 extends Controller {
-
+	/**
+	 * @var string
+	 */
 	public static $default_extension = 'json';
 
+	/**
+	 * @var array
+	 */
 	private static $url_handlers = array(
 		'errors/$ErrorID!' => 'showError',
 		'errors' => 'listErrors',
@@ -16,6 +21,9 @@ class ControllerV2 extends Controller {
 		'$ResourceName!' => 'listResources'
 	);
 
+	/**
+	 * @var array
+	 */
 	private static $allowed_actions = array(
 		'index',
 		'listResources',
@@ -25,6 +33,9 @@ class ControllerV2 extends Controller {
 		'showError'
 	);
 
+	/**
+	 * @var array
+	 */
 	private static $valid_formats = array(
 		'json' => '\\RestfulServer\\JSONFormatter',
 		'xml' => '\\RestfulServer\\XMLFormatter',
@@ -33,13 +44,19 @@ class ControllerV2 extends Controller {
 
 	private static $base_url = null;
 
-	/** @var Formatter  */
+	/**
+	 * @var Formatter
+	 */
 	private $formatter = null;
 
-	/** @var Request */
+	/**
+	 * @var Request
+	 */
 	private $apiRequest = null;
 
-	/** @var RequestLogger */
+	/**
+	 * @var RequestLogger
+	 */
 	private static $logger = null;
 
 	public $templateRenderer;
@@ -80,6 +97,9 @@ class ControllerV2 extends Controller {
 		$this->getResponse()->addHeader('Content-Type', $this->formatter->getOutputContentType());
 	}
 
+	/**
+	 * sets the formatter based on the extension provided in the request
+	 */
 	private function setFormatter() {
 		// we only use the URL extension to determine format for the time being
 		$extension = $this->getRequest()->getExtension();
@@ -249,6 +269,12 @@ class ControllerV2 extends Controller {
 		}
 	}
 
+	/**
+	 * adds a new formatter to the controller
+	 *
+	 * @param string $extension
+	 * @param Formatter $formatterClassName
+	 */
 	public static function add_format($extension, $formatterClassName) {
 		if (!class_exists($formatterClassName)) {
 			user_error('Formatter class (' . $formatterClassName . ') not found');
@@ -257,16 +283,31 @@ class ControllerV2 extends Controller {
 		self::$valid_formats[$extension] = $formatterClassName;
 	}
 
+	/**
+	 * removes a existing formatter
+	 *
+	 * @param  string $extension
+	 */
 	public static function remove_format($extension) {
 		if (isset(self::$valid_formats[$extension])) {
 			unset(self::$valid_formats[$extension]);
 		}
 	}
 
+	/**
+	 * returns an array of the available formats
+	 *
+	 * @return array
+	 */
 	public static function get_available_formats() {
 		return array_keys(self::$valid_formats);
 	}
 
+	/**
+	 * returns the applicable base url
+	 *
+	 * @return string
+	 */
 	public static function get_base_url() {
 		if (!is_null(self::$base_url)) {
 			return self::$base_url;
@@ -318,8 +359,12 @@ class ControllerV2 extends Controller {
 		Config::inst()->update('Director', 'rules', $routes);
 	}
 
+	/**
+	 * set the logger for the requests onto the controller
+	 *
+	 * @param RequestLogger $logger
+	 */
 	public static function set_request_logger(RequestLogger $logger) {
 		self::$logger = $logger;
 	}
-
 }

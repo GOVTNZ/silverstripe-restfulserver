@@ -40,6 +40,13 @@ class GETRequest extends Request {
 		return $this->outputList($list, $className);
 	}
 
+	/**
+	 * generates the output and returns a formated version depending on the set format
+	 *
+	 * @param  \DataList $list
+	 * @param  string    $className
+	 * @return string
+	 */
 	private function outputList(\DataList $list, $className) {
 		$this->setPagination();
 		$this->setSorting($className);
@@ -76,11 +83,17 @@ class GETRequest extends Request {
 		return $this->formatter->format();
 	}
 
+	/**
+	 * set the pagination (limit and offset) on the request
+	 */
 	private function setPagination() {
 		$this->setLimit();
 		$this->setOffset();
 	}
 
+	/**
+	 * sets the limit within the allowed limits
+	 */
 	private function setLimit() {
 		$limit = (int) $this->httpRequest->getVar('limit');
 
@@ -91,6 +104,9 @@ class GETRequest extends Request {
 		}
 	}
 
+	/**
+	 * sets the offset
+	 */
 	private function setOffset() {
 		$offset = (int) $this->httpRequest->getVar('offset');
 
@@ -127,6 +143,12 @@ class GETRequest extends Request {
 		return in_array($sort, $fields);
 	}
 
+	/**
+	 * assembles the available fields of a given class
+	 *
+	 * @param  string $className
+	 * @return array
+	 */
 	private function getClassFields($className) {
 		$fields = array(
 			'ID',
@@ -137,6 +159,9 @@ class GETRequest extends Request {
 		return array_merge($fields, array_keys(singleton($className)->inheritedDatabaseFields()));
 	}
 
+	/**
+	 * verifies and sets the order
+	 */
 	private function setOrder() {
 		$validOrders = array(
 			'ASC',
@@ -152,6 +177,12 @@ class GETRequest extends Request {
 		}
 	}
 
+	/**
+	 * applies the filters on the result list
+	 *
+	 * @param  \DataList $list
+	 * @return \DataList
+	 */
 	private function applyFilters(\DataList $list) {
 		$getVars = $this->httpRequest->getVars();
 		$filterValues = $this->transformAliases($getVars, $list->dataClass());
@@ -165,6 +196,13 @@ class GETRequest extends Request {
 		return $list;
 	}
 
+	/**
+	 * maps the fields names from the aliases to the real names
+	 *
+	 * @param  array $aliasValueMap
+	 * @param  string $className
+	 * @return array
+	 */
 	private function transformAliases($aliasValueMap, $className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
@@ -186,6 +224,11 @@ class GETRequest extends Request {
 		return $fieldValueMap;
 	}
 
+	/**
+	 * sets the total count
+	 *
+	 * @param \DataList $list
+	 */
 	private function setTotalCount(\DataList $list) {
 		$this->totalCount = (int) $list->Count();
 
@@ -194,6 +237,9 @@ class GETRequest extends Request {
 		}
 	}
 
+	/**
+	 * adds the additional data to the output
+	 */
 	private function setMetaData() {
 		$this->formatter->addExtraData(array(
 			'_metadata' => array(
