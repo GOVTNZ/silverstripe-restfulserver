@@ -122,6 +122,11 @@ class GETRequest extends Request {
 		$this->setOrder();
 	}
 
+	/**
+	 * sets the sorts if it is a acceptable option
+	 *
+	 * @var string
+	 */
 	private function setSort($sortClassName) {
 		$sort = $this->httpRequest->getVar('sort');
 
@@ -288,6 +293,13 @@ class GETRequest extends Request {
 		return $result;
 	}
 
+	/**
+	 * removes all fields which aren't explicit allowed
+	 *
+	 * @param  array $result
+	 * @param  string $className
+	 * @return array
+	 */
 	private function removeForbiddenFields($result, $className) {
 		$availableFields = APIInfo::get_viewable_fields_for($className);
 
