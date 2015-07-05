@@ -142,6 +142,13 @@ class GETRequest extends Request {
 		}
 	}
 
+	/**
+	 * checks if the sort field is a valid option to sort by
+	 *
+	 * @param string $sort
+	 * @param string $sortClassName
+	 * @return boolean
+	 */
 	private function isValidSortField($sort, $sortClassName) {
 		$fields = $this->getClassFields($sortClassName);
 
@@ -255,6 +262,12 @@ class GETRequest extends Request {
 		));
 	}
 
+	/**
+	 * reduces the option to a set of fields
+	 *
+	 * @param  array $itemFieldValueMap
+	 * @return array
+	 */
 	private function applyPartialResponse($itemFieldValueMap) {
 		$partialResponseFields = $this->httpRequest->getVar('fields');
 
@@ -312,6 +325,13 @@ class GETRequest extends Request {
 		return $result;
 	}
 
+	/**
+	 * maps aliases if there are defined in the api access
+	 *
+	 * @param  array $response
+	 * @param  string $className
+	 * @return string
+	 */
 	private function applyFieldNameAliasTransformation($response, $className) {
 		$apiAccess = singleton($className)->stat('api_access');
 
@@ -382,6 +402,9 @@ class GETRequest extends Request {
 		return $this->formatter->format();
 	}
 
+	/**
+	 * sets the resource
+	 */
 	private function setResource() {
 		$className = $this->resourceClassName;
 
@@ -392,6 +415,11 @@ class GETRequest extends Request {
 		}
 	}
 
+	/**
+	 * generates the output list
+	 *
+	 * @return string
+	 */
 	public function outputRelationList() {
 		$this->resourceClassName = APIInfo::get_class_name_by_resource_name($this->httpRequest->param('ResourceName'));
 		$this->resourceID = (int) $this->httpRequest->param('ResourceID');
@@ -414,5 +442,4 @@ class GETRequest extends Request {
 
 		return $this->outputList($list, $this->relationClassName);
 	}
-
 }
