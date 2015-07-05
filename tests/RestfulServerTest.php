@@ -400,7 +400,7 @@ class RestfulServerTest extends SapphireTest {
 
 		$this->assertEquals(
 			$formatter->convertDataObject($editor, array("FirstName", "Email")),
-			'{"FirstName":"Editor", "Email":"editor@test.com"}',
+			'{"FirstName":"Editor","Email":"editor@test.com"}',
 			"Correct JSON formatting with field subset");
 
 		$set = DataObject::get(
@@ -410,8 +410,8 @@ class RestfulServerTest extends SapphireTest {
 		);
 		$this->assertEquals(
 			$formatter->convertDataObjectSet($set, array("FirstName", "Email")),
-			'{"totalSize":null, "items":[{"FirstName":"Editor", "Email":"editor@test.com"},' .
-			'{"FirstName":"User", "Email":"user@test.com"}]}',
+			'{"totalSize":null,"items":[{"FirstName":"Editor","Email":"editor@test.com"},' .
+			'{"FirstName":"User","Email":"user@test.com"}]}',
 			"Correct JSON formatting on a dataobjectset with field filter");
 	}
 
