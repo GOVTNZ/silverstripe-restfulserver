@@ -68,6 +68,9 @@ class ControllerV2 extends Controller {
 	const DEFAULT_SORT   = 'ID';
 	const DEFAULT_ORDER  = 'ASC';
 
+	/**
+	 * run all initial steps like set the the templateRenderer, logger etc.
+	 */
 	public function init() {
 		parent::init();
 
