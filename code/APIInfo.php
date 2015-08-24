@@ -152,11 +152,7 @@ class APIInfo {
 		$validFields = array_keys(singleton($className)->inheritedDatabaseFields());
 		$validFields['id'] = 'ID';
 
-		if (in_array($fieldName, $validFields)) {
-			return true;
-		}
-
-		return false;
+		return in_array($fieldName, $validFields);
 	}
 
 	public static function get_relation_method_from_name($className, $relationName) {
