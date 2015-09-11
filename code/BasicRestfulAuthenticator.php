@@ -8,7 +8,7 @@
  * application accessing the RestfulServer to store logins in plain text (or in
  * decrytable form)
  */
-class BasicRestfulAuthenticator  {
+class BasicRestfulAuthenticator {
 
 	/**
 	 * The authenticate function
@@ -35,5 +35,4 @@ class BasicRestfulAuthenticator  {
 		}
 		return false;
 	}
-
 }
