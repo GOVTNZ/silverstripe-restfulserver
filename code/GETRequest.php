@@ -43,8 +43,8 @@ class GETRequest extends Request {
 	/**
 	 * generates the output and returns a formated version depending on the set format
 	 *
-	 * @param  \DataList $list
-	 * @param  string    $className
+	 * @param \DataList $list
+	 * @param string    $className
 	 * @return string
 	 */
 	private function outputList(\DataList $list, $className) {
@@ -158,7 +158,7 @@ class GETRequest extends Request {
 	/**
 	 * assembles the available fields of a given class
 	 *
-	 * @param  string $className
+	 * @param string $className
 	 * @return array
 	 */
 	private function getClassFields($className) {
@@ -192,7 +192,7 @@ class GETRequest extends Request {
 	/**
 	 * applies the filters on the result list
 	 *
-	 * @param  \DataList $list
+	 * @param \DataList $list
 	 * @return \DataList
 	 */
 	private function applyFilters(\DataList $list) {
@@ -211,8 +211,8 @@ class GETRequest extends Request {
 	/**
 	 * maps the fields names from the aliases to the real names
 	 *
-	 * @param  array $aliasValueMap
-	 * @param  string $className
+	 * @param array $aliasValueMap
+	 * @param string $className
 	 * @return array
 	 */
 	private function transformAliases($aliasValueMap, $className) {
@@ -265,7 +265,7 @@ class GETRequest extends Request {
 	/**
 	 * reduces the option to a set of fields
 	 *
-	 * @param  array $itemFieldValueMap
+	 * @param array $itemFieldValueMap
 	 * @return array
 	 */
 	private function applyPartialResponse($itemFieldValueMap) {
@@ -309,8 +309,8 @@ class GETRequest extends Request {
 	/**
 	 * removes all fields which aren't explicit allowed
 	 *
-	 * @param  array $result
-	 * @param  string $className
+	 * @param array $result
+	 * @param string $className
 	 * @return array
 	 */
 	private function removeForbiddenFields($result, $className) {
@@ -328,8 +328,8 @@ class GETRequest extends Request {
 	/**
 	 * maps aliases if there are defined in the api access
 	 *
-	 * @param  array $response
-	 * @param  string $className
+	 * @param array $response
+	 * @param string $className
 	 * @return string
 	 */
 	private function applyFieldNameAliasTransformation($response, $className) {

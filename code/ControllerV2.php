@@ -289,7 +289,7 @@ class ControllerV2 extends Controller {
 	/**
 	 * removes a existing formatter
 	 *
-	 * @param  string $extension
+	 * @param string $extension
 	 */
 	public static function remove_format($extension) {
 		if (isset(self::$valid_formats[$extension])) {

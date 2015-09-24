@@ -31,8 +31,8 @@ abstract class Request {
 	/**
 	 * transforms a request
 	 *
-	 * @param  string         $className
-	 * @param  SS_HTTPRequest $originalRequest
+	 * @param string         $className
+	 * @param SS_HTTPRequest $originalRequest
 	 * @return SS_HTTPRequest
 	 */
 	public static function get_transformed_request($className, SS_HTTPRequest $originalRequest) {
@@ -94,8 +94,8 @@ abstract class Request {
 	/**
 	 * maps the sort field in case an alias has been used.
 	 *
-	 * @param  string $requestField
-	 * @param  array  $aliasFieldMap
+	 * @param string $requestField
+	 * @param array  $aliasFieldMap
 	 * @return string
 	 */
 	private static function transform_sort($requestField, $aliasFieldMap) {
@@ -105,8 +105,8 @@ abstract class Request {
 	/**
 	 * transforms a field list into a field list without aliases
 	 *
-	 * @param  string $requestValue  comma separated list of fields including aliases
-	 * @param  array  $aliasFieldMap
+	 * @param string $requestValue  comma separated list of fields including aliases
+	 * @param array  $aliasFieldMap
 	 * @return string                comma separated list of fields without aliases
 	 */
 	private static function transform_partial_response($requestValue, $aliasFieldMap) {
@@ -127,7 +127,7 @@ abstract class Request {
 	/**
 	 * some fields aren't relevant and need to be removed.
 	 *
-	 * @param  array $originalGetVars
+	 * @param array $originalGetVars
 	 * @return array $originalGetVars
 	 */
 	protected static function remove_ignored_fields($originalGetVars) {
@@ -143,8 +143,8 @@ abstract class Request {
 	/**
 	 * some fields aren't transformed and will only be copied.
 	 *
-	 * @param  array $originalGetVars
-	 * @param  array $newGetVars
+	 * @param array $originalGetVars
+	 * @param array $newGetVars
 	 * @return array $newGetVars
 	 */
 	protected static function copy_field_without_transformation($originalGetVars, $newGetVars) {
