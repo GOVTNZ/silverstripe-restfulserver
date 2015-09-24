@@ -157,10 +157,10 @@ class RestfulServer extends Controller {
 	 *
 	 * @todo Access checking
 	 *
-	 * @param String $className
-	 * @param Int $id
-	 * @param String $relation
-	 * @return String The serialized representation of the requested object(s) - usually XML or JSON.
+	 * @param string $className
+	 * @param int $id
+	 * @param string $relation
+	 * @return string The serialized representation of the requested object(s) - usually XML or JSON.
 	 */
 	protected function getHandler($className, $id, $relationName) {
 		$sort = '';
@@ -248,7 +248,7 @@ class RestfulServer extends Controller {
 	 * extension or mimetype. Falls back to {@link self::$default_extension}.
 	 *
 	 * @param boolean $includeAcceptHeader Determines wether to inspect and prioritize any HTTP Accept headers
-	 * @param String Classname of a DataObject
+	 * @param string Classname of a DataObject
 	 * @return DataFormatter
 	 */
 	protected function getDataFormatter($includeAcceptHeader = false, $className = null) {
@@ -313,7 +313,7 @@ class RestfulServer extends Controller {
 	}
 
 	/**
-	 * @param String Classname of a DataObject
+	 * @param string Classname of a DataObject
 	 * @return DataFormatter
 	 */
 	protected function getRequestDataFormatter($className = null) {
@@ -321,7 +321,7 @@ class RestfulServer extends Controller {
 	}
 
 	/**
-	 * @param String Classname of a DataObject
+	 * @param string Classname of a DataObject
 	 * @return DataFormatter
 	 */
 	protected function getResponseDataFormatter($className = null) {
