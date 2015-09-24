@@ -262,7 +262,7 @@ class RestfulServerTest extends SapphireTest {
 		$this->assertEquals($response->getHeader('Content-Type'), 'application/json');
 	}
 	
-	public function testNotFound(){
+	public function testNotFound() {
 		$_SERVER['PHP_AUTH_USER'] = 'user@test.com';
 		$_SERVER['PHP_AUTH_PW'] = 'user';
 		
@@ -473,7 +473,7 @@ class RestfulServerTest_Comment extends DataObject implements PermissionProvider
 		'Author' => 'RestfulServerTest_Author', 
 	);
 	
-	public function providePermissions(){
+	public function providePermissions() {
 		return array(
 			'EDIT_Comment' => 'Edit Comment Objects',
 			'CREATE_Comment' => 'Create Comment Objects',
@@ -510,7 +510,7 @@ class RestfulServerTest_SecretThing extends DataObject implements TestOnly,Permi
 		return Permission::checkMember($member, 'VIEW_SecretThing');
 	}
 	
-	public function providePermissions(){
+	public function providePermissions() {
 		return array(
 			'VIEW_SecretThing' => 'View Secret Things',
 		);
