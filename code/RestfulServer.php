@@ -286,28 +286,28 @@ class RestfulServer extends Controller {
 		$apiAccess = singleton($className)->stat('api_access');
 		if(is_array($apiAccess) && isset($apiAccess['view'])) {
 			$formatter->setCustomAddFields(
-				array_intersect((array)$formatter->getCustomAddFields(), (array)$apiAccess['view'])
+				array_intersect((array) $formatter->getCustomAddFields(), (array) $apiAccess['view'])
 			);
 			if($formatter->getCustomFields()) {
 				$formatter->setCustomFields(
-					array_intersect((array)$formatter->getCustomFields(), (array)$apiAccess['view'])
+					array_intersect((array) $formatter->getCustomFields(), (array) $apiAccess['view'])
 				);
 			} else {
-				$formatter->setCustomFields((array)$apiAccess['view']);
+				$formatter->setCustomFields((array) $apiAccess['view']);
 			}
 			if($formatter->getCustomRelations()) {
 				$formatter->setCustomRelations(
-					array_intersect((array)$formatter->getCustomRelations(), (array)$apiAccess['view'])
+					array_intersect((array) $formatter->getCustomRelations(), (array) $apiAccess['view'])
 				);
 			} else {
-				$formatter->setCustomRelations((array)$apiAccess['view']);
+				$formatter->setCustomRelations((array) $apiAccess['view']);
 			}
 
 		}
 
 		// set relation depth
 		$relationDepth = $this->request->getVar('relationdepth');
-		if(is_numeric($relationDepth)) $formatter->relationDepth = (int)$relationDepth;
+		if(is_numeric($relationDepth)) $formatter->relationDepth = (int) $relationDepth;
 
 		return $formatter;
 	}
@@ -571,7 +571,7 @@ class RestfulServer extends Controller {
 	protected function getAllowedRelations($class, $member = null) {
 		$allowedRelations = array();
 		$obj = singleton($class);
-		$relations = (array)$obj->has_one() + (array)$obj->has_many() + (array)$obj->many_many();
+		$relations = (array) $obj->has_one() + (array) $obj->has_many() + (array) $obj->many_many();
 		if($relations) foreach($relations as $relName => $relClass) {
 			if(singleton($relClass)->stat('api_access')) {
 				$allowedRelations[] = $relName;
